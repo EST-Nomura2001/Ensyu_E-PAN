@@ -16,8 +16,9 @@ namespace Ensyu_E_PAN.Models.Acounts
         [StringLength(100)]
         public string Name { get; set; }//名前
 
-        [ForeignKey("Roll")]
         public int Roll_CD { get; set; }//Roll_ListのIDと紐づけ
+
+        [ForeignKey("Roll_CD")]
         public Roll Roll { get; set; }//リレーション用　Roll_Lists
 
 
@@ -25,9 +26,9 @@ namespace Ensyu_E_PAN.Models.Acounts
         [StringLength(100)]
         public string Password { get; set; }//パスワード
         [Range(0,int.MaxValue)]
-        public int TimePrice { get; set; }//時給
+        public int TimePrice_D { get; set; }//日中の時給
 
         [Range(0, int.MaxValue)]
-        public int TimePrice_N { get; set; }//深夜料金
+        public int TimePrice_N { get; set; }//夜間の時給
     }
 }

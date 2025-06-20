@@ -1,0 +1,6 @@
+@Ensyu_E_PAN_HostAddress = http://localhost:5011
+
+GET {{Ensyu_E_PAN_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -4,6 +4,7 @@ import LoginPageView from '../views/LoginPageView.vue'
 import AdminView from '../views/AdminView.vue'
 import EmployeeView from '../views/EmployeeView.vue'
 import PartTimeView from '../views/PartTimeView.vue'
+import AttendanceManagement from '../views/AttendanceManagement.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,34 +44,62 @@ const router = createRouter({
       name: 'part-time',
       component: PartTimeView,
       meta: { requiresAuth: true, role: 'partTime' },
-
-    {//田村担当
+    },
+    {
+      path: '/attendance-management',
+      name: 'attendance-management',
+      component: AttendanceManagement,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/attendance',
+      name: 'attendance',
+      component: () => import('../views/AttendanceHome.vue'), // 仮で勤怠ホームへ
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/attendance-home',
+      name: 'attendance-home',
+      component: () => import('../views/AttendanceHome.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/kibou-form',
       name: 'kibou-form',
       component: () => import('../views/KibouForm.vue'),
+      meta: { requiresAuth: true },
     },
-     {//田村担当
-      path: '/Attendance-home',
-      name: 'Attendance-home',
-      component: () => import('../views/AttendanceHome.vue'),
+    {
+      path: '/purchase-order',
+      name: 'purchase-order',
+      component: () => import('../views/PurchaseOrder.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/account',
+      name: 'account',
+      component: HomeView, // アカウント管理画面がないため仮でホームへ
+      meta: { requiresAuth: true },
     },
   ],
 })
 
 router.beforeEach((to, from, next) => {
-  const loggedInRole = sessionStorage.getItem('userRole');
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  
-  if (requiresAuth && !loggedInRole) {
-    // 認証が必要なページに、未ログインでアクセスした場合
-    next('/login');
-  } else if (requiresAuth && to.meta.role && to.meta.role !== loggedInRole) {
-    // 必要な権限と、実際の権限が異なる場合
-    // とりあえずログインページにリダイレクトするが、権限エラーページなどを作っても良い
-    next('/login');
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+  const isAuthenticated = localStorage.getItem('token') // または他の認証状態の確認方法
+  const userRole = localStorage.getItem('role') // ユーザーの役割
+
+  if (requiresAuth && !isAuthenticated) {
+    next('/login')
+  } else if (isAuthenticated && to.name === 'login') {
+    // ログインしているユーザーがログインページにアクセスしようとした場合
+    next('/') // ホームにリダイレクト
+  } else if (requiresAuth && to.meta.role && to.meta.role !== userRole) {
+    // 必要な役割があるルートで、ユーザーの役割が一致しない場合
+    next('/') // またはアクセス拒否ページへリダイレクト
   } else {
-    next();
+    next()
   }
-});
+})
 
 export default router

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Ensyu_E_PAN.Models.Order;
 
 namespace Ensyu_E_PAN.Models.Masters
 {
@@ -27,5 +28,6 @@ namespace Ensyu_E_PAN.Models.Masters
         public string Mail { get; set; }
 
         public ICollection<User> Users { get; set; }
+        public ICollection<PurchaseOrder> PurchaseOrders { get; set; }
     }
 }

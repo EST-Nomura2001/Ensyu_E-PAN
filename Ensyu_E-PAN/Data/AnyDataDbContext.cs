@@ -45,15 +45,41 @@ namespace Ensyu_E_PAN.Data
                 .HasForeignKey(u => u.Stores_Cd);
 
             // ===== Attendance 関連 =====
-            modelBuilder.Entity<UserDateShift>()
-                .HasOne<UserShift>()
+            modelBuilder.Entity<UserShift>()
+                .HasOne(us => us.User)
                 .WithMany()
-                .HasForeignKey(uds => uds.User_Shift_Id);
+                .HasForeignKey(us => us.User_Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<UserDateShift>()
-                .HasOne<DateSchedule>()
+            modelBuilder.Entity<UserShift>()
+                .HasOne(us => us.AllShift)
                 .WithMany()
-                .HasForeignKey(uds => uds.Date_Schedule_Id);
+                .HasForeignKey(us => us.Shift_Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DayShift>()
+                .HasOne(ds => ds.AllShift)
+                .WithMany()
+                .HasForeignKey(ds => ds.All_Shift_Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DateSchedule>()
+                .HasOne(ds => ds.User)
+                .WithMany()
+                .HasForeignKey(ds => ds.User_Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DateSchedule>()
+                .HasOne(ds => ds.WorkRoll)
+                .WithMany()
+                .HasForeignKey(ds => ds.Work_Roll_Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DateSchedule>()
+                .HasOne(ds => ds.DayShift)
+                .WithMany(d => d.DateSchedules)
+                .HasForeignKey(ds => ds.Day_Shift_Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // ===== Order 関連 =====
             modelBuilder.Entity<OrderItemList>()

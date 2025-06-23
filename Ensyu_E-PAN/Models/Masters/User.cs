@@ -37,5 +37,6 @@ namespace Ensyu_E_PAN.Models.Masters
         public Roll Roll { get; set; }
         public Store Store { get; set; }
         public ICollection<UserShift> UserShifts { get; set; }
+        public ICollection<DateSchedule> DateSchedules { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Ensyu_E_PAN.Models.Attendance;
 
 namespace Ensyu_E_PAN.Models.Masters
 {
@@ -9,6 +10,6 @@ namespace Ensyu_E_PAN.Models.Masters
 
         [Required]
         public string Name { get; set; }
-        public ICollection<WorkRoll> WorkRolls { get; set; }
+        public ICollection<DateSchedule> DateSchedules { get; set; }
     }
 }

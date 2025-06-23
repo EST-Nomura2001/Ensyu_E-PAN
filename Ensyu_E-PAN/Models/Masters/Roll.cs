@@ -12,6 +12,6 @@ namespace Ensyu_E_PAN.Models.Masters
         public string Name { get; set; }
 
         //ナビゲーションプロパティ
-        ICollection<User> Users;
+        public ICollection<User> Users { get; set; }
     }
 }

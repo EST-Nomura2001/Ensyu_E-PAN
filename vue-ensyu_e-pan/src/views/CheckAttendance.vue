@@ -55,7 +55,8 @@
 </style>
 
 <template>
-  <h1>シフト調整</h1>
+  <h1>シフト確認</h1>
+  
   <div v-if="loading">データを読み込み中...</div>
   <div v-if="apiError">{{ apiError }}</div>
 
@@ -65,8 +66,10 @@
       <h2>{{ formattedDate }}</h2>
       <button @click="changeDay(1)">次の日へ</button>
     </div>
-    <p>{{ storeName }}</p>
-
+    <div>
+      <p>{{ storeName }}</p>
+      <p>ステータス：保存済み <button @click="goToMakeAttendance">編集ページへ</button></p>　<!--日付をクエリパラメータで編集ページに送っている-->
+    </div>
     <table id="timeTable">
       <thead>
         <tr>
@@ -80,57 +83,36 @@
       </thead>
       <tbody>
         <template v-for="(schedule, index) in schedules" :key="schedule.scheduleId">
-          <tr><!--上段: 希望シフト-->
-            <th class="event-col" rowspan="2">
+          <tr>
+            <th class="event-col">
               {{ schedule.userName }}
             </th>
-            <td rowspan="2">¥{{ schedule.hourlyWage }}</td>
-            <td rowspan="2"><input type="text" v-model="schedule.workRollName"></td>
-            <td>{{ schedule.hopeStart }}</td>
-            <td>{{ schedule.hopeEnd }}</td>
-            <template v-for="(cell, cellIndex) in calculateRow(schedule.hopeStart, schedule.hopeEnd)" :key="cellIndex">
-              <td v-if="cell.type === 'event'" :colspan="cell.colspan" class="event-block">希望</td>
-              <td v-if="cell.type === 'empty'" class="empty">&nbsp;</td>
-            </template>
-          </tr>
-          <tr><!--下段: 予定シフト-->
-            <td>
-              <input type="time" v-model="schedule.plannedStart">
-              <div v-if="errors[index]?.start" class="error-message">{{ errors[index].start }}</div>
-            </td>
-            <td>
-              <input type="time" v-model="schedule.plannedEnd">
-              <div v-if="errors[index]?.end" class="error-message">{{ errors[index].end }}</div>
-            </td>
+            <td >¥{{ schedule.hourlyWage }}</td>
+            <td >{{ schedule.workRollName }}</td>
+            <td>{{ schedule.plannedStart }}</td>
+            <td>{{ schedule.plannedEnd }}</td>
             <template v-for="(cell, cellIndex) in calculateRow(schedule.plannedStart, schedule.plannedEnd)" :key="cellIndex">
-              <td v-if="cell.type === 'event'" :colspan="cell.colspan" class="event-block">予定</td>
+              <td v-if="cell.type === 'event'" :colspan="cell.colspan" class="event-block">&nbsp;</td>
               <td v-if="cell.type === 'empty'" class="empty">&nbsp;</td>
             </template>
           </tr>
         </template>
       </tbody>
     </table>
-    <div style="text-align: right; margin-top: 1rem;">
-      <button @click="saveChanges" :disabled="!isDirty">保存</button>
-    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
-import { getShiftsByDate, updateSchedulesBulk } from '../services/api.js';
-import { isEqual } from 'lodash-es';
-import { useRoute } from 'vue-router';
+import { ref, computed, onMounted } from 'vue';
+import { getShiftsByDate } from '../services/api.js';
+import { useRouter } from 'vue-router';
 
-const route = useRoute();
+const router = useRouter();
 
 // --- State ---
 const currentDate = ref(new Date());
 const storeName = ref('');
 const schedules = ref([]);
-const originalSchedules = ref([]); // To track changes
-const isDirty = ref(false); // To track unsaved changes
-const errors = ref([]);
 const loading = ref(true);
 const apiError = ref(null);
 
@@ -217,9 +199,7 @@ const fetchShifts = async (date) => {
     const data = await getShiftsByDate(date);
     const filteredSchedules = data.schedules.filter(s => s.hopeStart || s.plannedStart);
     schedules.value = JSON.parse(JSON.stringify(filteredSchedules));
-    originalSchedules.value = JSON.parse(JSON.stringify(filteredSchedules));
     storeName.value = data.storeName;
-    isDirty.value = false;
   } catch (error) {
     apiError.value = 'シフトデータの読み込みに失敗しました。';
     console.error(error);
@@ -229,63 +209,23 @@ const fetchShifts = async (date) => {
 };
 
 const changeDay = (days) => {
-  if (isDirty.value) {
-    if (!window.confirm("内容が保存されていません。ページを移動しますか？")) {
-      return; // Stop navigation if user cancels
-    }
-  }
   const newDate = new Date(currentDate.value);
   newDate.setDate(newDate.getDate() + days);
   currentDate.value = newDate;
   fetchShifts(currentDate.value);
 };
 
-const saveChanges = async () => {
-  try {
-    await updateSchedulesBulk(schedules.value);
-    originalSchedules.value = JSON.parse(JSON.stringify(schedules.value));
-    isDirty.value = false;
-    alert('保存しました。');
-  } catch (error) {
-    alert('保存に失敗しました。');
-    console.error('Failed to save changes:', error);
-  }
+const goToMakeAttendance = () => {
+  const yyyy = currentDate.value.getFullYear();
+  const mm = String(currentDate.value.getMonth() + 1).padStart(2, '0');
+  const dd = String(currentDate.value.getDate()).padStart(2, '0');
+  const dateString = `${yyyy}-${mm}-${dd}`;
+  router.push({ name: 'Make-Attendance', query: { date: dateString } });
 };
-
-// --- Watchers ---
-watch(schedules, (newSchedules) => {
-  // Input validation
-  errors.value = newSchedules.map(schedule => {
-    const eventErrors = { start: null, end: null };
-    const startMin = getMinutes(schedule.plannedStart);
-    const endMin = getMinutes(schedule.plannedEnd);
-    const minStart = getMinutes(`${String(startHour).padStart(2, '0')}:00`);
-    if (startMin !== -1 && startMin < minStart) {
-      eventErrors.start = `${startHour}:00以降にしてください。`;
-    }
-    if (startMin !== -1 && endMin !== -1 && startMin >= endMin) {
-      eventErrors.end = '退勤は出勤より後にしてください。';
-    }
-    return eventErrors;
-  });
-
-  // Set dirty flag if data has changed from original
-  if (originalSchedules.value.length > 0) {
-    isDirty.value = !isEqual(newSchedules, originalSchedules.value);
-  }
-
-}, { deep: true });
 
 // --- Lifecycle Hooks ---
 onMounted(() => {
-  const dateFromQuery = route.query.date;
-  if (dateFromQuery) {
-    // タイムゾーンのずれを考慮してパースする
-    const [year, month, day] = dateFromQuery.split('-').map(Number);
-    currentDate.value = new Date(year, month - 1, day);
-  } else {
-    currentDate.value = new Date(); // Fallback to current date
-  }
+  currentDate.value = new Date(2024, 5, 23); // For consistent mock data
   fetchShifts(currentDate.value);
 });
 </script>

@@ -18,6 +18,7 @@ import HelloWorld from './components/HelloWorld.vue'
         <RouterLink to="/kibou-form">希望フォーム</RouterLink>
         <RouterLink to="/Attendance-home">勤怠ホーム</RouterLink>
         <RouterLink to="/Make-Attendance">シフト調整</RouterLink>
+        <RouterLink to="/Check-Attendance">シフト確認</RouterLink>
 
         
         

@@ -86,6 +86,11 @@ const router = createRouter({
       name: 'Make-Attendance',
       component: () => import('../views/MakeAttendance.vue'),
     },
+    {//田村担当
+      path: '/Check-Attendance',
+      name: 'Check-Attendance',
+      component: () => import('../views/CheckAttendance.vue'),
+    },
   ],
 })
 

@@ -9,5 +9,6 @@ namespace Ensyu_E_PAN.Models.Masters
 
         [Required]
         public string Name { get; set; }
+        public ICollection<WorkRoll> WorkRolls { get; set; }
     }
 }

@@ -13,6 +13,5 @@ namespace Ensyu_E_PAN.Models.Masters
 
         //ナビゲーションプロパティ
         ICollection<User> Users;
-        ICollection<WorkRoll> WorkRolls;
     }
 }

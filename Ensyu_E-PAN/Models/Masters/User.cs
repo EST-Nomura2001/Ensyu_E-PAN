@@ -36,5 +36,6 @@ namespace Ensyu_E_PAN.Models.Masters
         // ナビゲーションプロパティ（必要に応じて）
         public Roll Roll { get; set; }
         public Store Store { get; set; }
+        public ICollection<UserShift> UserShifts { get; set; }
     }
 }

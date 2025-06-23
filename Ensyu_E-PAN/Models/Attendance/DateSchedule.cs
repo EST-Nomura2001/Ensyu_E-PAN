@@ -53,6 +53,7 @@ namespace Ensyu_E_PAN.Models.Attendance
         public User User { get; set; }
         public WorkRoll WorkRoll { get; set; }
         public DayShift DayShift { get; set; }
+        public ICollection<UserDateShift> UserDateShifts { get; set; }  
 
 
     }

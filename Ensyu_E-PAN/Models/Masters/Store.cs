@@ -26,5 +26,6 @@ namespace Ensyu_E_PAN.Models.Masters
 
         public string Mail { get; set; }
 
+        public ICollection<User> Users { get; set; }
     }
 }

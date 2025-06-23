@@ -16,9 +16,6 @@ namespace Ensyu_E_PAN.Models.Attendance
         public int All_Shift_Id { get; set; }
 
         [Required]
-        public int Cost { get; set; }
-
-        [Required]
         public TimeSpan Sum_WorkTime { get; set; }
 
         [Required]

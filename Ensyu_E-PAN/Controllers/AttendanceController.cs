@@ -19,9 +19,16 @@ namespace Ensyu_E_PAN.Controllers
         }
 
         [HttpGet("{today}")]
-        public IActionResult GetGetTodayAttendance()
+        public async Task<IActionResult> GetTodayAttendance(DateTime today)
         {
+            var records = await _context.Date_Schedules
+             .Where(ds => ds.Today == today) // カラム名は設計に合わせて変更
+                            .Include(ds => ds.User)
+             .Include(ds => ds.WorkRoll)
+             .Include(ds => ds.DayShift)
+             .ToListAsync();
 
+            return Ok(records);
         }
 
         /*[HttpGet("today")]

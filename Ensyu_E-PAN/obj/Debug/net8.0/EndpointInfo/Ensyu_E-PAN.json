@@ -4,6 +4,30 @@
     "title": "Ensyu_E-PAN",
     "version": "1.0"
   },
-  "paths": { },
+  "paths": {
+    "/api/Attendance/{today}": {
+      "get": {
+        "tags": [
+          "Attendance"
+        ],
+        "parameters": [
+          {
+            "name": "today",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
   "components": { }
 }

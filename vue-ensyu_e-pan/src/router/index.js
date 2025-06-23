@@ -91,6 +91,11 @@ const router = createRouter({
       name: 'Check-Attendance',
       component: () => import('../views/CheckAttendance.vue'),
     },
+     {//田村担当
+      path: '/Record-Attendance',
+      name: 'Record-Attendance',
+      component: () => import('../views/RecordAttendance.vue'),
+    },
   ],
 })
 

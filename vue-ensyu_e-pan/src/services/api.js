@@ -60,4 +60,22 @@ export const getUserInfo = (userId) => {
     // バックエンド側で、USERSテーブルから該当ユーザーの情報を取得します。
     // GET /api/users/{userId}
     return apiClient.get(`/users/${userId}`);
+};
+
+/**
+ * @description 月次シフトの一覧を取得します。
+ * @returns {Promise<Array>} 月次シフト情報の配列
+ */
+export const getAttendanceData = () => {
+    return apiClient.get('/AttendanceHome');
+};
+
+/**
+ * @description 月次シフト情報を更新します。
+ * @param {number} id 更新対象のシフトID
+ * @param {Object} data 更新するデータ (例: { fixedDate: '...' } or { recFlg: ... })
+ * @returns {Promise<Object>} 更新後の月次シフト情報
+ */
+export const updateAttendanceData = (id, data) => {
+    return apiClient.patch(`/AttendanceHome/${id}`, data);
 }; 

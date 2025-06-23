@@ -22,6 +22,11 @@ const router = createRouter({
       name: 'kibou-form',
       component: () => import('../views/KibouForm.vue'),
     },
+     {//田村担当
+      path: '/Attendance-home',
+      name: 'Attendance-home',
+      component: () => import('../views/AttendanceHome.vue'),
+    },
   ],
 })
 

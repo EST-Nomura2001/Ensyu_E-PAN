@@ -23,6 +23,7 @@ namespace Ensyu_E_PAN.Models.Attendance
 
         // ナビゲーションプロパティ（必要に応じて）
         public AllShift AllShift { get; set; }
+        public ICollection<DateSchedule> DateSchedules { get; set; }
 
     }
 }

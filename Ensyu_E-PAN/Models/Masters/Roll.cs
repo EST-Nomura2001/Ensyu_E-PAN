@@ -10,5 +10,9 @@ namespace Ensyu_E_PAN.Models.Masters
 
         [Required]
         public string Name { get; set; }
+
+        //ナビゲーションプロパティ
+        ICollection<User> Users;
+        ICollection<WorkRoll> WorkRolls;
     }
 }

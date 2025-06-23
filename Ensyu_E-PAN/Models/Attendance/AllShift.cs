@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ensyu_E_PAN.Models.Attendance
@@ -30,5 +31,8 @@ namespace Ensyu_E_PAN.Models.Attendance
         [Required]
         public bool Rec_Flg { get; set; }//シフト希望収集中フラグ
 
+        //ナビゲーション
+        public ICollection<DayShift> DayShifts { get; set; }
+        public ICollection<UserShift> UserShifts { get; set; }
     }
 }

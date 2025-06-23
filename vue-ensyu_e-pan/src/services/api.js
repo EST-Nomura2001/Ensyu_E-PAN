@@ -11,6 +11,8 @@ const apiClient = axios.create({
   },
 });
 
+const API_BASE_URL = 'http://localhost:5000/api'; // ASP.NET Web API or Node.js server address
+
 /**
  * @description シフト希望を募集中の年月と提出期限を取得します。
  * @returns {Promise<Object>} { year, month, deadline } を含むPromiseオブジェクト
@@ -78,4 +80,127 @@ export const getAttendanceData = () => {
  */
 export const updateAttendanceData = (id, data) => {
     return apiClient.patch(`/AttendanceHome/${id}`, data);
-}; 
+};
+
+/**
+ * @description 指定したIDの店舗情報を取得します。
+ * @param {number} storeId 店舗ID
+ * @returns {Promise<Object>} 店舗情報
+ */
+export const getStoreInfo = (storeId) => {
+    return apiClient.get(`/stores/${storeId}`);
+};
+
+/**
+ * 指定された日付のシフトデータを取得します。
+ * @param {Date} date - 取得するシフトの日付
+ * @returns {Promise<Object>} - 店舗名とスケジュールリストを含むオブジェクト
+ */
+export async function getShiftsByDate(date) {
+  const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD
+  try {
+    const response = await fetch(`${API_BASE_URL}/shifts/${dateString}`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching shift data:', error);
+    // In a real app, you'd want to show a user-friendly error
+    // For now, returning mock data to allow UI development
+    return getMockShiftData(date);
+  }
+}
+
+/**
+ * スケジュールを更新します。
+ * @param {number} scheduleId - 更新するスケジュールのID (DATE_SCHEDULES.ID)
+ * @param {Object} data - 更新するデータ { workRollName, plannedStart, plannedEnd }
+ * @returns {Promise<Object>} - 更新されたスケジュールオブジェクト
+ */
+export async function updateSchedule(scheduleId, data) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/schedules/${scheduleId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating schedule:', error);
+    throw error;
+  }
+}
+
+/**
+ * 複数のスケジュールを一括で更新します。
+ * @param {Array<Object>} schedules - 更新するスケジュールの配列
+ * @returns {Promise<Object>} - 更新結果
+ */
+export async function updateSchedulesBulk(schedules) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/schedules/bulk`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(schedules),
+    });
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error bulk updating schedules:', error);
+    // In a real app, you'd want to show a user-friendly error
+    throw error;
+  }
+}
+
+// --- Mock Data for UI Development ---
+// This part should be removed when the backend API is ready.
+function getMockShiftData(date) {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+
+    return {
+        storeName: `〇〇店`,
+        schedules: [
+            {
+                scheduleId: 101,
+                userName: "田中 太郎",
+                hourlyWage: 1200,
+                workRollName: "レジ",
+                hopeStart: "10:00",
+                hopeEnd: "14:30",
+                plannedStart: "10:00",
+                plannedEnd: "11:30"
+            },
+            {
+                scheduleId: 102,
+                userName: "鈴木 花子",
+                hourlyWage: 1150,
+                workRollName: "品出し",
+                hopeStart: "12:00",
+                hopeEnd: "15:00",
+                plannedStart: "13:00",
+                plannedEnd: "14:00"
+            },
+            {
+                scheduleId: 103,
+                userName: "佐藤 次郎",
+                hourlyWage: 1250,
+                workRollName: "清掃",
+                hopeStart: "14:00",
+                hopeEnd: "17:00",
+                plannedStart: "15:00",
+                plannedEnd: "16:30"
+            },
+        ]
+    }
+} 

@@ -81,6 +81,11 @@ const router = createRouter({
       component: HomeView, // アカウント管理画面がないため仮でホームへ
       meta: { requiresAuth: true },
     },
+     {//田村担当
+      path: '/Make-Attendance',
+      name: 'Make-Attendance',
+      component: () => import('../views/MakeAttendance.vue'),
+    },
   ],
 })
 

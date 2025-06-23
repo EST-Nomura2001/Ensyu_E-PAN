@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import CommonHeader from '@/components/CommonHeader.vue';
 
 const apiClient = axios.create({
   baseURL: 'https://localhost:7017/api', // 仮のバックエンドAPIのURL
@@ -81,6 +82,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <CommonHeader />
   <div id="adminPage" class="container page">
     <h2>管理者ページ</h2>
     <p>ようこそ、{{ loggedInUserName }}さん (管理者)！</p>
@@ -95,6 +97,10 @@ onMounted(() => {
     <button @click="registerUser">登録</button>
     <p v-if="registerMsg" class="message" :class="{ success: registerMsgIsSuccess }">{{ registerMsg }}</p>
 
+    <router-link to="/attendance-management" custom v-slot="{ navigate }">
+      <button @click="navigate" role="link" class="nav-button">勤怠管理ページへ</button>
+    </router-link>
+
     <h3>登録済みユーザー一覧</h3>
     <div class="user-list">
       <p v-if="userList.length === 0">現在登録されているユーザーはいません。</p>
@@ -107,7 +113,7 @@ onMounted(() => {
 
 <style scoped>
 .container {
-  max-width: 500px;
+  max-width: 800px;
   margin: 2rem auto;
   padding: 2rem;
   border: 1px solid #ccc;
@@ -163,5 +169,14 @@ button:hover {
     margin-top: 1.5rem;
     padding-top: 1rem;
     border-top: 1px solid #eee;
+}
+
+.nav-button {
+    background-color: #28a745;
+    margin-top: 1rem;
+}
+
+.nav-button:hover {
+    background-color: #218838;
 }
 </style> 

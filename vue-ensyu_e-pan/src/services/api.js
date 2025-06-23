@@ -78,4 +78,13 @@ export const getAttendanceData = () => {
  */
 export const updateAttendanceData = (id, data) => {
     return apiClient.patch(`/AttendanceHome/${id}`, data);
+};
+
+/**
+ * @description 指定したIDの店舗情報を取得します。
+ * @param {number} storeId 店舗ID
+ * @returns {Promise<Object>} 店舗情報
+ */
+export const getStoreInfo = (storeId) => {
+    return apiClient.get(`/stores/${storeId}`);
 }; 

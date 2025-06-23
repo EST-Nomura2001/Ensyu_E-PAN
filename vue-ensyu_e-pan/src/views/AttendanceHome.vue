@@ -2,7 +2,7 @@
 <template>
   <div class="attendance-home">
     <div class="header">
-      <h1>〇〇店</h1>
+      <h1>{{ storeName }}</h1>
       <button>新規作成</button>
     </div>
     <table>
@@ -46,15 +46,35 @@
 </template>
 
 <script>
-import { getAttendanceData, updateAttendanceData } from '@/services/api';
+import { getAttendanceData, updateAttendanceData, getUserInfo, getStoreInfo } from '@/services/api';
 
 export default {
   data() {
     return {
       shifts: [], // APIから取得したデータを格納
+      storeName: '〇〇店', // 初期値
     };
   },
   methods: {
+    async fetchInitialData() {
+      await this.fetchShifts();
+      await this.fetchStoreName();
+    },
+    async fetchStoreName() {
+      try {
+        // TODO: 実際のログインユーザーIDを使用するように変更
+        const userId = 1; 
+        const userInfoResponse = await getUserInfo(userId);
+        const storeId = userInfoResponse.data.storesCd; // STORES_CD に対応
+        if (storeId) {
+          const storeInfoResponse = await getStoreInfo(storeId);
+          this.storeName = storeInfoResponse.data.c_name;
+        }
+      } catch (error) {
+        console.error('店舗名の取得に失敗しました。', error);
+        this.storeName = '店舗名取得エラー';
+      }
+    },
     async fetchShifts() {
       try {
         const response = await getAttendanceData();
@@ -112,7 +132,7 @@ export default {
     }
   },
   created() {
-    this.fetchShifts();
+    this.fetchInitialData();
   }
 };
 </script>

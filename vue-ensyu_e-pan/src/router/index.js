@@ -43,6 +43,16 @@ const router = createRouter({
       name: 'part-time',
       component: PartTimeView,
       meta: { requiresAuth: true, role: 'partTime' },
+
+    {//田村担当
+      path: '/kibou-form',
+      name: 'kibou-form',
+      component: () => import('../views/KibouForm.vue'),
+    },
+     {//田村担当
+      path: '/Attendance-home',
+      name: 'Attendance-home',
+      component: () => import('../views/AttendanceHome.vue'),
     },
   ],
 })

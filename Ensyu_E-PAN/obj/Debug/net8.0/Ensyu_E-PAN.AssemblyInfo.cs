@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Ensyu_E-PAN")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e7c6137e85a07438f4e1e20c0540b6acd1eeb74b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+07558845344b1db478fd79541b3b0409c6acedc8")]
 [assembly: System.Reflection.AssemblyProductAttribute("Ensyu_E-PAN")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Ensyu_E-PAN")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

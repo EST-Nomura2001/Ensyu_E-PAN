@@ -7,27 +7,28 @@ namespace Ensyu_E_PAN.Models.Attendance
     {
 
         [Key]
-        public int Id { get; set; } // 月別シフトID（主キー）
+        public int Id { get; set; }
 
-        [Required]
-        public DateTime Date { get; set; } // 年月（yyyy-MM）
+        [Required]
+        public DateTime Date { get; set; }//年月
 
-        [Required]
-        public bool ConfirmFlg { get; set; } // シフト確定フラグ
+        [Required]
+        public bool Confirm_Flg { get; set; }//シフト確定フラグ
 
-        public DateTime FixedDate { get; set; } // シフト確定期日
+        [Required]
+        public DateTime Fixed_Date { get; set; }//シフト確定期日
 
-        public bool SendingFlg { get; set; } // 本部への送付フラグ
+        [Required]
+        public bool Sending_Flg { get; set; }//本部への送付フラグ
 
-        public int Cost { get; set; } // 人件費合計（初期値: 0）
+        [Required]
+        public int Cost { get; set; }//人件費
 
-        public TimeSpan SumWorkTime { get; set; } // 総労働時間（TimeSpan型）
+        [Required]
+        public TimeSpan Sum_WorkTime { get; set; }//各従業員の労働時間計
 
-        public bool RecFlg { get; set; } // シフト希望収集中フラグ（TRUE＝受付中）
-
-        // ナビゲーションプロパティ（必要に応じて）
-        // public ICollection<UserShift> UserShifts { get; set; }
-        // public ICollection<DayShift> DayShifts { get; set; }
+        [Required]
+        public bool Rec_Flg { get; set; }//シフト希望収集中フラグ
 
     }
 }

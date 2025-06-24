@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "ContainingType": "Ensyu_E_PAN.Controllers.AttendanceController",
+    "Method": "GetTodayAttendance",
+    "RelativePath": "api/Attendance/{today}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "today",
+        "Type": "System.DateTime",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

@@ -1,7 +1,11 @@
 <template>
   <div>
     <h1>勤怠実績確認</h1>
-    <h2>{{ yearMonth }}</h2>
+    <div class="attendance-table-controls" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center;">
+      <button @click="changeMonth(-1)">前の月へ</button>
+      <h2>{{ yearMonth }}</h2>
+      <button @click="changeMonth(1)">次の月へ</button>
+    </div>
     <p>{{ storeName }}</p>
     <p>ステータス：{{ status === true ? '送付済み' : '未提出' }}</p>
     <p>日付をクリックすると、詳細の確認・修正が可能です。</p>
@@ -124,6 +128,40 @@ export default {
     this.totalCost = data.totalCost; // ALL_SHIFTS.COST
   },
   methods: {
+    async changeMonth(diff) {
+      // yearMonth: 'YYYY年M月' or 'YYYY-MM' どちらでも対応
+      let y, m;
+      if (this.yearMonth.includes('年')) {
+        // 表示用（例: 2025年6月）
+        const match = this.yearMonth.match(/(\d{4})年(\d{1,2})月/);
+        y = parseInt(match[1]);
+        m = parseInt(match[2]);
+      } else {
+        // API用（例: 2025-06）
+        const match = this.yearMonth.match(/(\d{4})-(\d{1,2})/);
+        y = parseInt(match[1]);
+        m = parseInt(match[2]);
+      }
+      m += diff;
+      if (m < 1) { y--; m = 12; }
+      if (m > 12) { y++; m = 1; }
+      const newYearMonth = `${y}-${m.toString().padStart(2, '0')}`;
+      // storeIdは仮で1固定（必要に応じてstoreIdをdata等で管理）
+      const storeId = 1;
+      let data;
+      try {
+        data = await fetchAttendanceData({ storeId, yearMonth: newYearMonth });
+      } catch (e) {
+        data = this.staticDemoData;
+      }
+      this.status = data.status;
+      this.storeName = data.storeName;
+      this.yearMonth = data.yearMonth;
+      this.days = data.days;
+      this.users = data.users;
+      this.totalWorkTime = data.totalWorkTime;
+      this.totalCost = data.totalCost;
+    },
     onExport() {
       // 今は空
     }

@@ -114,7 +114,7 @@
 </style>
 
 <template>
-  <h1>シフト確認</h1>
+  <h1>シフト閲覧</h1>
   
   <div v-if="loading">データを読み込み中...</div>
   <div v-if="apiError">{{ apiError }}</div>

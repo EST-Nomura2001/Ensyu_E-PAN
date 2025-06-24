@@ -9,12 +9,12 @@ import AttendanceManagement from '../views/AttendanceManagement.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
+    { //ホーム（デフォルトのVue機能）
       path: '/',
       name: 'home',
       component: HomeView,
     },
-    {
+    { //アバウト（デフォルトのVue機能）
       path: '/about',
       name: 'about',
       // route level code-splitting
@@ -22,76 +22,70 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
     },
-    {
+    { //ログイン表示
       path: '/login',
       name: 'login',
       component: LoginPageView,
     },
-    {
+    { //アドミン。アカウント管理。社員一覧と新規登録
       path: '/admin',
       name: 'admin',
       component: AdminView,
-      meta: { requiresAuth: true, role: 'admin' },
+      // meta: { requiresAuth: true, role: 'admin' },　ログイン機能
     },
-    {
+    { //？？？
       path: '/employee',
       name: 'employee',
       component: EmployeeView,
-      meta: { requiresAuth: true, role: 'employee' },
+      // meta: { requiresAuth: true, role: 'employee' },  ログイン機能
     },
-    {
+    { ///???
       path: '/part-time',
       name: 'part-time',
       component: PartTimeView,
-      meta: { requiresAuth: true, role: 'partTime' },
+      // meta: { requiresAuth: true, role: 'partTime' }, ログイン機能
     },
-    {
+    { //勤怠登録（当日）
       path: '/attendance-management',
       name: 'attendance-management',
       component: AttendanceManagement,
-      meta: { requiresAuth: true },
+      // meta: { requiresAuth: true },　ログイン機能
     },
-    {
-      path: '/attendance',
-      name: 'attendance',
-      component: () => import('../views/AttendanceHome.vue'), // 仮で勤怠ホームへ
-      meta: { requiresAuth: true },
-    },
-    {
+    { //勤怠ホーム
       path: '/attendance-home',
       name: 'attendance-home',
       component: () => import('../views/AttendanceHome.vue'),
-      meta: { requiresAuth: true },
+      // meta: { requiresAuth: true },  ログイン機能
     },
-    {
+    { //シフト希望提出フォーム
       path: '/kibou-form',
       name: 'kibou-form',
       component: () => import('../views/KibouForm.vue'),
-      meta: { requiresAuth: true },
+      // meta: { requiresAuth: true },　　ログイン機能
     },
-    {
+    { //
       path: '/purchase-order',
       name: 'purchase-order',
       component: () => import('../views/PurchaseOrder.vue'),
-      meta: { requiresAuth: true },
+      // meta: { requiresAuth: true }, ログイン機能
     },
-    {
+    { //未整備？
       path: '/account',
       name: 'account',
       component: HomeView, // アカウント管理画面がないため仮でホームへ
-      meta: { requiresAuth: true },
+      // meta: { requiresAuth: true },  ログイン機能
     },
-     {//田村担当
+     {//シフト調整フォーム
       path: '/Make-Attendance',
       name: 'Make-Attendance',
       component: () => import('../views/MakeAttendance.vue'),
     },
-    {//田村担当
+    {//シフト閲覧機能
       path: '/Check-Attendance',
       name: 'Check-Attendance',
       component: () => import('../views/CheckAttendance.vue'),
     },
-     {//田村担当
+     {//勤怠実績一覧
       path: '/Record-Attendance',
       name: 'Record-Attendance',
       component: () => import('../views/RecordAttendance.vue'),

@@ -5,6 +5,7 @@ using System;
 using Ensyu_E_PAN.Data;
 using Ensyu_E_PAN.Models.Attendance;
 using Ensyu_E_PAN.Services;
+using Ensyu_E_PAN.DTOs;
 using Microsoft.EntityFrameworkCore; // Includeメソッドのため
 
 namespace Ensyu_E_PAN.Controllers
@@ -213,14 +214,16 @@ namespace Ensyu_E_PAN.Controllers
         //Put処理
         [HttpPut("users/{userId}/schedules/{scheduleId}")]
         public async Task<IActionResult> UpdateUserDateSchedule(int userId, int scheduleId,
-            [FromBody] DateSchedule updatedSchedule)
+            [FromBody] UpdateDateScheduleDto dto)
+
         {
-            if (userId != updatedSchedule.User_Id || scheduleId != updatedSchedule.Id)
+            if (userId != dto.User_Id || scheduleId != dto.Id)
             {
                 return BadRequest("パラメータと送信データの不一致があります。");
             }
 
             var schedule = await _context.Date_Schedules
+                .Include(ds => ds.UserDateShifts)
                 .FirstOrDefaultAsync(ds => ds.Id == scheduleId && ds.User_Id == userId);
 
             if (schedule == null)
@@ -229,15 +232,11 @@ namespace Ensyu_E_PAN.Controllers
             }
 
             // 更新対象フィールド
-            schedule.Work_Roll_Id = updatedSchedule.Work_Roll_Id;
-            schedule.P_Start_WorkTime = updatedSchedule.P_Start_WorkTime;
-            schedule.P_End_WorkTime = updatedSchedule.P_End_WorkTime;
-            schedule.U_Start_WorkTime = updatedSchedule.U_Start_WorkTime;
-            schedule.U_End_WorkTime = updatedSchedule.U_End_WorkTime;
-            schedule.Start_WorkTime = updatedSchedule.Start_WorkTime;
-            schedule.End_WorkTime = updatedSchedule.End_WorkTime;
-            schedule.Start_BreakTime = updatedSchedule.Start_BreakTime;
-            schedule.End_BreakTime = updatedSchedule.End_BreakTime;
+            schedule.Work_Roll_Id = dto.Work_Roll_Id;
+            schedule.Start_WorkTime = dto.Start_WorkTime;
+            schedule.End_WorkTime = dto.End_WorkTime;
+            schedule.Start_BreakTime = dto.Start_BreakTime;
+            schedule.End_BreakTime = dto.End_BreakTime;
 
             // ユーザー取得（時給など計算に必要）
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
@@ -272,13 +271,13 @@ namespace Ensyu_E_PAN.Controllers
                 .FirstOrDefaultAsync(us => us.Id == link.User_Shift_Id);
             _calcService.CalculateUserShift(userShift, userSchedules);
 
-            // 必要なら全体集計も（AllShift）
+            // 全体集計（AllShift）
             var allUserShifts = await _context.User_Shifts
                 .Where(us => us.Shift_Id == userShift.Shift_Id)
                 .ToListAsync();
             var allShift = await _context.All_Shifts
                 .FirstOrDefaultAsync(a => a.Id == userShift.Shift_Id);
-
+            _calcService.CalculateAllShift(allShift, allUserShifts);
             await _context.SaveChangesAsync();
             return Ok("スケジュールを更新しました。");
         }

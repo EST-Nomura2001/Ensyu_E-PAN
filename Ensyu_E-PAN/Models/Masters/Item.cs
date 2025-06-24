@@ -12,6 +12,6 @@ namespace Ensyu_E_PAN.Models.Masters
         public string Item_Name { get; set; }
 
         //ナビゲーション
-        public ICollection<OrderItemList> OrderItemLists { get; set; }
+        public ICollection<OrderItemList>? OrderItemLists { get; set; }
     }
 }

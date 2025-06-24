@@ -90,6 +90,11 @@ const router = createRouter({
       name: 'Record-Attendance',
       component: () => import('../views/RecordAttendance.vue'),
     },
+    {//勤怠編集画面（後日）
+      path: '/Edit-Attendance',
+      name: 'Edit-Attendance',
+      component: () => import('../views/EditAttendance.vue'),
+    },
   ],
 })
 

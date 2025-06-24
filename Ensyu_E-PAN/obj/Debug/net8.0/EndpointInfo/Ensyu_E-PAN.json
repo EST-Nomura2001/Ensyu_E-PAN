@@ -5,7 +5,7 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/Attendance/{today}": {
+    "/api/Attendance/Date_Schedules/{today}": {
       "get": {
         "tags": [
           "Attendance"
@@ -18,6 +18,38 @@
             "schema": {
               "type": "string",
               "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Attendance/AllShiftSchedules/{year}/{month}": {
+      "get": {
+        "tags": [
+          "Attendance"
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],

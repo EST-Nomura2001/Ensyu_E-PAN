@@ -1,1 +1,8 @@
 .vs/
+# ビルド出力
+bin/
+obj/
+out/
+Ensyu_E-PAN/bin/
+# ログファイル
+*.log

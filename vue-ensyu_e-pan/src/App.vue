@@ -14,7 +14,14 @@ import HelloWorld from './components/HelloWorld.vue'
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
         
-        <!--田村テスト用-->
+        <!--テスト用-->
+        
+        <RouterLink to="/admin">アカウント管理・登録</RouterLink>
+        <RouterLink to="/employee">？？？</RouterLink>
+        
+        <RouterLink to="/attendance-management">勤怠登録</RouterLink>
+        <RouterLink to="/purchase-order">あ</RouterLink>
+        <RouterLink to="/admin"></RouterLink>
         <RouterLink to="/kibou-form">希望フォーム</RouterLink>
         <RouterLink to="/Attendance-home">勤怠ホーム</RouterLink>
         <RouterLink to="/Make-Attendance">シフト調整</RouterLink>

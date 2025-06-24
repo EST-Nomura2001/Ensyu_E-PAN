@@ -231,4 +231,25 @@ export async function fetchStores() {
 export async function fetchUsers({ storeId }) {
   const res = await axios.get('/api/users', { params: { storeId } });
   return res.data;
+}
+
+/**
+ * 勤怠編集画面用：指定日付・店舗の勤怠データ取得
+ * @param {string} date - 'YYYY-MM-DD' 形式
+ * @param {number} storeId
+ * @returns {Promise<Object>} 勤怠データ
+ */
+export function getAttendanceByDateStore(date, storeId) {
+  return apiClient.get(`/attendance`, { params: { date, storeId } });
+}
+
+/**
+ * 勤怠編集画面用：指定日付・店舗の勤怠データ保存
+ * @param {string} date - 'YYYY-MM-DD' 形式
+ * @param {number} storeId
+ * @param {Array<Object>} users - 編集後のユーザーデータ配列
+ * @returns {Promise<Object>} 保存結果
+ */
+export function updateAttendanceByDateStore(date, storeId, users) {
+  return apiClient.put(`/attendance/${date}/${storeId}`, { users });
 } 

@@ -4,6 +4,7 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <template>
   <header>
+
     <nav>
       
       <!--テスト用-->
@@ -22,6 +23,7 @@ import { RouterLink, RouterView } from 'vue-router'
       
       
     </nav>
+
   </header>
 
   <RouterView />

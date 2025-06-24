@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nomura\\Documents\\01_研修\\01_新人研修\\0618_チーム開発演習\\Ensyu_E-PAN\\Ensyu_E-PAN\\Ensyu_E-PAN.csproj": {}
+    "C:\\data_Tkensyu\\チーム開発\\Ensyu_E-PAN\\Ensyu_E-PAN\\Ensyu_E-PAN.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nomura\\Documents\\01_研修\\01_新人研修\\0618_チーム開発演習\\Ensyu_E-PAN\\Ensyu_E-PAN\\Ensyu_E-PAN.csproj": {
+    "C:\\data_Tkensyu\\チーム開発\\Ensyu_E-PAN\\Ensyu_E-PAN\\Ensyu_E-PAN.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nomura\\Documents\\01_研修\\01_新人研修\\0618_チーム開発演習\\Ensyu_E-PAN\\Ensyu_E-PAN\\Ensyu_E-PAN.csproj",
+        "projectUniqueName": "C:\\data_Tkensyu\\チーム開発\\Ensyu_E-PAN\\Ensyu_E-PAN\\Ensyu_E-PAN.csproj",
         "projectName": "Ensyu_E-PAN",
-        "projectPath": "C:\\Users\\nomura\\Documents\\01_研修\\01_新人研修\\0618_チーム開発演習\\Ensyu_E-PAN\\Ensyu_E-PAN\\Ensyu_E-PAN.csproj",
-        "packagesPath": "C:\\Users\\nomura\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nomura\\Documents\\01_研修\\01_新人研修\\0618_チーム開発演習\\Ensyu_E-PAN\\Ensyu_E-PAN\\obj\\",
+        "projectPath": "C:\\data_Tkensyu\\チーム開発\\Ensyu_E-PAN\\Ensyu_E-PAN\\Ensyu_E-PAN.csproj",
+        "packagesPath": "C:\\Users\\Owner\\.nuget\\packages\\",
+        "outputPath": "C:\\data_Tkensyu\\チーム開発\\Ensyu_E-PAN\\Ensyu_E-PAN\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\nomura\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Owner\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -44,7 +44,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.200"
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -92,7 +92,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

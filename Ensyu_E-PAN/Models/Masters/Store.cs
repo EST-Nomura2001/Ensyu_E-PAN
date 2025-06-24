@@ -28,9 +28,11 @@ namespace Ensyu_E_PAN.Models.Masters
 
         public string Mail { get; set; }
 
-        public ICollection<User> Users { get; set; }
+        //ナビゲーション
 
-        public ICollection<AllShift> AllShifts { get; set; }
-        public ICollection<PurchaseOrder> PurchaseOrders { get; set; }
+        public ICollection<User>? Users { get; set; }
+
+        public ICollection<AllShift>? AllShifts { get; set; }
+        public ICollection<PurchaseOrder>? PurchaseOrders { get; set; }
     }
 }

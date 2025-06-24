@@ -10,6 +10,6 @@ namespace Ensyu_E_PAN.Models.Masters
 
         [Required]
         public string Name { get; set; }
-        public ICollection<DateSchedule> DateSchedules { get; set; }
+        public ICollection<DateSchedule>? DateSchedules { get; set; }
     }
 }

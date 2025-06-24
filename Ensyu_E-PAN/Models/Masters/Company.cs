@@ -26,6 +26,7 @@ namespace Ensyu_E_PAN.Models.Masters
 
         public string Mail { get; set; }
 
-        public ICollection<PurchaseOrder> PurchaseOrders { get; set; }
+        //ナビゲーション
+        public ICollection<PurchaseOrder>? PurchaseOrders { get; set; }
     }
 }

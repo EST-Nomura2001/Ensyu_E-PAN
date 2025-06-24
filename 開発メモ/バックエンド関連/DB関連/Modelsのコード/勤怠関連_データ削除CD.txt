@@ -1,0 +1,12 @@
+Delete from All_Shifts;
+Delete from Day_Shifts;
+Delete from User_Shifts;
+Delete from User_Date_Shifts;
+Delete from Date_Schedules;
+
+
+        public DbSet<AllShift> All_Shifts { get; set; }
+        public DbSet<DayShift> Day_Shifts { get; set; }
+        public DbSet<UserShift> User_Shifts { get; set; }
+        public DbSet<UserDateShift> User_Date_Shifts { get; set; }
+        public DbSet<DateSchedule> Date_Schedules { get; set; }

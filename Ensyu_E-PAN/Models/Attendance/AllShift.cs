@@ -37,8 +37,8 @@ namespace Ensyu_E_PAN.Models.Attendance
         public bool Rec_Flg { get; set; }//シフト希望収集中フラグ
 
         //ナビゲーション
-        public Store Store { get; set; }
-        public ICollection<DayShift> DayShifts { get; set; }
-        public ICollection<UserShift> UserShifts { get; set; }
+        public Store? Store { get; set; }
+        public ICollection<DayShift>? DayShifts { get; set; }
+        public ICollection<UserShift>? UserShifts { get; set; }
     }
 }

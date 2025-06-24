@@ -34,9 +34,9 @@ namespace Ensyu_E_PAN.Models.Masters
         public int TimePrice_N { get; set; }
 
         // ナビゲーションプロパティ（必要に応じて）
-        public Roll Roll { get; set; }
-        public Store Store { get; set; }
-        public ICollection<UserShift> UserShifts { get; set; }
-        public ICollection<DateSchedule> DateSchedules { get; set; }
+        public Roll? Roll { get; set; }
+        public Store? Store { get; set; }
+        public ICollection<UserShift>? UserShifts { get; set; }
+        public ICollection<DateSchedule>? DateSchedules { get; set; }
     }
 }

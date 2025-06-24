@@ -1,6 +1,5 @@
 sqlite> .mode line
-sqlite> select * from sqlite_master
-   ...> ;
+sqlite> select * from sqlite_master;
     type = table
     name = __EFMigrationsLock
 tbl_name = __EFMigrationsLock
@@ -163,7 +162,7 @@ rootpage = 16
     "Id" INTEGER NOT NULL CONSTRAINT "PK_Order_Item_Lists" PRIMARY KEY AUTOINCREMENT,
     "P_Order_List_Id" INTEGER NOT NULL,
     "Item_Cd" INTEGER NOT NULL,
-    "Amount" INTEGER NOT NULL,
+    "Amount" INTEGER NOT NULL, "Other_ItemName" TEXT NOT NULL DEFAULT '',
     CONSTRAINT "FK_Order_Item_Lists_Items_Item_Cd" FOREIGN KEY ("Item_Cd") REFERENCES "Items" ("Id") ON DELETE CASCADE,
     CONSTRAINT "FK_Order_Item_Lists_Purchase_Orders_P_Order_List_Id" FOREIGN KEY ("P_Order_List_Id") REFERENCES "Purchase_Orders" ("Id") ON DELETE CASCADE
 )

@@ -1,9 +1,10 @@
 //田村担当
 <template>
+  <CommonHeader />
   <div class="attendance-home">
     <div class="header">
       <h1>{{ storeName }}</h1>
-      <button>新規作成</button>
+      <button>翌月の新規作成</button>
     </div>
     <table>
       <thead>
@@ -11,7 +12,7 @@
           <th>月</th>
           <th>希望収集</th>
           <th>シフト提出期限</th>
-          <th>編集画面</th>
+          <th>シフト表</th>
           <th>シフト編集状態</th>
           <th>勤怠画面</th>
           <th>勤怠送付</th>
@@ -35,9 +36,9 @@
               <button @click="editDeadline(shift)">設定</button>
             </div>
           </td>
-          <td><button>編集</button></td>
+          <td>編集 / 閲覧</td>
           <td>{{ shift.confirmFlg ? '済' : '' }}</td>
-          <td><button>確認</button></td>
+          <td>閲覧</td>
           <td>{{ shift.sendingFlg ? '済' : '' }}</td>
         </tr>
       </tbody>
@@ -47,8 +48,12 @@
 
 <script>
 import { getAttendanceData, updateAttendanceData, getUserInfo, getStoreInfo } from '@/services/api';
+import CommonHeader from '../components/CommonHeader.vue';
 
 export default {
+  components: {
+    CommonHeader
+  },
   data() {
     return {
       shifts: [], // APIから取得したデータを格納

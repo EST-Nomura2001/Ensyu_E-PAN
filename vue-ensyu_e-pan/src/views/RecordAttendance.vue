@@ -1,4 +1,5 @@
 <template>
+  <CommonHeader />
   <div>
     <h1>勤怠実績確認</h1>
     <div class="attendance-table-controls" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center;">
@@ -18,7 +19,11 @@
           <th class="sticky sticky-2">時給</th>
           <th class="sticky sticky-3">項目</th>
           <th class="sticky sticky-4">合計</th>
-          <th v-for="ds in dayShifts" :key="'header-'+ds.date">{{ formatDate(ds.date) }}</th>
+          <th v-for="ds in dayShifts" :key="'header-'+ds.date">
+            <router-link :to="{ name: 'Edit-Attendance', query: { date: ds.date, storeName: storeName } }">
+              {{ formatDate(ds.date) }}
+            </router-link>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -57,6 +62,9 @@
 
 <script>
 import { fetchAttendanceData } from '../services/api';
+
+//ヘッダー用
+import CommonHeader from '../components/CommonHeader.vue';
 
 export default {
   name: "RecordAttendance",
@@ -179,7 +187,12 @@ export default {
       if (isNaN(d)) return dateStr; // パース失敗時はそのまま
       return `${d.getMonth() + 1}/${d.getDate()}`;
     }
-  }
+  },
+
+  //ヘッダー用
+  components: {
+    CommonHeader
+  },
 };
 </script>
 

@@ -1,4 +1,5 @@
 <template>
+  <CommonHeader />
   <div class="shift-submission-form">
     <h1>希望シフト提出</h1>
     <div v-if="!isLoading && year && month">
@@ -42,6 +43,9 @@
 
 <script>
 import * as api from '@/services/api';
+
+//ヘッダー用
+import CommonHeader from '../components/CommonHeader.vue';
 
 export default {
   props: {
@@ -144,6 +148,10 @@ export default {
         alert('シフトの提出に失敗しました。');
       }
     },
+  },
+  //ヘッダー用
+  components: {
+    CommonHeader
   },
 };
 </script>

@@ -23,7 +23,7 @@
   {
     "ContainingType": "Ensyu_E_PAN.Controllers.AttendanceController",
     "Method": "GetTodayAttendance",
-    "RelativePath": "api/Attendance/Date_Schedules/{today}",
+    "RelativePath": "api/Attendance/DateSchedules/{today}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,

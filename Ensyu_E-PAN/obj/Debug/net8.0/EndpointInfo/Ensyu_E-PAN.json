@@ -5,7 +5,7 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/Attendance/Date_Schedules/{today}": {
+    "/api/Attendance/DateSchedules/{today}": {
       "get": {
         "tags": [
           "Attendance"

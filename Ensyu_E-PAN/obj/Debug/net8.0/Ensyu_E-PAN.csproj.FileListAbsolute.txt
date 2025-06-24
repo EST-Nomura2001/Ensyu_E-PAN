@@ -155,10 +155,10 @@ C:\Users\nomura\Documents\01_研修\01_新人研修\0618_チーム開発演習\E
 C:\Users\nomura\Documents\01_研修\01_新人研修\0618_チーム開発演習\Ensyu_E-PAN\Ensyu_E-PAN\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.Ensyu_E-PAN.props
 C:\Users\nomura\Documents\01_研修\01_新人研修\0618_チーム開発演習\Ensyu_E-PAN\Ensyu_E-PAN\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.Ensyu_E-PAN.props
 C:\Users\nomura\Documents\01_研修\01_新人研修\0618_チーム開発演習\Ensyu_E-PAN\Ensyu_E-PAN\obj\Debug\net8.0\staticwebassets.pack.json
-C:\Users\nomura\Documents\01_研修\01_新人研修\0618_チーム開発演習\Ensyu_E-PAN\Ensyu_E-PAN\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Users\nomura\Documents\01_研修\01_新人研修\0618_チーム開発演習\Ensyu_E-PAN\Ensyu_E-PAN\obj\Debug\net8.0\Ensyu_E-.E6521CB5.Up2Date
 C:\Users\nomura\Documents\01_研修\01_新人研修\0618_チーム開発演習\Ensyu_E-PAN\Ensyu_E-PAN\obj\Debug\net8.0\Ensyu_E-PAN.dll
 C:\Users\nomura\Documents\01_研修\01_新人研修\0618_チーム開発演習\Ensyu_E-PAN\Ensyu_E-PAN\obj\Debug\net8.0\refint\Ensyu_E-PAN.dll
 C:\Users\nomura\Documents\01_研修\01_新人研修\0618_チーム開発演習\Ensyu_E-PAN\Ensyu_E-PAN\obj\Debug\net8.0\Ensyu_E-PAN.pdb
 C:\Users\nomura\Documents\01_研修\01_新人研修\0618_チーム開発演習\Ensyu_E-PAN\Ensyu_E-PAN\obj\Debug\net8.0\Ensyu_E-PAN.genruntimeconfig.cache
 C:\Users\nomura\Documents\01_研修\01_新人研修\0618_チーム開発演習\Ensyu_E-PAN\Ensyu_E-PAN\obj\Debug\net8.0\ref\Ensyu_E-PAN.dll
+C:\Users\nomura\Documents\01_研修\01_新人研修\0618_チーム開発演習\Ensyu_E-PAN\Ensyu_E-PAN\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ensyu_E_PAN.Models; // データコンテキストやモデルへの参照
 using System.Linq;
 using System;
+using Ensyu_E_PAN.Data;
 using Microsoft.EntityFrameworkCore; // Includeメソッドのため
 
 namespace Ensyu_E_PAN.Controllers
@@ -10,14 +11,27 @@ namespace Ensyu_E_PAN.Controllers
     [Route("api/[controller]")]
     public class AttendanceController : ControllerBase
     {
-        // private readonly YourDbContext _context; // データコンテキストを後で定義
+        private readonly AnyDataDbContext _context; // データコンテキストを後で定義
 
-        // public AttendanceController(YourDbContext context)
-        // {
-        //     _context = context;
-        // }
+        public AttendanceController(AnyDataDbContext context)
+        {
+            _context = context;
+        }
 
-        [HttpGet("today")]
+        [HttpGet("{today}")]
+        public async Task<IActionResult> GetTodayAttendance(DateTime today)
+        {
+            var records = await _context.Date_Schedules
+             .Where(ds => ds.Today == today) // カラム名は設計に合わせて変更
+                            .Include(ds => ds.User)
+             .Include(ds => ds.WorkRoll)
+             .Include(ds => ds.DayShift)
+             .ToListAsync();
+
+            return Ok(records);
+        }
+
+        /*[HttpGet("today")]
         public IActionResult GetTodayAttendance()
         {
             // --- バックエンド実装が完了するまで、ダミーデータを返却 ---
@@ -59,7 +73,8 @@ namespace Ensyu_E_PAN.Controllers
                 // ログ記録
                 return StatusCode(500, "Internal server error");
             }
-            */
         }
+        */
+
     }
 } 

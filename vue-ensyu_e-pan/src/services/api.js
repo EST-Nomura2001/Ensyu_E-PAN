@@ -203,4 +203,32 @@ function getMockShiftData(date) {
             },
         ]
     }
+}
+
+// 勤怠実績データ取得
+export async function fetchAttendanceData({ storeId, yearMonth }) {
+  // 例: /api/attendance?storeId=1&date=2025-06
+  const res = await axios.get('/api/attendance', {
+    params: { storeId, date: yearMonth }
+  });
+  return res.data;
+}
+
+// 勤怠実績データ更新（関数名を競合回避のため変更）
+export async function updateAttendanceRecord(payload) {
+  // payloadは編集内容
+  const res = await axios.put('/api/attendance', payload);
+  return res.data;
+}
+
+// 店舗一覧取得
+export async function fetchStores() {
+  const res = await axios.get('/api/stores');
+  return res.data;
+}
+
+// ユーザー一覧取得
+export async function fetchUsers({ storeId }) {
+  const res = await axios.get('/api/users', { params: { storeId } });
+  return res.data;
 } 

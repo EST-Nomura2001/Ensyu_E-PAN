@@ -22,7 +22,7 @@ namespace Ensyu_E_PAN.Models.Attendance
 
         // ナビゲーションプロパティ（必要に応じて）
         public UserShift UserShift { get; set; }
-        public DateSchedule DateSchedules { get; set; }
+        public DateSchedule DateSchedule { get; set; }
 
     }
 }

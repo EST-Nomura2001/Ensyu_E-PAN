@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginPageView from '../views/LoginPageView.vue'
 import AdminView from '../views/AdminView.vue'
-import EmployeeView from '../views/EmployeeView.vue'
 import PartTimeView from '../views/PartTimeView.vue'
 import AttendanceManagement from '../views/AttendanceManagement.vue'
 
@@ -32,12 +31,6 @@ const router = createRouter({
       name: 'admin',
       component: AdminView,
       // meta: { requiresAuth: true, role: 'admin' },　ログイン機能
-    },
-    { //？？？
-      path: '/employee',
-      name: 'employee',
-      component: EmployeeView,
-      // meta: { requiresAuth: true, role: 'employee' },  ログイン機能
     },
     { ///???
       path: '/part-time',

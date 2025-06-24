@@ -34,9 +34,6 @@ async function login() {
       case 'admin':
         router.push('/admin');
         break;
-      case 'employee':
-        router.push('/employee');
-        break;
       case 'partTime':
         router.push('/part-time');
         break;

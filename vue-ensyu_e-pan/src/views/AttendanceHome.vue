@@ -22,7 +22,7 @@
           <td>{{ formatYearMonth(shift.date) }}</td>
           <td>
             {{ shift.recFlg ? '集計中' : '非収集中' }}
-            <button @click="toggleRecruiting(shift)">【切り替え】</button>
+            <button @click="toggleRecruiting(shift)">切り替え</button>
           </td>
           <td>
             <div v-if="shift.isEditingDeadline">
@@ -32,12 +32,12 @@
             </div>
             <div v-else>
               {{ formatDeadline(shift.fixedDate) }}
-              <button @click="editDeadline(shift)">【設定】</button>
+              <button @click="editDeadline(shift)">設定</button>
             </div>
           </td>
-          <td><button>【編集】</button></td>
+          <td><button>編集</button></td>
           <td>{{ shift.confirmFlg ? '済' : '' }}</td>
-          <td><button>【確認】</button></td>
+          <td><button>確認</button></td>
           <td>{{ shift.sendingFlg ? '済' : '' }}</td>
         </tr>
       </tbody>
@@ -53,6 +53,30 @@ export default {
     return {
       shifts: [], // APIから取得したデータを格納
       storeName: '〇〇店', // 初期値
+      // ↓↓↓ デモデータ（API連携できない場合用、後で削除）
+      demoShifts: [
+        {
+          id: 1,
+          date: '2024-07-01',
+          recFlg: true,
+          fixedDate: '2024-07-10T00:00:00',
+          confirmFlg: true,
+          sendingFlg: false,
+          isEditingDeadline: false,
+          editableDeadline: '2024-07-10',
+        },
+        {
+          id: 2,
+          date: '2024-08-01',
+          recFlg: false,
+          fixedDate: '2024-08-12T00:00:00',
+          confirmFlg: false,
+          sendingFlg: true,
+          isEditingDeadline: false,
+          editableDeadline: '2024-08-12',
+        },
+      ],
+      // ↑↑↑ デモデータここまで
     };
   },
   methods: {
@@ -85,6 +109,9 @@ export default {
         }));
       } catch (error) {
         console.error('シフト情報の取得に失敗しました。', error);
+        // ↓↓↓ デモデータ（API連携できない場合用、後で削除）
+        this.shifts = this.demoShifts.map(shift => ({ ...shift }));
+        // ↑↑↑ デモデータここまで
       }
     },
     async toggleRecruiting(shift) {

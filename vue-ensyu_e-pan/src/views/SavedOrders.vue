@@ -51,11 +51,11 @@
                 class="order-row"
                 :class="{ 'order-confirmed': order.isConfirmed }">
               <!-- 各データを表示 -->
-              <td>{{ order.orderNumber }}</td>
-              <td>{{ order.subject }}</td>
-              <td>{{ order.customerName }}</td>
+              <td>{{ order.Quotation }}</td>
+              <td>{{ order.Title }}</td>
+              <td>{{ order.Company.C_Name }}</td>
               <!-- 日付フォーマット関数を使用 -->
-              <td>{{ formatDate(order.issueDate) }}</td>
+              <td>{{ formatDate(order.Order_Date) }}</td>
               <td>{{ formatDateTime(order.createdAt) }}</td>
               <!-- 確定済みの場合のみチェックマークを表示 -->
               <td class="col-confirm">
@@ -75,7 +75,7 @@ import axios from 'axios'; // HTTP通信用ライブラリ
 import { useRouter } from 'vue-router'; // ページ遷移用
 
 // APIのベースURL（サーバーのアドレス）
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'http://localhost:5011';
 
 export default {
   // コンポーネント名

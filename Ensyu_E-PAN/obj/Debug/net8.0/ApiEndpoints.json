@@ -1,8 +1,29 @@
 [
   {
     "ContainingType": "Ensyu_E_PAN.Controllers.AttendanceController",
+    "Method": "GetAllShiftSchedules",
+    "RelativePath": "api/Attendance/AllShiftSchedules/{year}/{month}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "month",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Ensyu_E_PAN.Controllers.AttendanceController",
     "Method": "GetTodayAttendance",
-    "RelativePath": "api/Attendance/{today}",
+    "RelativePath": "api/Attendance/DateSchedules/{today}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,

@@ -1,4 +1,5 @@
 <template>
+  <CommonHeader />
   <!-- 保存済み発注書一覧のメインコンテナ -->
   <div class="saved-orders-container">
     <section class="saved-orders-section">
@@ -73,6 +74,9 @@
 // 必要なライブラリをインポート
 import axios from 'axios'; // HTTP通信用ライブラリ
 import { useRouter } from 'vue-router'; // ページ遷移用
+
+//ヘッダー用
+import CommonHeader from '../components/CommonHeader.vue';
 
 // APIのベースURL（サーバーのアドレス）
 const API_BASE_URL = 'http://localhost:3000';
@@ -161,7 +165,12 @@ export default {
         minute: '2-digit'   // 分を2桁で表示
       });
     }
-  }
+  },
+  
+  //ヘッダー用
+  components: {
+    CommonHeader
+  },
 };
 </script>
 

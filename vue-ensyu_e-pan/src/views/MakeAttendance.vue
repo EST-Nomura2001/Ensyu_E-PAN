@@ -54,6 +54,9 @@
   }
   /* 月別カレンダーの表示です */
   /* Calendar Styles */
+  .calendar-navi{
+    Text-align: center
+  }
   .calendar-container {
     margin-bottom: 1rem;
     border: 1px solid #ccc;
@@ -110,41 +113,22 @@
     color: blue;
   }
   /* 月別カレンダーの表示です */
+  h1 {
+    writing-mode: horizontal-tb !important; /* 横書きを強制 */
+    text-align: left !important;            /* 左寄せ */
+    margin: 0 0 1rem 0;
+    font-size: 2em;
+  }
 </style>
 
 <template>
+  <CommonHeader />
   <h1>シフト調整</h1>
   <div v-if="loading">データを読み込み中...</div>
   <div v-if="apiError">{{ apiError }}</div>
 
   <div v-if="!loading && !apiError">
-    <div class="calendar-container">
-      <div class="calendar-header">
-        <button @click="changeMonth(-1)">&lt; 前の月</button>
-        <h2>{{ calendarYear }}年 {{ calendarMonth }}月</h2>
-        <button @click="changeMonth(1)">次の月 &gt;</button>
-      </div>
-      <table class="calendar-table">
-        <thead>
-          <tr>
-            <th v-for="(day, index) in weekDays" :key="index" :class="{ 'sunday': index === 0, 'saturday': index === 6 }">{{ day }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(week, weekIndex) in calendarGrid" :key="weekIndex">
-            <td v-for="day in week" :key="day.date.getTime()" @click="selectDate(day)"
-                :class="{ 
-                  'not-current-month': !day.isCurrentMonth, 
-                  'selected-day': isSelected(day), 
-                  'sunday': day.date.getDay() === 0, 
-                  'saturday': day.date.getDay() === 6 
-                }">
-              {{ day.day }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+   
     <div class="date-navigation">
       <button @click="changeDay(-1)">前の日へ</button>
       <h2>{{ formattedDate }}</h2>
@@ -198,6 +182,40 @@
     <div style="text-align: right; margin-top: 1rem;">
       <button @click="saveChanges" :disabled="!isDirty">保存</button>
     </div>
+
+    <!-- カレンダーを表の下中央に配置 -->
+    <div style="display: flex; justify-content: center; margin-top: 1rem;">
+      <div>
+        <span class="calendar-navi">ジャンプしたい日付をクリックしてください。</span>
+        <div class="calendar-container">
+          <div class="calendar-header">
+            <button @click="changeMonth(-1)">&lt; 前の月</button>
+            <h2>{{ calendarYear }}年 {{ calendarMonth }}月</h2>
+            <button @click="changeMonth(1)">次の月 &gt;</button>
+          </div>
+          <table class="calendar-table">
+            <thead>
+              <tr>
+                <th v-for="(day, index) in weekDays" :key="index" :class="{ 'sunday': index === 0, 'saturday': index === 6 }">{{ day }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(week, weekIndex) in calendarGrid" :key="weekIndex">
+                <td v-for="day in week" :key="day.date.getTime()" @click="selectDate(day)"
+                    :class="{ 
+                      'not-current-month': !day.isCurrentMonth, 
+                      'selected-day': isSelected(day), 
+                      'sunday': day.date.getDay() === 0, 
+                      'saturday': day.date.getDay() === 6 
+                    }">
+                  {{ day.day }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -206,6 +224,9 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { getShiftsByDate, updateSchedulesBulk } from '../services/api.js';
 import { isEqual } from 'lodash-es';
 import { useRoute, useRouter } from 'vue-router';
+
+//ヘッダー用
+import CommonHeader from '../components/CommonHeader.vue';
 
 const route = useRoute();
 const router = useRouter();

@@ -1,4 +1,5 @@
 <template>
+  <CommonHeader />
   <div class="edit-attendance">
     <h1>勤怠編集</h1>
     <p>6月の勤怠一覧に戻る</p>
@@ -78,7 +79,11 @@
 <script>
 import { getAttendanceByDateStore, updateAttendanceByDateStore } from '../services/api';
 
-export default {
+//ヘッダー用
+import CommonHeader from '../components/CommonHeader.vue';
+
+
+  export default {
   name: 'EditAttendance',
   props: {
     date: { type: String, required: true }, // 'YYYY-MM-DD'
@@ -235,6 +240,11 @@ export default {
       },
       deep: true
     }
+  },
+
+  //ヘッダー表示
+  components: {
+    CommonHeader
   },
 };
 </script>

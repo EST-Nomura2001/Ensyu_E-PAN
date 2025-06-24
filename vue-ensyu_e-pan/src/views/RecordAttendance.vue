@@ -1,4 +1,5 @@
 <template>
+  <CommonHeader />
   <div>
     <h1>勤怠実績確認</h1>
     <div class="attendance-table-controls" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center;">
@@ -18,7 +19,11 @@
           <th class="sticky sticky-2">時給</th>
           <th class="sticky sticky-3">項目</th>
           <th class="sticky sticky-4">合計</th>
-          <th v-for="day in days" :key="day">{{ day }}日</th>
+          <th v-for="ds in dayShifts" :key="'header-'+ds.date">
+            <router-link :to="{ name: 'Edit-Attendance', query: { date: ds.date, storeName: storeName } }">
+              {{ formatDate(ds.date) }}
+            </router-link>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -26,12 +31,12 @@
           <td class="sticky sticky-1" colspan="2" rowspan="2">合計</td>
           <td class="sticky sticky-3">労働時間(h)</td>
           <td class="sticky sticky-4">{{ totalWorkTime }}</td>
-          <td v-for="day in days" :key="'total-worktime'+day"></td>
+          <td v-for="ds in dayShifts" :key="'total-worktime'+ds.date">{{ ds.sumWorkTime }}</td>
         </tr>
         <tr class="total-row">
           <td class="sticky sticky-3">人件費</td>
           <td class="sticky sticky-4">{{ totalCost }}</td>
-          <td v-for="day in days" :key="'total-cost'+day"></td>
+          <td v-for="ds in dayShifts" :key="'total-cost'+ds.date">{{ ds.sumTotalCost }}</td>
         </tr>
         <template v-for="user in users" :key="user.name">
           <tr>
@@ -58,6 +63,9 @@
 <script>
 import { fetchAttendanceData } from '../services/api';
 
+//ヘッダー用
+import CommonHeader from '../components/CommonHeader.vue';
+
 export default {
   name: "RecordAttendance",
   data() {
@@ -65,16 +73,22 @@ export default {
       status: '',      // ステータス
       storeName: '',   // 店舗名
       yearMonth: '',   // 月
-      days: [],        // 日付配列
+      days: [],        // 日付配列（DB値で上書きするため初期値は空でOK）
       users: [],       // ユーザー配列
       totalWorkTime: 0, // 合計労働時間
       totalCost: 0,     // 合計人件費
+      dayShifts: [],    // 日別合計（DBから取得）
       // ↓↓↓ デモ用静的データ（API未接続時のサンプル）
       staticDemoData: {
         status: false, // ALL_SHIFTS.SENDING_FLG
         storeName: '〇店', // STORES.C_NAME
         yearMonth: '2025年6月', // ALL_SHIFTS.DATE
-        days: Array.from({ length: 31 }, (_, i) => i + 1),
+        dayShifts: Array.from({ length: 31 }, (_, i) => ({
+          date: `2025-06-${(i+1).toString().padStart(2, '0')}`,
+          sumWorkTime: i % 2 === 0 ? 8.0 : 0,
+          sumTotalCost: i % 2 === 0 ? 7600 : 0,
+        })),
+        days: [], // 使わない
         totalWorkTime: '123.5', // ALL_SHIFTS.SUM_WORKTIME
         totalCost: '456789', // ALL_SHIFTS.COST
         users: [
@@ -122,7 +136,8 @@ export default {
     this.status = data.status; // ALL_SHIFTS.SENDING_FLG
     this.storeName = data.storeName; // STORES.C_NAME
     this.yearMonth = data.yearMonth; // ALL_SHIFTS.DATE
-    this.days = data.days; // [1,2,...,31]
+    this.dayShifts = data.dayShifts || [];
+    this.days = this.dayShifts.map(ds => ds.date); // 日付はDB値で
     this.users = data.users; // [{ name, wage, totalWorkTime, monthPrice, days: [{ workTime, dayPrice }, ...] }]
     this.totalWorkTime = data.totalWorkTime; // ALL_SHIFTS.SUM_WORKTIME
     this.totalCost = data.totalCost; // ALL_SHIFTS.COST
@@ -157,15 +172,27 @@ export default {
       this.status = data.status;
       this.storeName = data.storeName;
       this.yearMonth = data.yearMonth;
-      this.days = data.days;
+      this.dayShifts = data.dayShifts || [];
+      this.days = this.dayShifts.map(ds => ds.date);
       this.users = data.users;
       this.totalWorkTime = data.totalWorkTime;
       this.totalCost = data.totalCost;
     },
     onExport() {
       // 今は空
+    },
+    formatDate(dateStr) {
+      // 例: "2025-06-01" → "6/1"
+      const d = new Date(dateStr);
+      if (isNaN(d)) return dateStr; // パース失敗時はそのまま
+      return `${d.getMonth() + 1}/${d.getDate()}`;
     }
-  }
+  },
+
+  //ヘッダー用
+  components: {
+    CommonHeader
+  },
 };
 </script>
 

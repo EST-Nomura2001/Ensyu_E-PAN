@@ -1,9 +1,10 @@
 //田村担当
 <template>
+  <CommonHeader />
   <div class="attendance-home">
     <div class="header">
       <h1>{{ storeName }}</h1>
-      <button>新規作成</button>
+      <button>翌月の新規作成</button>
     </div>
     <table>
       <thead>
@@ -11,7 +12,7 @@
           <th>月</th>
           <th>希望収集</th>
           <th>シフト提出期限</th>
-          <th>編集画面</th>
+          <th>シフト表</th>
           <th>シフト編集状態</th>
           <th>勤怠画面</th>
           <th>勤怠送付</th>
@@ -22,7 +23,7 @@
           <td>{{ formatYearMonth(shift.date) }}</td>
           <td>
             {{ shift.recFlg ? '集計中' : '非収集中' }}
-            <button @click="toggleRecruiting(shift)">【切り替え】</button>
+            <button @click="toggleRecruiting(shift)">切り替え</button>
           </td>
           <td>
             <div v-if="shift.isEditingDeadline">
@@ -32,12 +33,12 @@
             </div>
             <div v-else>
               {{ formatDeadline(shift.fixedDate) }}
-              <button @click="editDeadline(shift)">【設定】</button>
+              <button @click="editDeadline(shift)">設定</button>
             </div>
           </td>
-          <td><button>【編集】</button></td>
+          <td>編集 / 閲覧</td>
           <td>{{ shift.confirmFlg ? '済' : '' }}</td>
-          <td><button>【確認】</button></td>
+          <td>閲覧</td>
           <td>{{ shift.sendingFlg ? '済' : '' }}</td>
         </tr>
       </tbody>
@@ -47,12 +48,40 @@
 
 <script>
 import { getAttendanceData, updateAttendanceData, getUserInfo, getStoreInfo } from '@/services/api';
+import CommonHeader from '../components/CommonHeader.vue';
 
 export default {
+  components: {
+    CommonHeader
+  },
   data() {
     return {
       shifts: [], // APIから取得したデータを格納
       storeName: '〇〇店', // 初期値
+      // ↓↓↓ デモデータ（API連携できない場合用、後で削除）
+      demoShifts: [
+        {
+          id: 1,
+          date: '2024-07-01',
+          recFlg: true,
+          fixedDate: '2024-07-10T00:00:00',
+          confirmFlg: true,
+          sendingFlg: false,
+          isEditingDeadline: false,
+          editableDeadline: '2024-07-10',
+        },
+        {
+          id: 2,
+          date: '2024-08-01',
+          recFlg: false,
+          fixedDate: '2024-08-12T00:00:00',
+          confirmFlg: false,
+          sendingFlg: true,
+          isEditingDeadline: false,
+          editableDeadline: '2024-08-12',
+        },
+      ],
+      // ↑↑↑ デモデータここまで
     };
   },
   methods: {
@@ -85,6 +114,9 @@ export default {
         }));
       } catch (error) {
         console.error('シフト情報の取得に失敗しました。', error);
+        // ↓↓↓ デモデータ（API連携できない場合用、後で削除）
+        this.shifts = this.demoShifts.map(shift => ({ ...shift }));
+        // ↑↑↑ デモデータここまで
       }
     },
     async toggleRecruiting(shift) {

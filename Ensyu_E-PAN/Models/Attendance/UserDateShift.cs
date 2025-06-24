@@ -21,8 +21,8 @@ namespace Ensyu_E_PAN.Models.Attendance
         public int Date_Schedule_Id { get; set; }
 
         // ナビゲーションプロパティ（必要に応じて）
-        public UserShift UserShift { get; set; }
-        public DateSchedule DateSchedule { get; set; }
+        public UserShift? UserShift { get; set; }
+        public DateSchedule? DateSchedule { get; set; }
 
     }
 }

@@ -65,8 +65,8 @@
         "IsRequired": true
       },
       {
-        "Name": "updatedSchedule",
-        "Type": "Ensyu_E_PAN.Models.Attendance.DateSchedule",
+        "Name": "dto",
+        "Type": "Ensyu_E_PAN.DTOs.UpdateDateScheduleDto",
         "IsRequired": true
       }
     ],

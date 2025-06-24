@@ -3,6 +3,7 @@ using Ensyu_E_PAN.Models; // データコンテキストやモデルへの参照
 using System.Linq;
 using System;
 using Ensyu_E_PAN.Data;
+using Ensyu_E_PAN.Models.Attendance;
 using Microsoft.EntityFrameworkCore; // Includeメソッドのため
 
 namespace Ensyu_E_PAN.Controllers
@@ -106,5 +107,103 @@ namespace Ensyu_E_PAN.Controllers
             return Ok(schedules);
         }
         //Get処理↑
+
+        //Post処理↓
+        //シフト表作成
+        [HttpPost("generate-monthly")]
+        public async Task<IActionResult> GenerateNextMonthShifts()
+        {
+            var now = DateTime.Now;
+            var firstDay = new DateTime(now.Year, now.Month, 1).AddMonths(1);
+            var lastDay = firstDay.AddMonths(1).AddDays(-1);
+
+            var stores = await _context.Stores.Include(s => s.Users).ToListAsync();
+            var workRoll = await _context.WorkRoll_Lists.FirstOrDefaultAsync();
+            if (workRoll == null)
+                return BadRequest("業務ロールが存在しません");
+
+            foreach (var store in stores)
+            {
+                // 店舗ごとに AllShift の重複チェック
+                bool exists = await _context.All_Shifts.AnyAsync(a =>
+                    a.Store_ID == store.Id &&
+                    a.Date.Year == firstDay.Year &&
+                    a.Date.Month == firstDay.Month);
+
+                if (exists)
+                    continue; // skip if already exists
+
+                var allShift = new AllShift
+                {
+                    Store_ID = store.Id,
+                    Date = firstDay,
+                    Confirm_Flg = false,
+                    Fixed_Date = firstDay.AddDays(20),
+                    Sending_Flg = false,
+                    Cost = 0,
+                    Sum_WorkTime = TimeSpan.Zero,
+                    Rec_Flg = true
+                };
+                _context.All_Shifts.Add(allShift);
+                await _context.SaveChangesAsync();
+
+                // DayShifts 作成
+                var dayShifts = new List<DayShift>();
+                for (var date = firstDay; date <= lastDay; date = date.AddDays(1))
+                {
+                    var dayShift = new DayShift
+                    {
+                        Date = date,
+                        All_Shift_Id = allShift.Id,
+                        Sum_WorkTime = TimeSpan.Zero,
+                        Sum_TotalCost = 0
+                    };
+                    dayShifts.Add(dayShift);
+                    _context.Day_Shifts.Add(dayShift);
+                }
+                await _context.SaveChangesAsync();
+
+                // 各ユーザー分の UserShift 作成
+                foreach (var user in store.Users)
+                {
+                    var userShift = new UserShift
+                    {
+                        User_Id = user.Id,
+                        Shift_Id = allShift.Id,
+                        Date_Ym = firstDay,
+                        List_Status = false,
+                        Total_WorkTime = TimeSpan.Zero,
+                        Month_Price = 0,
+                        U_Confirm_Flg = false
+                    };
+                    _context.User_Shifts.Add(userShift);
+                    await _context.SaveChangesAsync();
+
+                    foreach (var dayShift in dayShifts)
+                    {
+                        var schedule = new DateSchedule
+                        {
+                            Today = dayShift.Date,
+                            User_Id = user.Id,
+                            Work_Roll_Id = workRoll.Id,
+                            Day_Shift_Id = dayShift.Id
+                        };
+                        _context.Date_Schedules.Add(schedule);
+                        await _context.SaveChangesAsync();
+
+                        var link = new UserDateShift
+                        {
+                            User_Shift_Id = userShift.Id,
+                            Shift_Date = dayShift.Date,
+                            Date_Schedule_Id = schedule.Id
+                        };
+                        _context.User_Date_Shifts.Add(link);
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok("翌月分のシフト表を事業所単位で作成しました。");
+        }
     }
 } 

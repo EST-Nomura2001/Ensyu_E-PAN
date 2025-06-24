@@ -3,6 +3,7 @@ using System;
 using Ensyu_E_PAN.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ensyu_E_PAN.Migrations
 {
     [DbContext(typeof(AnyDataDbContext))]
-    partial class AnyDataDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250624050921_AddStoreForeignKey")]
+    partial class AddStoreForeignKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.6");
@@ -228,19 +231,18 @@ namespace Ensyu_E_PAN.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Fax")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("Fax")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Mail")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Post_Code")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Post_Code")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("Tel")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("Tel")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -298,19 +300,18 @@ namespace Ensyu_E_PAN.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Fax")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("Fax")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Mail")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Post_Code")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Post_Code")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("Tel")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("Tel")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

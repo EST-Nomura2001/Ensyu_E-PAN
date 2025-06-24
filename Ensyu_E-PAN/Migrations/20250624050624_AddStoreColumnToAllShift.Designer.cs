@@ -3,6 +3,7 @@ using System;
 using Ensyu_E_PAN.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ensyu_E_PAN.Migrations
 {
     [DbContext(typeof(AnyDataDbContext))]
-    partial class AnyDataDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250624050624_AddStoreColumnToAllShift")]
+    partial class AddStoreColumnToAllShift
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.6");
@@ -48,8 +51,6 @@ namespace Ensyu_E_PAN.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Store_ID");
 
                     b.ToTable("All_Shifts");
                 });
@@ -228,19 +229,18 @@ namespace Ensyu_E_PAN.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Fax")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("Fax")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Mail")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Post_Code")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Post_Code")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("Tel")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("Tel")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -298,19 +298,18 @@ namespace Ensyu_E_PAN.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Fax")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("Fax")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Mail")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Post_Code")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Post_Code")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("Tel")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("Tel")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -455,17 +454,6 @@ namespace Ensyu_E_PAN.Migrations
                     b.HasIndex("Store_Cd");
 
                     b.ToTable("Purchase_Orders");
-                });
-
-            modelBuilder.Entity("Ensyu_E_PAN.Models.Attendance.AllShift", b =>
-                {
-                    b.HasOne("Ensyu_E_PAN.Models.Masters.Store", "Store")
-                        .WithMany("AllShifts")
-                        .HasForeignKey("Store_ID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("Ensyu_E_PAN.Models.Attendance.DateSchedule", b =>
@@ -640,8 +628,6 @@ namespace Ensyu_E_PAN.Migrations
 
             modelBuilder.Entity("Ensyu_E_PAN.Models.Masters.Store", b =>
                 {
-                    b.Navigation("AllShifts");
-
                     b.Navigation("PurchaseOrders");
 
                     b.Navigation("Users");

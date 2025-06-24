@@ -18,10 +18,6 @@ namespace Ensyu_E_PAN.Models.Attendance
         [ForeignKey("AllShift")]
         public int Shift_Id { get; set; }
 
-        [Required]
-        [ForeignKey("DayShift")]
-        public int Day_Shifts_Id {  get; set; }
-
         public DateTime Date_Ym { get; set; }
 
         [Required]
@@ -39,7 +35,6 @@ namespace Ensyu_E_PAN.Models.Attendance
         // ナビゲーションプロパティ（必要に応じて）
         public User User { get; set; }
         public AllShift AllShift { get; set; }
-        public DayShift DayShift { get; set; }
         public ICollection<UserDateShift> UserDateShifts { get; set; }
 
     }

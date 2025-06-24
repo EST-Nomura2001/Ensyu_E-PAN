@@ -35,5 +35,62 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Ensyu_E_PAN.Controllers.AttendanceController",
+    "Method": "GenerateNextMonthShifts",
+    "RelativePath": "api/Attendance/generate-monthly",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Ensyu_E_PAN.Controllers.AttendanceController",
+    "Method": "GetUserDailySchedule",
+    "RelativePath": "api/Attendance/UserSchedule/Day/{userId}/{date}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "date",
+        "Type": "System.DateTime",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Ensyu_E_PAN.Controllers.AttendanceController",
+    "Method": "GetUserMonthlySchedules",
+    "RelativePath": "api/Attendance/UserSchedule/Month/{userId}/{year}/{month}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "month",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

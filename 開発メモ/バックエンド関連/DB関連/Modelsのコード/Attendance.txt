@@ -3,6 +3,7 @@ Attendance
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Ensyu_E_PAN.Models.Masters;
 
 namespace Ensyu_E_PAN.Models.Attendance
 {
@@ -11,6 +12,10 @@ namespace Ensyu_E_PAN.Models.Attendance
 
         [Key]
         public int Id { get; set; }
+
+        [Required]
+        [ForeignKey("Store")]
+        public int Store_ID { get; set; }
 
         [Required]
         public DateTime Date { get; set; }//年月
@@ -34,10 +39,12 @@ namespace Ensyu_E_PAN.Models.Attendance
         public bool Rec_Flg { get; set; }//シフト希望収集中フラグ
 
         //ナビゲーション
+        public Store Store { get; set; }
         public ICollection<DayShift> DayShifts { get; set; }
         public ICollection<UserShift> UserShifts { get; set; }
     }
 }
+
 using Ensyu_E_PAN.Models.Masters;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
@@ -123,7 +130,6 @@ namespace Ensyu_E_PAN.Models.Attendance
 
         // ナビゲーションプロパティ（必要に応じて）
         public AllShift AllShift { get; set; }
-        public ICollection<UserShift> UserShifts { get; set; }
         public ICollection<DateSchedule> DateSchedules { get; set; }
 
     }
@@ -176,10 +182,6 @@ namespace Ensyu_E_PAN.Models.Attendance
         [ForeignKey("AllShift")]
         public int Shift_Id { get; set; }
 
-        [Required]
-        [ForeignKey("DayShift")]
-        public int Day_Shifts_Id {  get; set; }
-
         public DateTime Date_Ym { get; set; }
 
         [Required]
@@ -197,7 +199,6 @@ namespace Ensyu_E_PAN.Models.Attendance
         // ナビゲーションプロパティ（必要に応じて）
         public User User { get; set; }
         public AllShift AllShift { get; set; }
-        public DayShift DayShift { get; set; }
         public ICollection<UserDateShift> UserDateShifts { get; set; }
 
     }

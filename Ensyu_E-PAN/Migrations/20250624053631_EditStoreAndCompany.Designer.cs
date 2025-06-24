@@ -3,6 +3,7 @@ using System;
 using Ensyu_E_PAN.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ensyu_E_PAN.Migrations
 {
     [DbContext(typeof(AnyDataDbContext))]
-    partial class AnyDataDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250624053631_EditStoreAndCompany")]
+    partial class EditStoreAndCompany
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.6");

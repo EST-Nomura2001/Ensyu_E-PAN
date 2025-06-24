@@ -51,6 +51,11 @@ namespace Ensyu_E_PAN.Data
                 .HasForeignKey(u => u.Stores_Cd);
 
             // ===== Attendance 関連 =====
+            //AllShift
+                modelBuilder.Entity<AllShift>()
+                    .HasOne(alls => alls.Store)
+                    .WithMany(s => s.AllShifts)
+                    .HasForeignKey(alls => alls.Store_ID);
             //UserShift
                 modelBuilder.Entity<UserShift>()
                     .HasOne(us => us.User)
@@ -63,12 +68,6 @@ namespace Ensyu_E_PAN.Data
                     .WithMany(aShifts => aShifts.UserShifts)
                     .HasForeignKey(us => us.Shift_Id)
                     .OnDelete(DeleteBehavior.Cascade);
-
-                modelBuilder.Entity<UserShift>()
-                   .HasOne(us => us.DayShift)
-                   .WithMany(ds => ds.UserShifts)
-                   .HasForeignKey(us => us.Day_Shifts_Id)
-                   .OnDelete(DeleteBehavior.Restrict);
 
             //DayShift
                 modelBuilder.Entity<DayShift>()

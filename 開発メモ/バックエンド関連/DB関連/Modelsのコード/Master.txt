@@ -66,6 +66,7 @@ namespace Ensyu_E_PAN.Models.Masters
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Ensyu_E_PAN.Models.Order;
+using Ensyu_E_PAN.Models.Attendance;
 
 namespace Ensyu_E_PAN.Models.Masters
 {
@@ -93,9 +94,12 @@ namespace Ensyu_E_PAN.Models.Masters
         public string Mail { get; set; }
 
         public ICollection<User> Users { get; set; }
+
+        public ICollection<AllShift> AllShifts { get; set; }
         public ICollection<PurchaseOrder> PurchaseOrders { get; set; }
     }
 }
+
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

@@ -33,9 +33,9 @@ namespace Ensyu_E_PAN.Models.Attendance
         public bool U_Confirm_Flg { get; set; }
 
         // ナビゲーションプロパティ（必要に応じて）
-        public User User { get; set; }
-        public AllShift AllShift { get; set; }
-        public ICollection<UserDateShift> UserDateShifts { get; set; }
+        public User? User { get; set; }
+        public AllShift? AllShift { get; set; }
+        public ICollection<UserDateShift>? UserDateShifts { get; set; }
 
     }
 }

@@ -48,6 +48,32 @@
   },
   {
     "ContainingType": "Ensyu_E_PAN.Controllers.AttendanceController",
+    "Method": "UpdateUserDateSchedule",
+    "RelativePath": "api/Attendance/users/{userId}/schedules/{scheduleId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "scheduleId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "updatedSchedule",
+        "Type": "Ensyu_E_PAN.Models.Attendance.DateSchedule",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Ensyu_E_PAN.Controllers.AttendanceController",
     "Method": "GetUserDailySchedule",
     "RelativePath": "api/Attendance/UserSchedule/Day/{userId}/{date}",
     "HttpMethod": "GET",

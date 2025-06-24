@@ -4,6 +4,7 @@ using System.Linq;
 using System;
 using Ensyu_E_PAN.Data;
 using Ensyu_E_PAN.Models.Attendance;
+using Ensyu_E_PAN.Services;
 using Microsoft.EntityFrameworkCore; // Includeメソッドのため
 
 namespace Ensyu_E_PAN.Controllers
@@ -13,10 +14,12 @@ namespace Ensyu_E_PAN.Controllers
     public class AttendanceController : ControllerBase
     {
         private readonly AnyDataDbContext _context; // データコンテキストを後で定義
+        private readonly AttendanceCalculationService _calcService;//計算用メソッド
 
         public AttendanceController(AnyDataDbContext context)
         {
             _context = context;
+            _calcService = new AttendanceCalculationService();
         }
         //Get処理↓
         //全体の本日分のスケジュールを渡す
@@ -204,6 +207,80 @@ namespace Ensyu_E_PAN.Controllers
 
             await _context.SaveChangesAsync();
             return Ok("翌月分のシフト表を事業所単位で作成しました。");
+        }
+        //Post処理↑
+
+        //Put処理
+        [HttpPut("users/{userId}/schedules/{scheduleId}")]
+        public async Task<IActionResult> UpdateUserDateSchedule(int userId, int scheduleId,
+            [FromBody] DateSchedule updatedSchedule)
+        {
+            if (userId != updatedSchedule.User_Id || scheduleId != updatedSchedule.Id)
+            {
+                return BadRequest("パラメータと送信データの不一致があります。");
+            }
+
+            var schedule = await _context.Date_Schedules
+                .FirstOrDefaultAsync(ds => ds.Id == scheduleId && ds.User_Id == userId);
+
+            if (schedule == null)
+            {
+                return NotFound("指定されたスケジュールが見つかりません。");
+            }
+
+            // 更新対象フィールド
+            schedule.Work_Roll_Id = updatedSchedule.Work_Roll_Id;
+            schedule.P_Start_WorkTime = updatedSchedule.P_Start_WorkTime;
+            schedule.P_End_WorkTime = updatedSchedule.P_End_WorkTime;
+            schedule.U_Start_WorkTime = updatedSchedule.U_Start_WorkTime;
+            schedule.U_End_WorkTime = updatedSchedule.U_End_WorkTime;
+            schedule.Start_WorkTime = updatedSchedule.Start_WorkTime;
+            schedule.End_WorkTime = updatedSchedule.End_WorkTime;
+            schedule.Start_BreakTime = updatedSchedule.Start_BreakTime;
+            schedule.End_BreakTime = updatedSchedule.End_BreakTime;
+
+            // ユーザー取得（時給など計算に必要）
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return BadRequest("ユーザーが存在しません");
+            // 該当DayShiftの日付の全スケジュール取得
+            var allDateSchedulesInDay = await _context.Date_Schedules
+                .Where(ds => ds.Day_Shift_Id == schedule.Day_Shift_Id)
+                .ToListAsync();
+
+            _calcService.CalculateDateSchedule(schedule, user);
+
+            var link = schedule.UserDateShifts.FirstOrDefault();
+            if (link == null)
+                return BadRequest("UserDateShift に紐づくデータが見つかりませんでした。");
+
+            // 日単位の再集計
+            var dayShift = await _context.Day_Shifts.FirstOrDefaultAsync(d => d.Id == schedule.Day_Shift_Id);
+            _calcService.CalculateDayShift(dayShift, allDateSchedulesInDay);
+
+            // ユーザーの月間全スケジュール取得
+            var userDateShiftIds = await _context.User_Date_Shifts
+                .Where(uds => uds.User_Shift_Id == link.User_Shift_Id)
+                .Select(uds => uds.Date_Schedule_Id)
+                .ToListAsync();
+
+            var userSchedules = await _context.Date_Schedules
+                .Where(ds => userDateShiftIds.Contains(ds.Id))
+                .ToListAsync();
+
+            var userShift = await _context.User_Shifts
+                .FirstOrDefaultAsync(us => us.Id == link.User_Shift_Id);
+            _calcService.CalculateUserShift(userShift, userSchedules);
+
+            // 必要なら全体集計も（AllShift）
+            var allUserShifts = await _context.User_Shifts
+                .Where(us => us.Shift_Id == userShift.Shift_Id)
+                .ToListAsync();
+            var allShift = await _context.All_Shifts
+                .FirstOrDefaultAsync(a => a.Id == userShift.Shift_Id);
+
+            await _context.SaveChangesAsync();
+            return Ok("スケジュールを更新しました。");
         }
     }
 } 

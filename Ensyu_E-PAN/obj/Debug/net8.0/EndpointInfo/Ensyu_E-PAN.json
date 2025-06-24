@@ -144,7 +144,751 @@
           }
         }
       }
+    },
+    "/api/Attendance/users/{userId}/schedules/{scheduleId}": {
+      "put": {
+        "tags": [
+          "Attendance"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "scheduleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DateSchedule"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DateSchedule"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DateSchedule"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
-  "components": { }
+  "components": {
+    "schemas": {
+      "AllShift": {
+        "required": [
+          "confirm_Flg",
+          "cost",
+          "date",
+          "fixed_Date",
+          "rec_Flg",
+          "sending_Flg",
+          "store_ID",
+          "sum_WorkTime"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "store_ID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "confirm_Flg": {
+            "type": "boolean"
+          },
+          "fixed_Date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sending_Flg": {
+            "type": "boolean"
+          },
+          "cost": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sum_WorkTime": {
+            "type": "string",
+            "format": "date-span"
+          },
+          "rec_Flg": {
+            "type": "boolean"
+          },
+          "store": {
+            "$ref": "#/components/schemas/Store"
+          },
+          "dayShifts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DayShift"
+            },
+            "nullable": true
+          },
+          "userShifts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserShift"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Company": {
+        "required": [
+          "address1",
+          "c_Name",
+          "post_Code"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "c_Name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "post_Code": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "address1": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "address2": {
+            "type": "string",
+            "nullable": true
+          },
+          "tel": {
+            "type": "string",
+            "nullable": true
+          },
+          "fax": {
+            "type": "string",
+            "nullable": true
+          },
+          "mail": {
+            "type": "string",
+            "nullable": true
+          },
+          "purchaseOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrder"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DateSchedule": {
+        "required": [
+          "day_Shift_Id",
+          "today",
+          "user_Id",
+          "work_Roll_Id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "today": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "work_Roll_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "day_Shift_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "p_Start_WorkTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "p_End_WorkTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "u_Start_WorkTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "u_End_WorkTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "start_WorkTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "end_WorkTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "start_BreakTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "end_BreakTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "t_WorkTime_D": {
+            "type": "string",
+            "format": "date-span",
+            "nullable": true
+          },
+          "t_WorkTime_N": {
+            "type": "string",
+            "format": "date-span",
+            "nullable": true
+          },
+          "t_WorkTime_All": {
+            "type": "string",
+            "format": "date-span",
+            "nullable": true
+          },
+          "d_DayPrice": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "n_DayPrice": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "t_DayPrice": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "workRoll": {
+            "$ref": "#/components/schemas/WorkRoll"
+          },
+          "dayShift": {
+            "$ref": "#/components/schemas/DayShift"
+          },
+          "userDateShifts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserDateShift"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DayShift": {
+        "required": [
+          "date",
+          "sum_TotalCost",
+          "sum_WorkTime"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "all_Shift_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sum_WorkTime": {
+            "type": "string",
+            "format": "date-span"
+          },
+          "sum_TotalCost": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "allShift": {
+            "$ref": "#/components/schemas/AllShift"
+          },
+          "dateSchedules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DateSchedule"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Item": {
+        "required": [
+          "item_Name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "item_Name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "orderItemLists": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemList"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrderItemList": {
+        "required": [
+          "amount",
+          "item_Cd",
+          "p_Order_List_Id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "p_Order_List_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "item_Cd": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "other_ItemName": {
+            "type": "string",
+            "nullable": true
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "purchaseOrder": {
+            "$ref": "#/components/schemas/PurchaseOrder"
+          },
+          "item": {
+            "$ref": "#/components/schemas/Item"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PurchaseOrder": {
+        "required": [
+          "company_Cd",
+          "confirm_Flg",
+          "quotation",
+          "store_Cd",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "quotation": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tax": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "order_Date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "delivery_Date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "payment_Date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "payment_Terms": {
+            "type": "string",
+            "nullable": true
+          },
+          "confirm_Flg": {
+            "type": "boolean"
+          },
+          "company_Cd": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "manager": {
+            "type": "string",
+            "nullable": true
+          },
+          "store_Cd": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "other": {
+            "type": "string",
+            "nullable": true
+          },
+          "company": {
+            "$ref": "#/components/schemas/Company"
+          },
+          "store": {
+            "$ref": "#/components/schemas/Store"
+          },
+          "orderItemLists": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemList"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Roll": {
+        "required": [
+          "isAdmin",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "isAdmin": {
+            "type": "boolean"
+          },
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Store": {
+        "required": [
+          "address1",
+          "c_Name",
+          "post_Code"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "c_Name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "post_Code": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "address1": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "address2": {
+            "type": "string",
+            "nullable": true
+          },
+          "tel": {
+            "type": "string",
+            "nullable": true
+          },
+          "fax": {
+            "type": "string",
+            "nullable": true
+          },
+          "mail": {
+            "type": "string",
+            "nullable": true
+          },
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            },
+            "nullable": true
+          },
+          "allShifts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AllShift"
+            },
+            "nullable": true
+          },
+          "purchaseOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrder"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "User": {
+        "required": [
+          "login_Id",
+          "name",
+          "password",
+          "roll_Cd",
+          "stores_Cd",
+          "timePrice_D",
+          "timePrice_N"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "login_Id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "roll_Cd": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "password": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "stores_Cd": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "timePrice_D": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "timePrice_N": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roll": {
+            "$ref": "#/components/schemas/Roll"
+          },
+          "store": {
+            "$ref": "#/components/schemas/Store"
+          },
+          "userShifts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserShift"
+            },
+            "nullable": true
+          },
+          "dateSchedules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DateSchedule"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserDateShift": {
+        "required": [
+          "date_Schedule_Id",
+          "shift_Date",
+          "user_Shift_Id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "user_Shift_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shift_Date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "date_Schedule_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userShift": {
+            "$ref": "#/components/schemas/UserShift"
+          },
+          "dateSchedule": {
+            "$ref": "#/components/schemas/DateSchedule"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserShift": {
+        "required": [
+          "list_Status",
+          "month_Price",
+          "shift_Id",
+          "total_WorkTime",
+          "u_Confirm_Flg",
+          "user_Id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "user_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shift_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "date_Ym": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "list_Status": {
+            "type": "boolean"
+          },
+          "total_WorkTime": {
+            "type": "string",
+            "format": "date-span"
+          },
+          "month_Price": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "u_Confirm_Flg": {
+            "type": "boolean"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "allShift": {
+            "$ref": "#/components/schemas/AllShift"
+          },
+          "userDateShifts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserDateShift"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "WorkRoll": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "dateSchedules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DateSchedule"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
 }

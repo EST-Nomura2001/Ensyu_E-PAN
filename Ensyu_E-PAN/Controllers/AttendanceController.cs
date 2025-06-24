@@ -18,18 +18,49 @@ namespace Ensyu_E_PAN.Controllers
             _context = context;
         }
 
-        [HttpGet("{today}")]
+        //本日分のスケジュールを渡す
+        [HttpGet("Date_Schedules/{today}")]
         public async Task<IActionResult> GetTodayAttendance(DateTime today)
         {
             var records = await _context.Date_Schedules
-             .Where(ds => ds.Today == today) // カラム名は設計に合わせて変更
-                            .Include(ds => ds.User)
-             .Include(ds => ds.WorkRoll)
-             .Include(ds => ds.DayShift)
-             .ToListAsync();
+             .Where(ds => ds.Today.Date == today.Date) // ここで日付だけを比較
+             // DateSchedule 直下の関係
+            .Include(ds => ds.User)
+            .Include(ds => ds.WorkRoll)
+            .Include(ds => ds.DayShift)
 
+            // UserDateShifts → UserShift → User
+            .Include(ds => ds.UserDateShifts)
+                .ThenInclude(uds => uds.UserShift)
+                    .ThenInclude(us => us.User)
+            .ToListAsync();
             return Ok(records);
         }
+
+        //当月分のスケジュールを渡す
+        [HttpGet("AllShiftSchedules/{year}/{month}")]
+        public async Task<IActionResult> GetAllShiftSchedules(int year, int month)
+        {
+            var startDate = new DateTime(year, month, 1);
+            var endDate = startDate.AddMonths(1);
+
+            var dateSchedules = await _context.All_Shifts
+                .Where(a => a.Date >= startDate && a.Date < endDate)
+                .SelectMany(a => a.UserShifts)
+                    .SelectMany(us => us.UserDateShifts)
+                        .Include(uds => uds.DateSchedule)
+                            .ThenInclude(ds => ds.User)
+                        .Include(uds => uds.DateSchedule)
+                            .ThenInclude(ds => ds.WorkRoll)
+                        .Include(uds => uds.DateSchedule)
+                            .ThenInclude(ds => ds.DayShift)
+                .Select(uds => uds.DateSchedule)
+                .ToListAsync();
+
+            return Ok(dateSchedules);
+        }
+
+
 
         /*[HttpGet("today")]
         public IActionResult GetTodayAttendance()

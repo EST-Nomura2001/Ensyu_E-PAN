@@ -2,7 +2,7 @@
   <div class="edit-attendance">
     <h1>勤怠編集</h1>
     <p>6月の勤怠一覧に戻る</p>
-    <p>6月24日</p>
+    <p>{{ dayShiftDate }}</p>
     <div v-if="fetchError" class="fetch-error-message">データを取得できませんでした</div>
     <div>
       <div class="edit-controls">
@@ -95,6 +95,7 @@ export default {
       totalNightWorkTime: '',
       storeName: '',
       fetchError: false,
+      dayShiftDate: '',
     };
   },
   async mounted() {
@@ -109,6 +110,7 @@ export default {
         this.totalWorkTime = res.totalWorkTime || '';
         this.totalNightWorkTime = res.totalNightWorkTime || '';
         this.storeName = res.storeName || '';
+        this.dayShiftDate = res.date || this.date;
         this.fetchError = false;
       } catch (e) {
         this.fetchError = true;
@@ -128,6 +130,7 @@ export default {
         this.totalWorkTime = '24:00';
         this.totalNightWorkTime = '3:00';
         this.storeName = 'デモ店舗';
+        this.dayShiftDate = '2024-06-24';
         // ↑↑↑ デモデータここまで ↑↑↑
       }
     },

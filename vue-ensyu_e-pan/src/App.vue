@@ -17,16 +17,15 @@ import HelloWorld from './components/HelloWorld.vue'
         <!--テスト用-->
         
         <RouterLink to="/admin">アカウント管理・登録</RouterLink>
-        <RouterLink to="/employee">？？？</RouterLink>
-        
+        <RouterLink to="/employee">？？？</RouterLink>        
         <RouterLink to="/attendance-management">勤怠登録</RouterLink>
-        <RouterLink to="/purchase-order">あ</RouterLink>
-        <RouterLink to="/admin"></RouterLink>
+        <RouterLink to="/purchase-order">purchase-order</RouterLink>        
         <RouterLink to="/kibou-form">希望フォーム</RouterLink>
         <RouterLink to="/Attendance-home">勤怠ホーム</RouterLink>
         <RouterLink to="/Make-Attendance">シフト調整</RouterLink>
         <RouterLink to="/Check-Attendance">シフト確認</RouterLink>
         <RouterLink to="/Record-Attendance">勤怠確認</RouterLink>
+        <RouterLink to="/Edit-Attendance">勤怠編集</RouterLink>
 
         
         

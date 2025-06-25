@@ -5,7 +5,7 @@ import axios from 'axios';
 import CommonHeader from '@/components/CommonHeader.vue';
 
 const apiClient = axios.create({
-  baseURL: 'https://localhost:5011/api', // 仮のバックエンドAPIのURL
+  baseURL: 'http://localhost:5011/api', // 仮のバックエンドAPIのURL
   headers: {
     'Content-Type': 'application/json',
   },
@@ -52,7 +52,7 @@ async function registerUser() {
 
 async function fetchUsers() {
   try {
-    const response = await apiClient.get('/users');
+    const response = await apiClient.get('/Account/users/all');
     userList.value = response.data;
   } catch (error) {
     console.error('Failed to fetch users:', error);

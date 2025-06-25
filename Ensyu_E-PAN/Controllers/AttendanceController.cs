@@ -7,6 +7,7 @@ using Ensyu_E_PAN.Models.Attendance;
 using Ensyu_E_PAN.Services;
 using Ensyu_E_PAN.DTOs;
 using Ensyu_E_PAN.DTOs.UpDateAttendance;
+using Ensyu_E_PAN.DTOs.AttendanceDTO;
 using Microsoft.EntityFrameworkCore;
 using Ensyu_E_PAN.DTOs.UpdateAttendance; // Includeメソッドのため
 
@@ -45,7 +46,81 @@ namespace Ensyu_E_PAN.Controllers
         }
 
         //全体の当月分のスケジュールを渡す
-        [HttpGet("AllShiftSchedules/{year}/{month}")]
+
+        [HttpGet("store/{storeId}/allshifts/{year}/{month}")]
+        public async Task<IActionResult> GetStoreMonthlyShifts(int storeId, int year, int month)
+        {
+            var allShifts = await _context.All_Shifts
+                .Where(a => a.Store_ID == storeId && a.Date.Year == year && a.Date.Month == month)
+                .Include(a => a.UserShifts)
+                    .ThenInclude(us => us.UserDateShifts)
+                        .ThenInclude(uds => uds.DateSchedule)
+                            .ThenInclude(ds => ds.User)
+                .Include(a => a.UserShifts)
+                    .ThenInclude(us => us.UserDateShifts)
+                        .ThenInclude(uds => uds.DateSchedule)
+                            .ThenInclude(ds => ds.WorkRoll)
+                .Include(a => a.UserShifts)
+                    .ThenInclude(us => us.UserDateShifts)
+                        .ThenInclude(uds => uds.DateSchedule)
+                            .ThenInclude(ds => ds.DayShift)
+                .ToListAsync();
+
+            var dtoList = allShifts.Select(a => new AllShiftDto
+            {
+                Id = a.Id,
+                Store_ID = a.Store_ID,
+                Date = a.Date,
+                Confirm_Flg = a.Confirm_Flg,
+                Fixed_Date = a.Fixed_Date,
+                Sending_Flg = a.Sending_Flg,
+                Cost = a.Cost,
+                Sum_WorkTime = a.Sum_WorkTime,
+                Rec_Flg = a.Rec_Flg,
+                UserShifts = a.UserShifts.Select(us => new UserShiftDto
+                {
+                    Id = us.Id,
+                    User_Id = us.User_Id,
+                    UserName = us.User?.Name,
+                    List_Status = us.List_Status,
+                    Total_WorkTime = us.Total_WorkTime,
+                    Month_Price = us.Month_Price,
+                    U_Confirm_Flg = us.U_Confirm_Flg,
+                    UserDateShifts = us.UserDateShifts.Select(uds => new UserDateShiftDto
+                    {
+                        Id = uds.Id,
+                        Shift_Date = uds.Shift_Date,
+                        DateSchedule = new DateScheduleDto
+                        {
+                            Id = uds.DateSchedule.Id,
+                            Today = uds.DateSchedule.Today,
+                            P_Start_WorkTime = uds.DateSchedule.P_Start_WorkTime,
+                            P_End_WorkTime = uds.DateSchedule.P_End_WorkTime,
+                            U_Start_WorkTime = uds.DateSchedule.U_Start_WorkTime,
+                            U_End_WorkTime = uds.DateSchedule.U_End_WorkTime,
+                            Start_WorkTime = uds.DateSchedule.Start_WorkTime,
+                            End_WorkTime = uds.DateSchedule.End_WorkTime,
+                            Start_BreakTime = uds.DateSchedule.Start_BreakTime,
+                            End_BreakTime = uds.DateSchedule.End_BreakTime,
+                            T_WorkTime_D = uds.DateSchedule.T_WorkTime_D,
+                            T_WorkTime_N = uds.DateSchedule.T_WorkTime_N,
+                            T_WorkTime_All = uds.DateSchedule.T_WorkTime_All,
+                            D_DayPrice = uds.DateSchedule.D_DayPrice,
+                            N_DayPrice = uds.DateSchedule.N_DayPrice,
+                            T_DayPrice = uds.DateSchedule.T_DayPrice,
+                            UserName = uds.DateSchedule.User?.Name,
+                            WorkRollName = uds.DateSchedule.WorkRoll?.Name,
+                            DayShiftDate = uds.DateSchedule.DayShift?.Date
+                        }
+                    }).ToList()
+                }).ToList()
+            }).ToList();
+
+            return Ok(dtoList);
+        }
+
+        //古いデータ
+        /*[HttpGet("AllShiftSchedules/{year}/{month}")]
         public async Task<IActionResult> GetAllShiftSchedules(int year, int month)
         {
             var startDate = new DateTime(year, month, 1);
@@ -75,7 +150,7 @@ namespace Ensyu_E_PAN.Controllers
                 .ToList();
 
             return Ok(dateSchedules);
-        }
+        }*/
 
         //個人の本日のスケジュール
         [HttpGet("UserSchedule/Day/{userId}/{date}")]

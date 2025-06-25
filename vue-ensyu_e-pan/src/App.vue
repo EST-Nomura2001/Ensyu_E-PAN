@@ -18,7 +18,7 @@ import { RouterLink, RouterView } from 'vue-router'
       <RouterLink to="/Check-Attendance">シフト確認</RouterLink>
       <RouterLink to="/Record-Attendance">勤怠確認</RouterLink>
     </nav>
->>>>>>> ff2a90b674064120c025837788c727d8b49005fd
+
   </header>
 
   <RouterView />

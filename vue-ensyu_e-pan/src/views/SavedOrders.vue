@@ -47,22 +47,22 @@
             <!-- :key: Vue.jsがリストの各要素を識別するための一意なキー -->
             <!-- @click: 行をクリックした時の処理 -->
             <!-- :class: 条件によってCSSクラスを動的に適用 -->
-            <tr v-for="order in savedOrders" :key="order.id" 
-                @click="navigateToPurchaseOrder(order.id)" 
+            <tr v-for="order in savedOrders" :key="order.Id" 
+                @click="navigateToPurchaseOrder(order.Id)" 
                 class="order-row"
-                :class="{ 'order-confirmed': order.isConfirmed }">
+                :class="{ 'order-confirmed': order.Confirm_Flg }">
               <!-- 各データを表示 -->
               <td>{{ order.Quotation }}</td>
               <td>{{ order.Title }}</td>
               <td>{{ order.Company.C_Name }}</td>
               <!-- 日付フォーマット関数を使用 -->
               <td>{{ formatDate(order.Order_Date) }}</td>
-              <td>{{ formatDateTime(order.createdAt) }}</td>
+              <td>{{ formatDateTime(order.CreatedAt) }}</td>
               <!-- 確定済みの場合のみチェックマークを表示 -->
               <td class="col-confirm">
-                <span v-if="order.isConfirmed" class="confirmed-mark">✔</span>
+                <span v-if="order.Confirm_Flg" class="confirmed-mark">✔</span>
               </td>
-            </tr>
+            </tr> 
           </tbody>
         </table>
       </div>

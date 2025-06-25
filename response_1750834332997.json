@@ -1,0 +1,2471 @@
+{
+  "$id": "1",
+  "$values": [
+    {
+      "$id": "2",
+      "id": 32,
+      "today": "2025-07-01T00:00:00",
+      "user_Id": 1,
+      "work_Roll_Id": 0,
+      "day_Shift_Id": 32,
+      "p_Start_WorkTime": null,
+      "p_End_WorkTime": null,
+      "u_Start_WorkTime": null,
+      "u_End_WorkTime": null,
+      "start_WorkTime": null,
+      "end_WorkTime": null,
+      "start_BreakTime": null,
+      "end_BreakTime": null,
+      "t_WorkTime_D": null,
+      "t_WorkTime_N": null,
+      "t_WorkTime_All": null,
+      "d_DayPrice": null,
+      "n_DayPrice": null,
+      "t_DayPrice": null,
+      "user": {
+        "$id": "3",
+        "id": 1,
+        "login_Id": "suzuki001",
+        "name": "鈴木一郎",
+        "roll_Cd": 1,
+        "password": "Admin123",
+        "stores_Cd": 1,
+        "timePrice_D": 1200,
+        "timePrice_N": 1600,
+        "roll": null,
+        "store": null,
+        "userShifts": {
+          "$id": "4",
+          "$values": [
+            {
+              "$id": "5",
+              "id": 2,
+              "user_Id": 1,
+              "shift_Id": 2,
+              "date_Ym": "2025-07-01T00:00:00",
+              "list_Status": false,
+              "total_WorkTime": "16:00:00",
+              "month_Price": 20400,
+              "u_Confirm_Flg": false,
+              "user": {
+                "$ref": "3"
+              },
+              "allShift": {
+                "$id": "6",
+                "id": 2,
+                "store_ID": 1,
+                "date": "2025-07-01T00:00:00",
+                "confirm_Flg": false,
+                "fixed_Date": "2025-07-21T00:00:00",
+                "sending_Flg": false,
+                "cost": 20400,
+                "sum_WorkTime": "16:00:00",
+                "rec_Flg": true,
+                "store": null,
+                "dayShifts": {
+                  "$id": "7",
+                  "$values": [
+                    {
+                      "$id": "8",
+                      "id": 32,
+                      "date": "2025-07-01T00:00:00",
+                      "all_Shift_Id": 2,
+                      "sum_WorkTime": "00:00:00",
+                      "sum_TotalCost": 0,
+                      "allShift": {
+                        "$ref": "6"
+                      },
+                      "dateSchedules": {
+                        "$id": "9",
+                        "$values": [
+                          {
+                            "$ref": "2"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "$id": "10",
+                      "id": 33,
+                      "date": "2025-07-02T00:00:00",
+                      "all_Shift_Id": 2,
+                      "sum_WorkTime": "00:00:00",
+                      "sum_TotalCost": 0,
+                      "allShift": {
+                        "$ref": "6"
+                      },
+                      "dateSchedules": {
+                        "$id": "11",
+                        "$values": [
+                          {
+                            "$id": "12",
+                            "id": 33,
+                            "today": "2025-07-02T00:00:00",
+                            "user_Id": 1,
+                            "work_Roll_Id": 0,
+                            "day_Shift_Id": 33,
+                            "p_Start_WorkTime": null,
+                            "p_End_WorkTime": null,
+                            "u_Start_WorkTime": null,
+                            "u_End_WorkTime": null,
+                            "start_WorkTime": null,
+                            "end_WorkTime": null,
+                            "start_BreakTime": null,
+                            "end_BreakTime": null,
+                            "t_WorkTime_D": null,
+                            "t_WorkTime_N": null,
+                            "t_WorkTime_All": null,
+                            "d_DayPrice": null,
+                            "n_DayPrice": null,
+                            "t_DayPrice": null,
+                            "user": {
+                              "$ref": "3"
+                            },
+                            "workRoll": {
+                              "$id": "13",
+                              "id": 0,
+                              "name": "フリー",
+                              "dateSchedules": {
+                                "$id": "14",
+                                "$values": [
+                                  {
+                                    "$ref": "2"
+                                  },
+                                  {
+                                    "$ref": "12"
+                                  },
+                                  {
+                                    "$id": "15",
+                                    "id": 34,
+                                    "today": "2025-07-03T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 34,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "16",
+                                      "id": 34,
+                                      "date": "2025-07-03T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "17",
+                                        "$values": [
+                                          {
+                                            "$ref": "15"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "18",
+                                      "$values": [
+                                        {
+                                          "$id": "19",
+                                          "id": 34,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-03T00:00:00",
+                                          "date_Schedule_Id": 34,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "15"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "20",
+                                    "id": 35,
+                                    "today": "2025-07-04T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 35,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "21",
+                                      "id": 35,
+                                      "date": "2025-07-04T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "22",
+                                        "$values": [
+                                          {
+                                            "$ref": "20"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "23",
+                                      "$values": [
+                                        {
+                                          "$id": "24",
+                                          "id": 35,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-04T00:00:00",
+                                          "date_Schedule_Id": 35,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "20"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "25",
+                                    "id": 36,
+                                    "today": "2025-07-05T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 36,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "26",
+                                      "id": 36,
+                                      "date": "2025-07-05T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "27",
+                                        "$values": [
+                                          {
+                                            "$ref": "25"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "28",
+                                      "$values": [
+                                        {
+                                          "$id": "29",
+                                          "id": 36,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-05T00:00:00",
+                                          "date_Schedule_Id": 36,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "25"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "30",
+                                    "id": 37,
+                                    "today": "2025-07-06T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 37,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "31",
+                                      "id": 37,
+                                      "date": "2025-07-06T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "32",
+                                        "$values": [
+                                          {
+                                            "$ref": "30"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "33",
+                                      "$values": [
+                                        {
+                                          "$id": "34",
+                                          "id": 37,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-06T00:00:00",
+                                          "date_Schedule_Id": 37,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "30"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "35",
+                                    "id": 39,
+                                    "today": "2025-07-08T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 39,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "36",
+                                      "id": 39,
+                                      "date": "2025-07-08T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "37",
+                                        "$values": [
+                                          {
+                                            "$ref": "35"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "38",
+                                      "$values": [
+                                        {
+                                          "$id": "39",
+                                          "id": 39,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-08T00:00:00",
+                                          "date_Schedule_Id": 39,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "35"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "40",
+                                    "id": 40,
+                                    "today": "2025-07-09T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 40,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "41",
+                                      "id": 40,
+                                      "date": "2025-07-09T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "42",
+                                        "$values": [
+                                          {
+                                            "$ref": "40"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "43",
+                                      "$values": [
+                                        {
+                                          "$id": "44",
+                                          "id": 40,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-09T00:00:00",
+                                          "date_Schedule_Id": 40,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "40"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "45",
+                                    "id": 41,
+                                    "today": "2025-07-10T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 41,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "46",
+                                      "id": 41,
+                                      "date": "2025-07-10T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "47",
+                                        "$values": [
+                                          {
+                                            "$ref": "45"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "48",
+                                      "$values": [
+                                        {
+                                          "$id": "49",
+                                          "id": 41,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-10T00:00:00",
+                                          "date_Schedule_Id": 41,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "45"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "50",
+                                    "id": 42,
+                                    "today": "2025-07-11T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 42,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "51",
+                                      "id": 42,
+                                      "date": "2025-07-11T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "52",
+                                        "$values": [
+                                          {
+                                            "$ref": "50"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "53",
+                                      "$values": [
+                                        {
+                                          "$id": "54",
+                                          "id": 42,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-11T00:00:00",
+                                          "date_Schedule_Id": 42,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "50"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "55",
+                                    "id": 43,
+                                    "today": "2025-07-12T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 43,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "56",
+                                      "id": 43,
+                                      "date": "2025-07-12T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "57",
+                                        "$values": [
+                                          {
+                                            "$ref": "55"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "58",
+                                      "$values": [
+                                        {
+                                          "$id": "59",
+                                          "id": 43,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-12T00:00:00",
+                                          "date_Schedule_Id": 43,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "55"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "60",
+                                    "id": 44,
+                                    "today": "2025-07-13T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 44,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "61",
+                                      "id": 44,
+                                      "date": "2025-07-13T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "62",
+                                        "$values": [
+                                          {
+                                            "$ref": "60"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "63",
+                                      "$values": [
+                                        {
+                                          "$id": "64",
+                                          "id": 44,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-13T00:00:00",
+                                          "date_Schedule_Id": 44,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "60"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "65",
+                                    "id": 45,
+                                    "today": "2025-07-14T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 45,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "66",
+                                      "id": 45,
+                                      "date": "2025-07-14T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "67",
+                                        "$values": [
+                                          {
+                                            "$ref": "65"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "68",
+                                      "$values": [
+                                        {
+                                          "$id": "69",
+                                          "id": 45,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-14T00:00:00",
+                                          "date_Schedule_Id": 45,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "65"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "70",
+                                    "id": 46,
+                                    "today": "2025-07-15T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 46,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "71",
+                                      "id": 46,
+                                      "date": "2025-07-15T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "72",
+                                        "$values": [
+                                          {
+                                            "$ref": "70"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "73",
+                                      "$values": [
+                                        {
+                                          "$id": "74",
+                                          "id": 46,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-15T00:00:00",
+                                          "date_Schedule_Id": 46,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "70"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "75",
+                                    "id": 47,
+                                    "today": "2025-07-16T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 47,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "76",
+                                      "id": 47,
+                                      "date": "2025-07-16T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "77",
+                                        "$values": [
+                                          {
+                                            "$ref": "75"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "78",
+                                      "$values": [
+                                        {
+                                          "$id": "79",
+                                          "id": 47,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-16T00:00:00",
+                                          "date_Schedule_Id": 47,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "75"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "80",
+                                    "id": 48,
+                                    "today": "2025-07-17T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 48,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "81",
+                                      "id": 48,
+                                      "date": "2025-07-17T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "82",
+                                        "$values": [
+                                          {
+                                            "$ref": "80"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "83",
+                                      "$values": [
+                                        {
+                                          "$id": "84",
+                                          "id": 48,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-17T00:00:00",
+                                          "date_Schedule_Id": 48,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "80"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "85",
+                                    "id": 49,
+                                    "today": "2025-07-18T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 49,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "86",
+                                      "id": 49,
+                                      "date": "2025-07-18T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "87",
+                                        "$values": [
+                                          {
+                                            "$ref": "85"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "88",
+                                      "$values": [
+                                        {
+                                          "$id": "89",
+                                          "id": 49,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-18T00:00:00",
+                                          "date_Schedule_Id": 49,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "85"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "90",
+                                    "id": 50,
+                                    "today": "2025-07-19T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 50,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "91",
+                                      "id": 50,
+                                      "date": "2025-07-19T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "92",
+                                        "$values": [
+                                          {
+                                            "$ref": "90"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "93",
+                                      "$values": [
+                                        {
+                                          "$id": "94",
+                                          "id": 50,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-19T00:00:00",
+                                          "date_Schedule_Id": 50,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "90"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "95",
+                                    "id": 51,
+                                    "today": "2025-07-20T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 51,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "96",
+                                      "id": 51,
+                                      "date": "2025-07-20T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "97",
+                                        "$values": [
+                                          {
+                                            "$ref": "95"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "98",
+                                      "$values": [
+                                        {
+                                          "$id": "99",
+                                          "id": 51,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-20T00:00:00",
+                                          "date_Schedule_Id": 51,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "95"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "100",
+                                    "id": 52,
+                                    "today": "2025-07-21T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 52,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "101",
+                                      "id": 52,
+                                      "date": "2025-07-21T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "102",
+                                        "$values": [
+                                          {
+                                            "$ref": "100"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "103",
+                                      "$values": [
+                                        {
+                                          "$id": "104",
+                                          "id": 52,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-21T00:00:00",
+                                          "date_Schedule_Id": 52,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "100"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "105",
+                                    "id": 53,
+                                    "today": "2025-07-22T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 53,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "106",
+                                      "id": 53,
+                                      "date": "2025-07-22T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "107",
+                                        "$values": [
+                                          {
+                                            "$ref": "105"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "108",
+                                      "$values": [
+                                        {
+                                          "$id": "109",
+                                          "id": 53,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-22T00:00:00",
+                                          "date_Schedule_Id": 53,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "105"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "110",
+                                    "id": 54,
+                                    "today": "2025-07-23T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 54,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "111",
+                                      "id": 54,
+                                      "date": "2025-07-23T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "112",
+                                        "$values": [
+                                          {
+                                            "$ref": "110"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "113",
+                                      "$values": [
+                                        {
+                                          "$id": "114",
+                                          "id": 54,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-23T00:00:00",
+                                          "date_Schedule_Id": 54,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "110"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "115",
+                                    "id": 55,
+                                    "today": "2025-07-24T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 55,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "116",
+                                      "id": 55,
+                                      "date": "2025-07-24T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "117",
+                                        "$values": [
+                                          {
+                                            "$ref": "115"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "118",
+                                      "$values": [
+                                        {
+                                          "$id": "119",
+                                          "id": 55,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-24T00:00:00",
+                                          "date_Schedule_Id": 55,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "115"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "120",
+                                    "id": 56,
+                                    "today": "2025-07-25T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 56,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "121",
+                                      "id": 56,
+                                      "date": "2025-07-25T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "122",
+                                        "$values": [
+                                          {
+                                            "$ref": "120"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "123",
+                                      "$values": [
+                                        {
+                                          "$id": "124",
+                                          "id": 56,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-25T00:00:00",
+                                          "date_Schedule_Id": 56,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "120"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "125",
+                                    "id": 57,
+                                    "today": "2025-07-26T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 57,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "126",
+                                      "id": 57,
+                                      "date": "2025-07-26T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "127",
+                                        "$values": [
+                                          {
+                                            "$ref": "125"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "128",
+                                      "$values": [
+                                        {
+                                          "$id": "129",
+                                          "id": 57,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-26T00:00:00",
+                                          "date_Schedule_Id": 57,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "125"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "130",
+                                    "id": 58,
+                                    "today": "2025-07-27T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 58,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "131",
+                                      "id": 58,
+                                      "date": "2025-07-27T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "132",
+                                        "$values": [
+                                          {
+                                            "$ref": "130"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "133",
+                                      "$values": [
+                                        {
+                                          "$id": "134",
+                                          "id": 58,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-27T00:00:00",
+                                          "date_Schedule_Id": 58,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "130"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "135",
+                                    "id": 59,
+                                    "today": "2025-07-28T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 59,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "136",
+                                      "id": 59,
+                                      "date": "2025-07-28T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "137",
+                                        "$values": [
+                                          {
+                                            "$ref": "135"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "138",
+                                      "$values": [
+                                        {
+                                          "$id": "139",
+                                          "id": 59,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-28T00:00:00",
+                                          "date_Schedule_Id": 59,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "135"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "140",
+                                    "id": 60,
+                                    "today": "2025-07-29T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 60,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "141",
+                                      "id": 60,
+                                      "date": "2025-07-29T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "142",
+                                        "$values": [
+                                          {
+                                            "$ref": "140"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "143",
+                                      "$values": [
+                                        {
+                                          "$id": "144",
+                                          "id": 60,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-29T00:00:00",
+                                          "date_Schedule_Id": 60,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "140"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "145",
+                                    "id": 61,
+                                    "today": "2025-07-30T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 61,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "146",
+                                      "id": 61,
+                                      "date": "2025-07-30T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "147",
+                                        "$values": [
+                                          {
+                                            "$ref": "145"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "148",
+                                      "$values": [
+                                        {
+                                          "$id": "149",
+                                          "id": 61,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-30T00:00:00",
+                                          "date_Schedule_Id": 61,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "145"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "$id": "150",
+                                    "id": 62,
+                                    "today": "2025-07-31T00:00:00",
+                                    "user_Id": 1,
+                                    "work_Roll_Id": 0,
+                                    "day_Shift_Id": 62,
+                                    "p_Start_WorkTime": null,
+                                    "p_End_WorkTime": null,
+                                    "u_Start_WorkTime": null,
+                                    "u_End_WorkTime": null,
+                                    "start_WorkTime": null,
+                                    "end_WorkTime": null,
+                                    "start_BreakTime": null,
+                                    "end_BreakTime": null,
+                                    "t_WorkTime_D": null,
+                                    "t_WorkTime_N": null,
+                                    "t_WorkTime_All": null,
+                                    "d_DayPrice": null,
+                                    "n_DayPrice": null,
+                                    "t_DayPrice": null,
+                                    "user": {
+                                      "$ref": "3"
+                                    },
+                                    "workRoll": {
+                                      "$ref": "13"
+                                    },
+                                    "dayShift": {
+                                      "$id": "151",
+                                      "id": 62,
+                                      "date": "2025-07-31T00:00:00",
+                                      "all_Shift_Id": 2,
+                                      "sum_WorkTime": "00:00:00",
+                                      "sum_TotalCost": 0,
+                                      "allShift": {
+                                        "$ref": "6"
+                                      },
+                                      "dateSchedules": {
+                                        "$id": "152",
+                                        "$values": [
+                                          {
+                                            "$ref": "150"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "userDateShifts": {
+                                      "$id": "153",
+                                      "$values": [
+                                        {
+                                          "$id": "154",
+                                          "id": 62,
+                                          "user_Shift_Id": 2,
+                                          "shift_Date": "2025-07-31T00:00:00",
+                                          "date_Schedule_Id": 62,
+                                          "userShift": {
+                                            "$ref": "5"
+                                          },
+                                          "dateSchedule": {
+                                            "$ref": "150"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "dayShift": {
+                              "$ref": "10"
+                            },
+                            "userDateShifts": {
+                              "$id": "155",
+                              "$values": [
+                                {
+                                  "$id": "156",
+                                  "id": 33,
+                                  "user_Shift_Id": 2,
+                                  "shift_Date": "2025-07-02T00:00:00",
+                                  "date_Schedule_Id": 33,
+                                  "userShift": {
+                                    "$ref": "5"
+                                  },
+                                  "dateSchedule": {
+                                    "$ref": "12"
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "$ref": "16"
+                    },
+                    {
+                      "$ref": "21"
+                    },
+                    {
+                      "$ref": "26"
+                    },
+                    {
+                      "$ref": "31"
+                    },
+                    {
+                      "$id": "157",
+                      "id": 38,
+                      "date": "2025-07-07T00:00:00",
+                      "all_Shift_Id": 2,
+                      "sum_WorkTime": "16:00:00",
+                      "sum_TotalCost": 20400,
+                      "allShift": {
+                        "$ref": "6"
+                      },
+                      "dateSchedules": {
+                        "$id": "158",
+                        "$values": [
+                          {
+                            "$id": "159",
+                            "id": 38,
+                            "today": "2025-07-07T00:00:00",
+                            "user_Id": 1,
+                            "work_Roll_Id": 1,
+                            "day_Shift_Id": 38,
+                            "p_Start_WorkTime": null,
+                            "p_End_WorkTime": null,
+                            "u_Start_WorkTime": null,
+                            "u_End_WorkTime": null,
+                            "start_WorkTime": "2025-06-24T08:00:00",
+                            "end_WorkTime": "2025-06-25T01:00:00",
+                            "start_BreakTime": "2025-06-24T12:00:00",
+                            "end_BreakTime": "2025-06-24T13:00:00",
+                            "t_WorkTime_D": "13:00:00",
+                            "t_WorkTime_N": "03:00:00",
+                            "t_WorkTime_All": "16:00:00",
+                            "d_DayPrice": 15600,
+                            "n_DayPrice": 4800,
+                            "t_DayPrice": 20400,
+                            "user": {
+                              "$ref": "3"
+                            },
+                            "workRoll": {
+                              "$id": "160",
+                              "id": 1,
+                              "name": "ホール",
+                              "dateSchedules": {
+                                "$id": "161",
+                                "$values": [
+                                  {
+                                    "$ref": "159"
+                                  }
+                                ]
+                              }
+                            },
+                            "dayShift": {
+                              "$ref": "157"
+                            },
+                            "userDateShifts": {
+                              "$id": "162",
+                              "$values": [
+                                {
+                                  "$id": "163",
+                                  "id": 38,
+                                  "user_Shift_Id": 2,
+                                  "shift_Date": "2025-07-07T00:00:00",
+                                  "date_Schedule_Id": 38,
+                                  "userShift": {
+                                    "$ref": "5"
+                                  },
+                                  "dateSchedule": {
+                                    "$ref": "159"
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "$ref": "36"
+                    },
+                    {
+                      "$ref": "41"
+                    },
+                    {
+                      "$ref": "46"
+                    },
+                    {
+                      "$ref": "51"
+                    },
+                    {
+                      "$ref": "56"
+                    },
+                    {
+                      "$ref": "61"
+                    },
+                    {
+                      "$ref": "66"
+                    },
+                    {
+                      "$ref": "71"
+                    },
+                    {
+                      "$ref": "76"
+                    },
+                    {
+                      "$ref": "81"
+                    },
+                    {
+                      "$ref": "86"
+                    },
+                    {
+                      "$ref": "91"
+                    },
+                    {
+                      "$ref": "96"
+                    },
+                    {
+                      "$ref": "101"
+                    },
+                    {
+                      "$ref": "106"
+                    },
+                    {
+                      "$ref": "111"
+                    },
+                    {
+                      "$ref": "116"
+                    },
+                    {
+                      "$ref": "121"
+                    },
+                    {
+                      "$ref": "126"
+                    },
+                    {
+                      "$ref": "131"
+                    },
+                    {
+                      "$ref": "136"
+                    },
+                    {
+                      "$ref": "141"
+                    },
+                    {
+                      "$ref": "146"
+                    },
+                    {
+                      "$ref": "151"
+                    }
+                  ]
+                },
+                "userShifts": {
+                  "$id": "164",
+                  "$values": [
+                    {
+                      "$ref": "5"
+                    }
+                  ]
+                }
+              },
+              "userDateShifts": {
+                "$id": "165",
+                "$values": [
+                  {
+                    "$id": "166",
+                    "id": 32,
+                    "user_Shift_Id": 2,
+                    "shift_Date": "2025-07-01T00:00:00",
+                    "date_Schedule_Id": 32,
+                    "userShift": {
+                      "$ref": "5"
+                    },
+                    "dateSchedule": {
+                      "$ref": "2"
+                    }
+                  },
+                  {
+                    "$ref": "156"
+                  },
+                  {
+                    "$ref": "19"
+                  },
+                  {
+                    "$ref": "24"
+                  },
+                  {
+                    "$ref": "29"
+                  },
+                  {
+                    "$ref": "34"
+                  },
+                  {
+                    "$ref": "163"
+                  },
+                  {
+                    "$ref": "39"
+                  },
+                  {
+                    "$ref": "44"
+                  },
+                  {
+                    "$ref": "49"
+                  },
+                  {
+                    "$ref": "54"
+                  },
+                  {
+                    "$ref": "59"
+                  },
+                  {
+                    "$ref": "64"
+                  },
+                  {
+                    "$ref": "69"
+                  },
+                  {
+                    "$ref": "74"
+                  },
+                  {
+                    "$ref": "79"
+                  },
+                  {
+                    "$ref": "84"
+                  },
+                  {
+                    "$ref": "89"
+                  },
+                  {
+                    "$ref": "94"
+                  },
+                  {
+                    "$ref": "99"
+                  },
+                  {
+                    "$ref": "104"
+                  },
+                  {
+                    "$ref": "109"
+                  },
+                  {
+                    "$ref": "114"
+                  },
+                  {
+                    "$ref": "119"
+                  },
+                  {
+                    "$ref": "124"
+                  },
+                  {
+                    "$ref": "129"
+                  },
+                  {
+                    "$ref": "134"
+                  },
+                  {
+                    "$ref": "139"
+                  },
+                  {
+                    "$ref": "144"
+                  },
+                  {
+                    "$ref": "149"
+                  },
+                  {
+                    "$ref": "154"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "dateSchedules": {
+          "$id": "167",
+          "$values": [
+            {
+              "$ref": "2"
+            },
+            {
+              "$ref": "12"
+            },
+            {
+              "$ref": "15"
+            },
+            {
+              "$ref": "20"
+            },
+            {
+              "$ref": "25"
+            },
+            {
+              "$ref": "30"
+            },
+            {
+              "$ref": "159"
+            },
+            {
+              "$ref": "35"
+            },
+            {
+              "$ref": "40"
+            },
+            {
+              "$ref": "45"
+            },
+            {
+              "$ref": "50"
+            },
+            {
+              "$ref": "55"
+            },
+            {
+              "$ref": "60"
+            },
+            {
+              "$ref": "65"
+            },
+            {
+              "$ref": "70"
+            },
+            {
+              "$ref": "75"
+            },
+            {
+              "$ref": "80"
+            },
+            {
+              "$ref": "85"
+            },
+            {
+              "$ref": "90"
+            },
+            {
+              "$ref": "95"
+            },
+            {
+              "$ref": "100"
+            },
+            {
+              "$ref": "105"
+            },
+            {
+              "$ref": "110"
+            },
+            {
+              "$ref": "115"
+            },
+            {
+              "$ref": "120"
+            },
+            {
+              "$ref": "125"
+            },
+            {
+              "$ref": "130"
+            },
+            {
+              "$ref": "135"
+            },
+            {
+              "$ref": "140"
+            },
+            {
+              "$ref": "145"
+            },
+            {
+              "$ref": "150"
+            }
+          ]
+        }
+      },
+      "workRoll": {
+        "$ref": "13"
+      },
+      "dayShift": {
+        "$ref": "8"
+      },
+      "userDateShifts": {
+        "$id": "168",
+        "$values": [
+          {
+            "$ref": "166"
+          }
+        ]
+      }
+    },
+    {
+      "$ref": "12"
+    },
+    {
+      "$ref": "15"
+    },
+    {
+      "$ref": "20"
+    },
+    {
+      "$ref": "25"
+    },
+    {
+      "$ref": "30"
+    },
+    {
+      "$ref": "159"
+    },
+    {
+      "$ref": "35"
+    },
+    {
+      "$ref": "40"
+    },
+    {
+      "$ref": "45"
+    },
+    {
+      "$ref": "50"
+    },
+    {
+      "$ref": "55"
+    },
+    {
+      "$ref": "60"
+    },
+    {
+      "$ref": "65"
+    },
+    {
+      "$ref": "70"
+    },
+    {
+      "$ref": "75"
+    },
+    {
+      "$ref": "80"
+    },
+    {
+      "$ref": "85"
+    },
+    {
+      "$ref": "90"
+    },
+    {
+      "$ref": "95"
+    },
+    {
+      "$ref": "100"
+    },
+    {
+      "$ref": "105"
+    },
+    {
+      "$ref": "110"
+    },
+    {
+      "$ref": "115"
+    },
+    {
+      "$ref": "120"
+    },
+    {
+      "$ref": "125"
+    },
+    {
+      "$ref": "130"
+    },
+    {
+      "$ref": "135"
+    },
+    {
+      "$ref": "140"
+    },
+    {
+      "$ref": "145"
+    },
+    {
+      "$ref": "150"
+    }
+  ]
+}

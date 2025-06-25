@@ -257,8 +257,8 @@ export function updateAttendanceByDateStore(date, storeId, users) {
  * @description 翌月のシフトデータを新規作成します。
  * @returns {Promise<Object>} 成功レスポンス
  */
-export const generateMonthly = () => {
-  return apiClient.post('/Attendance/generate-monthly');
+export const generateMonthly = (postDate) => {
+  return axios.post(`http://localhost:5011/api/Attendance/generate-monthly/${postDate}`);
 };
 
 /**

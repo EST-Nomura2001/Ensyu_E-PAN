@@ -199,12 +199,13 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { getDateSchedulesByDate } from '../services/api.js';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 import CommonHeader from '../components/CommonHeader.vue';  //ヘッダー
 
 
 const router = useRouter();
+const route = useRoute();
 
 // --- State ---
 const currentDate = ref(new Date());
@@ -392,8 +393,19 @@ const goToMakeAttendance = () => {
 
 // --- Lifecycle Hooks ---
 onMounted(() => {
-  currentDate.value = new Date(2024, 5, 23); // For consistent mock data
-  calendarDate.value = new Date(2024, 5, 23);
+  // クエリから日付取得
+  let dateParam = route.query.date;
+  let initialDate;
+  if (dateParam && typeof dateParam === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+    // "YYYY-MM-DD" 形式
+    const [yyyy, mm, dd] = dateParam.split('-').map(Number);
+    initialDate = new Date(yyyy, mm - 1, dd);
+  } else {
+    // クエリがなければ本日
+    initialDate = new Date();
+  }
+  currentDate.value = initialDate;
+  calendarDate.value = new Date(initialDate);
   fetchShifts(currentDate.value);
 });
 </script>

@@ -260,4 +260,50 @@ export function updateAttendanceByDateStore(date, storeId, users) {
  */
 export const generateMonthly = () => {
   return apiClient.post('/Attendance/generate-monthly');
-}; 
+};
+
+/**
+ * @description 指定年月の全ユーザーの日別勤怠実績（RecordAttendanceの各人の日付列用）を取得します。
+ * @param {number} year 年（例: 2025）
+ * @param {number} month 月（例: 6）
+ * @returns {Promise<Array>} DateScheduleの配列
+ */
+export async function fetchAllShiftSchedules(year, month) {
+  // Swagger: /api/Attendance/AllShiftSchedules/{year}/{month}
+  // 例: http://localhost:5011/api/Attendance/AllShiftSchedules/2025/6
+  try {
+    const response = await axios.get(
+      `http://localhost:5011/api/Attendance/AllShiftSchedules/${year}/${month}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('全ユーザー日別勤怠データ取得失敗:', error);
+    throw error;
+  }
+}
+
+/**
+ * @description 指定年月の全体合計（労働時間・人件費など）を取得します。
+ * @param {number} year 年
+ * @param {number} month 月
+ * @returns {Promise<Object>} 合計値オブジェクト
+ */
+export async function fetchAllShiftsSummary(year, month) {
+  // 合計行・合計列用API（例: /api/Attendance/AllShiftsSummary/{year}/{month}）
+  try {
+    const response = await axios.get(
+      `http://localhost:5011/api/Attendance/AllShiftsSummary/${year}/${month}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('全体合計データ取得失敗:', error);
+    throw error;
+  }
+}
+
+// 日付指定でDateScheduleデータ取得
+export async function getDateSchedulesByDate(today) {
+  // todayは "YYYY-MM-DD" 形式で渡すことを推奨
+  const response = await axios.get(`http://localhost:5011/api/Attendance/DateSchedules/${today}`);
+  return response.data;
+} 

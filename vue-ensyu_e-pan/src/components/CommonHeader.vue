@@ -6,7 +6,7 @@ import { RouterLink } from 'vue-router'
   <header class="common-header">
     <nav>
       <ul class="header-nav">
-        <li><RouterLink to="/attendance">本日のシフト勤怠登録</RouterLink></li>
+        <li><RouterLink to="/attendance-management">本日のシフト勤怠登録</RouterLink></li>
         <li><RouterLink to="/attendance-home">勤怠ホーム</RouterLink></li>
         <li><RouterLink to="/kibou-form">シフト希望フォーム</RouterLink></li>
         <li><RouterLink to="/purchase-order">発注管理</RouterLink></li>

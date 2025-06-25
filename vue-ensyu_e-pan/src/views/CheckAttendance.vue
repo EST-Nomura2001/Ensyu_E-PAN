@@ -198,7 +198,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { getShiftsByDate } from '../services/api.js';
+import { getDateSchedulesByDate } from '../services/api.js';
 import { useRouter } from 'vue-router';
 
 import CommonHeader from '../components/CommonHeader.vue';  //ヘッダー
@@ -343,10 +343,29 @@ const fetchShifts = async (date) => {
   loading.value = true;
   apiError.value = null;
   try {
-    const data = await getShiftsByDate(date);
-    const filteredSchedules = data.schedules.filter(s => s.hopeStart || s.plannedStart);
-    schedules.value = JSON.parse(JSON.stringify(filteredSchedules));
-    storeName.value = data.storeName;
+    // 日付を "YYYY-MM-DD" 形式に変換
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const dateString = `${yyyy}-${mm}-${dd}`;
+
+    const data = await getDateSchedulesByDate(dateString);
+    console.log('APIレスポンス', data);
+
+    // dataが配列でなければ$valuesを参照
+    const rawSchedules = Array.isArray(data) ? data : (data.$values || []);
+    schedules.value = rawSchedules.map(ds => ({
+      scheduleId: ds.id,
+      userName: ds.user?.name || '',
+      hourlyWage: ds.user?.hourlyWage || '',
+      workRollName: ds.workRoll?.name || '',
+      plannedStart: ds.pStartWorktime ? ds.pStartWorktime.substring(11, 16) : '',
+      plannedEnd: ds.pEndWorktime ? ds.pEndWorktime.substring(11, 16) : '',
+      hopeStart: ds.uStartWorktime ? ds.uStartWorktime.substring(11, 16) : '',
+      hopeEnd: ds.uEndWorktime ? ds.uEndWorktime.substring(11, 16) : ''
+    }));
+    // 店舗名は必要に応じてセット（APIで取得できる場合のみ）
+    storeName.value = rawSchedules.length > 0 && rawSchedules[0].storeName ? rawSchedules[0].storeName : '';
   } catch (error) {
     apiError.value = 'シフトデータの読み込みに失敗しました。';
     console.error(error);

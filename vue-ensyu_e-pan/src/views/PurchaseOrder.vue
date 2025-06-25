@@ -1,4 +1,3 @@
-
 <!-- 
   発注書作成フォームのVue.jsコンポーネント
   このコンポーネントは発注書を作成・編集・印刷する機能を持っています
@@ -13,7 +12,7 @@
         <!-- 発注元の会社情報 -->
         <div class="company-info">
           <!-- v-modelは双方向データバインディング：入力内容がデータと同期される -->
-          <input type="text" v-model="purchaseOrder.company_Cd" class="issuer-company-name" placeholder="会社CD">
+          <input type="text" v-model="purchaseOrder.Company_Cd" class="issuer-company-name" placeholder="会社CD">
           <div class="issuer-address">
               <span>〒</span>
               <!-- 郵便番号入力欄 -->
@@ -100,11 +99,11 @@
             </tr>
             <tr>
               <th>支払期日:</th>
-              <td><input type="date" v-model="purchaseOrder.payment_Date"></td>
+              <td><input type="date" v-model="purchaseOrder.Payment_Date"></td>
             </tr>
             <tr>
               <th>支払条件:</th>
-              <td><input type="text" v-model="purchaseOrder.PaymentTerms" placeholder="月末締め、翌月末払い"></td>
+              <td><input type="text" v-model="purchaseOrder.Payment_Terms" placeholder="月末締め、翌月末払い"></td>
             </tr>
             <tr>
               <th>見積No:</th>
@@ -136,13 +135,13 @@
           <tbody>
             <!-- v-forで商品項目を繰り返し表示 -->
             <!-- (item, index)でitemは商品データ、indexは配列の番号 -->
-            <tr v-for="(item, index) in purchaseOrder.orderItemLists" :key="index">
+            <tr v-for="(item, index) in purchaseOrder.OrderItemLists" :key="index">
               <td>{{ index + 1 }}</td>
               <td>
-                <input type="text" v-model="item.item_Cd" list="product-list" placeholder="商品コードまたは商品名">
+                <input type="text" v-model="item.Item_Cd" list="product-list" placeholder="商品コードまたは商品名">
               </td>
               <td>
-                <input type="number" v-model.number="item.amount" placeholder="数量">
+                <input type="number" v-model.number="item.Amount" placeholder="数量">
               </td>
               <td class="no-print">
                 <button @click="removeItem(index)" class="remove-btn">削除</button>
@@ -169,12 +168,12 @@
       
       <!-- 下書き保存ボタン -->
       <button @click="handleSave(false)" class="action-btn save-btn" :disabled="isSaving">
-        {{ isSaving ? '保存中...' : (purchaseOrder.id ? '下書きを更新' : '下書き保存') }}
+        {{ isSaving ? '保存中...' : (purchaseOrder.Id ? '下書きを更新' : '下書き保存') }}
       </button>
       
       <!-- 確定保存ボタン -->
       <button @click="handleSave(true)" class="action-btn save-btn" :disabled="isSaving">
-        {{ isSaving ? '保存中...' : (purchaseOrder.id ? '確定内容を更新' : '確定保存') }}
+        {{ isSaving ? '保存中...' : (purchaseOrder.Id ? '確定内容を更新' : '確定保存') }}
       </button>
       
       <!-- 印刷ボタン -->
@@ -183,7 +182,7 @@
 
     <!-- 確定済みの場合の警告バナー -->
     <!-- v-ifは条件に合致する場合のみ要素を表示 -->
-    <div v-if="purchaseOrder.confirm_Flg" class="confirmed-banner no-print">
+    <div v-if="purchaseOrder.Confirm_Flg" class="confirmed-banner no-print">
       <p>この発注書は確定済みです。内容は変更できません。</p>
     </div>
   </div>
@@ -213,40 +212,40 @@ export default {
       
       // 発注書のデータ（resetForm or loadOrderで初期化される）
       purchaseOrder: {
-        id: null,
-        title: '本日',
-        quotation: 123456789,
-        tax: 10,
-        order_Date: '2025-06-23',
-        delivery_Date: '2025-06-25',
-        payment_Date: '2025-09-01',
-        payment_Terms: '月末締め',
-        confirm_Flg: false,
-        company_Cd: 2222,
-        manager: 'ダミー担当者',
-        store_Cd: 1001,
-        other: '',
+        Id: null,
+        Title: '本日',
+        Quotation: 123456789,
+        Tax: 10,
+        Order_Date: '2025-06-23',
+        Delivery_Date: '2025-06-25',
+        Payment_Date: '2025-09-01',
+        Payment_Terms: '月末締め',
+        Confirm_Flg: false,
+        Company_Cd: 2222,
+        Manager: 'ダミー担当者',
+        Store_Cd: 1001,
+        Other: '',
         Company: {
-          id: 1,
-          c_Name: 'ダミー会社'
+          Id: 1,
+          C_Name: 'ダミー会社'
         },
         Store: {
-          id: 1,
-          c_Name: 'ダミー店舗'
+          Id: 1,
+          C_Name: 'ダミー店舗'
         },
-        orderItemLists: [
+        OrderItemLists: [
           {
-            id: null,
-            p_Order_List_Id: null,
-            item_Cd: 1,
-            other_ItemName: 'ダミー商品',
-            amount: 1,
+            Id: null,
+            P_Order_List_Id: null,
+            Item_Cd: 1,
+            Other_ItemName: 'ダミー商品',
+            Amount: 1,
             Item: {
-              id: 1,
-              item_Name: 'ダミー商品'
+              Id: 1,
+              Item_Name: 'ダミー商品'
             },
             PurchaseOrder: {
-              id: 0
+              Id: 0
             }
           }
         ],
@@ -287,40 +286,40 @@ export default {
       
       // フォームを初期値でリセット
       this.purchaseOrder = {
-        id: null,
-        title: '本日',
-        quotation: 123456789,
-        tax: 10,
-        order_Date: '2025-06-23',
-        delivery_Date: '2025-06-25',
-        payment_Date: '2025-09-01',
-        payment_Terms: '月末締め',
-        confirm_Flg: false,
-        company_Cd: 2222,
-        manager: 'ダミー担当者',
-        store_Cd: 1001,
-        other: '',
+        Id: null,
+        Title: '本日',
+        Quotation: 123456789,
+        Tax: 10,
+        Order_Date: '2025-06-23',
+        Delivery_Date: '2025-06-25',
+        Payment_Date: '2025-09-01',
+        Payment_Terms: '月末締め',
+        Confirm_Flg: false,
+        Company_Cd: 2222,
+        Manager: 'ダミー担当者',
+        Store_Cd: 1001,
+        Other: '',
         Company: {
-          id: 1,
-          c_Name: 'ダミー会社'
+          Id: 1,
+          C_Name: 'ダミー会社'
         },
         Store: {
-          id: 1,
-          c_Name: 'ダミー店舗'
+          Id: 1,
+          C_Name: 'ダミー店舗'
         },
-        orderItemLists: [
+        OrderItemLists: [
           {
-            id: null,
-            p_Order_List_Id: null,
-            item_Cd: 1,
-            other_ItemName: 'ダミー商品',
-            amount: 1,
+            Id: null,
+            P_Order_List_Id: null,
+            Item_Cd: 1,
+            Other_ItemName: 'ダミー商品',
+            Amount: 1,
             Item: {
-              id: 1,
-              item_Name: 'ダミー商品'
+              Id: 1,
+              Item_Name: 'ダミー商品'
             },
             PurchaseOrder: {
-              id: 0
+              Id: 0
             }
           }
         ],
@@ -352,15 +351,15 @@ export default {
 
     // 商品行を追加する関数
     addItem() {
-      if (this.purchaseOrder.confirm_Flg) return;
-      this.purchaseOrder.orderItemLists.push({ id: null, p_Order_List_Id: null, item_Cd: '', other_ItemName: '', amount: 1 });
+      if (this.purchaseOrder.Confirm_Flg) return;
+      this.purchaseOrder.OrderItemLists.push({ Id: null, P_Order_List_Id: null, Item_Cd: '', Other_ItemName: '', Amount: 1 });
     },
 
     // 商品行を削除する関数
     removeItem(index) {
-      if (this.purchaseOrder.confirm_Flg) return;
-      if (this.purchaseOrder.orderItemLists.length > 1) {
-        this.purchaseOrder.orderItemLists.splice(index, 1);
+      if (this.purchaseOrder.Confirm_Flg) return;
+      if (this.purchaseOrder.OrderItemLists.length > 1) {
+        this.purchaseOrder.OrderItemLists.splice(index, 1);
       } else {
         alert('最低1行は必要です。');
       }
@@ -368,11 +367,11 @@ export default {
 
     // 保存ボタンが押されたときの処理
     handleSave(isConfirm) {
-      if (this.purchaseOrder.confirm_Flg) {
+      if (this.purchaseOrder.Confirm_Flg) {
         alert('この発注書は確定済みのため、保存できません。');
         return;
       }
-      this.purchaseOrder.confirm_Flg = isConfirm;
+      this.purchaseOrder.Confirm_Flg = isConfirm;
       this.saveOrder();
     },
 
@@ -388,26 +387,25 @@ export default {
         };
         // API仕様に合わせてpayloadを整理
         const payload = {
-          id: Number(this.purchaseOrder.id) || 0, // 新規時は0
-          Order: this.purchaseOrder.Order || 1, // Orderフィールド（大文字）
-          title: this.purchaseOrder.title || 'ダミータイトル',
-          quotation: Number(this.purchaseOrder.quotation) || 99999999,
-          tax: Number(this.purchaseOrder.tax) || 10,
-          order_Date: toISO8601(this.purchaseOrder.order_Date),
-          delivery_Date: toISO8601(this.purchaseOrder.delivery_Date),
-          payment_Date: toISO8601(this.purchaseOrder.payment_Date),
-          payment_Terms: this.purchaseOrder.payment_Terms || '月末締め',
-          confirm_Flg: this.purchaseOrder.confirm_Flg,
-          company_Cd: Number(this.purchaseOrder.company_Cd) || 1,
-          manager: this.purchaseOrder.manager || 'ダミー担当',
-          store_Cd: Number(this.purchaseOrder.store_Cd) || 1,
-          other: this.purchaseOrder.other || '備考なし',
-          orderItemLists: this.purchaseOrder.orderItemLists.map((item, idx) => ({
-            id: Number(item.id) || 0,
-            p_Order_List_Id: Number(item.p_Order_List_Id) || 0,
-            item_Cd: Number(item.item_Cd) || (idx + 1),
-            other_ItemName: item.other_ItemName || 'ダミー商品',
-            amount: Number(item.amount) || 1
+          Id: Number(this.purchaseOrder.Id) || 0,
+          Title: this.purchaseOrder.Title || '本日',
+          Quotation: Number(this.purchaseOrder.Quotation) || 123456789,
+          Tax: Number(this.purchaseOrder.Tax) || 10,
+          Order_Date: toISO8601(this.purchaseOrder.Order_Date),
+          Delivery_Date: toISO8601(this.purchaseOrder.Delivery_Date),
+          Payment_Date: toISO8601(this.purchaseOrder.Payment_Date),
+          Payment_Terms: this.purchaseOrder.Payment_Terms || '月末締め',
+          Confirm_Flg: this.purchaseOrder.Confirm_Flg,
+          Company_Cd: Number(this.purchaseOrder.Company_Cd) || 1,
+          Manager: this.purchaseOrder.Manager || 'ダミー担当者',
+          Store_Cd: Number(this.purchaseOrder.Store_Cd) || 1,
+          Other: this.purchaseOrder.Other || '',
+          OrderItemLists: this.purchaseOrder.OrderItemLists.map((item, idx) => ({
+            Id: Number(item.Id) || 0,
+            P_Order_List_Id: Number(item.P_Order_List_Id) || 0,
+            Item_Cd: Number(item.Item_Cd) || (idx + 1),
+            Other_ItemName: item.Other_ItemName || 'ダミー商品',
+            Amount: Number(item.Amount) || 1
           }))
         };
         console.log('送信payload', JSON.stringify(payload, null, 2));

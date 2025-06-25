@@ -124,13 +124,13 @@ namespace Ensyu_E_PAN.Controllers
                 .OrderByDescending(o => o.Id)
                 .Select(o => new
                 {
-                    id = o.Id,
+                    Id = o.Id,
                     Quotation = o.Quotation,
                     Title = o.Title,
                     Company = o.Company, // 会社情報
                     Order_Date = o.Order_Date,
-                    createdAt = o.Order_Date,
-                    isConfirmed = o.Confirm_Flg
+                    CreatedAt = o.Order_Date,
+                    Confirm_Flg = o.Confirm_Flg
                 })
                 .ToListAsync();
 

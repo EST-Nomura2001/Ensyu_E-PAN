@@ -5,7 +5,7 @@ import axios from 'axios';
 import CommonHeader from '@/components/CommonHeader.vue';
 
 const apiClient = axios.create({
-  baseURL: 'https://localhost:7017/api', // 仮のバックエンドAPIのURL
+  baseURL: 'https://localhost:5011/api', // 仮のバックエンドAPIのURL
   headers: {
     'Content-Type': 'application/json',
   },

@@ -1,10 +1,11 @@
-//田村担当
+<!--田村担当-->
+
 <template>
   <CommonHeader />
   <div class="attendance-home">
     <div class="header">
       <h1>{{ storeName }}</h1>
-      <button>翌月の新規作成</button>
+      <button @click="handleGenerateMonthly">翌月の新規作成</button>
     </div>
     <table>
       <thead>
@@ -47,7 +48,7 @@
 </template>
 
 <script>
-import { getAttendanceData, updateAttendanceData, getUserInfo, getStoreInfo } from '@/services/api';
+import { getAttendanceData, updateAttendanceData, getUserInfo, getStoreInfo, generateMonthly } from '@/services/api';
 import CommonHeader from '../components/CommonHeader.vue';
 
 export default {
@@ -161,7 +162,17 @@ export default {
       const date = new Date(dateString);
       if (date.getFullYear() === 9999) return '';
       return `${date.getMonth() + 1}月${date.getDate()}日`;
-    }
+    },
+    async handleGenerateMonthly() {
+      try {
+        const response = await generateMonthly();
+        alert(response.data || '翌月のシフトデータを作成しました。');
+        this.fetchShifts();
+      } catch (error) {
+        alert('翌月の新規作成に失敗しました。'|| response.data);
+        console.error(error);
+      }
+    },
   },
   created() {
     this.fetchInitialData();

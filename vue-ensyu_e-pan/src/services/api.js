@@ -11,7 +11,7 @@ const apiClient = axios.create({
   },
 });
 
-const API_BASE_URL = 'http://localhost:5000/api'; // ASP.NET Web API or Node.js server address
+const API_BASE_URL = 'http://localhost:5011/api'; // ASP.NET Web API or Node.js server address
 
 /**
  * @description シフト希望を募集中の年月と提出期限を取得します。
@@ -252,4 +252,12 @@ export function getAttendanceByDateStore(date, storeId) {
  */
 export function updateAttendanceByDateStore(date, storeId, users) {
   return apiClient.put(`/attendance/${date}/${storeId}`, { users });
-} 
+}
+
+/**勤怠ホーム画面、新規作成ボタンに対応。
+ * @description 翌月のシフトデータを新規作成します。
+ * @returns {Promise<Object>} 成功レスポンス
+ */
+export const generateMonthly = () => {
+  return apiClient.post('/Attendance/generate-monthly');
+}; 

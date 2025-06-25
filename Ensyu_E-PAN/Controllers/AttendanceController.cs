@@ -114,11 +114,11 @@ namespace Ensyu_E_PAN.Controllers
 
         //Post処理↓
         //シフト表作成
-        [HttpPost("generate-monthly")]
-        public async Task<IActionResult> GenerateNextMonthShifts()
+        [HttpPost("generate-monthly/{postDate}")]
+        public async Task<IActionResult> GenerateNextMonthShifts(DateTime postDate)
         {
             var now = DateTime.Now;
-            var firstDay = new DateTime(now.Year, now.Month, 1).AddMonths(1);
+            var firstDay = new DateTime(postDate.Year,postDate.Month,1).AddMonths(1);
             var lastDay = firstDay.AddMonths(1).AddDays(-1);
 
             var stores = await _context.Stores.Include(s => s.Users).ToListAsync();

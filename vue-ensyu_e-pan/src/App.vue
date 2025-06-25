@@ -6,9 +6,7 @@ import { RouterLink, RouterView } from 'vue-router'
   <header>
 
     <nav>
-      
       <!--テスト用-->
-      <h3>テスト用各ページリンク</h3>
       <RouterLink to="/admin">アカウント管理・登録</RouterLink>
       <RouterLink to="/part-time">アルバイトページ</RouterLink>
       <RouterLink to="/attendance-management">勤怠登録</RouterLink>
@@ -19,11 +17,8 @@ import { RouterLink, RouterView } from 'vue-router'
       <RouterLink to="/Make-Attendance">シフト調整</RouterLink>
       <RouterLink to="/Check-Attendance">シフト確認</RouterLink>
       <RouterLink to="/Record-Attendance">勤怠確認</RouterLink>
-      <br>
-      
-      
     </nav>
-
+>>>>>>> ff2a90b674064120c025837788c727d8b49005fd
   </header>
 
   <RouterView />

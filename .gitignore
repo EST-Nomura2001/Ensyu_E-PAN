@@ -8,5 +8,8 @@ Ensyu_E-PAN/bin/
 Ensyu_E-PAN/obj/
 # ログファイル
 *.log
-
 Ensyu_E-PAN/*.db
+
+Ensyu_E-PAN/*.db-shm
+Ensyu_E-PAN/*.db-wal
+

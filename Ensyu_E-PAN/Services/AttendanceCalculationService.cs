@@ -21,17 +21,22 @@ namespace Ensyu_E_PAN.Services
 
             var start = ds.Start_WorkTime.Value;
             var end = ds.End_WorkTime.Value;
-            int breakMinutes = 0;
-            // 休憩時間が入力されていれば分数を計算
+
+            //休憩時間の算出
+            int breakDayMinutes = 0;
+            int breakNightMinutes = 0;
+
             if (ds.Start_BreakTime != null && ds.End_BreakTime != null)
             {
-                breakMinutes = (int)(ds.End_BreakTime.Value - ds.Start_BreakTime.Value).TotalMinutes;
+                (breakDayMinutes, breakNightMinutes) =
+                    SplitBreakByTimeOfDay(ds.Start_BreakTime.Value, ds.End_BreakTime.Value);
             }
 
+
             // 日中労働時間（5:00～22:00の範囲で働いた時間）
-            ds.T_WorkTime_D = TimeSpan.FromHours(CalculateDayWorkTime(start, end, breakMinutes));
+            ds.T_WorkTime_D = TimeSpan.FromHours(CalculateDayWorkTime(start, end, breakDayMinutes));
             // 夜間労働時間（22:00～翌5:00の範囲で働いた時間）
-            ds.T_WorkTime_N = TimeSpan.FromHours(CalculateNightWorkTime(start, end, breakMinutes));
+            ds.T_WorkTime_N = TimeSpan.FromHours(CalculateNightWorkTime(start, end, breakNightMinutes));
             // 総労働時間（日中＋夜間）
             ds.T_WorkTime_All = ds.T_WorkTime_D + ds.T_WorkTime_N;
 
@@ -133,9 +138,7 @@ namespace Ensyu_E_PAN.Services
                 currentTime = nextHour;
             }
             // 休憩時間を全体労働時間で按分して日中分を減算
-            var totalWorkMinutes = (workEnd - workStart).TotalMinutes;
-            var breakRatio = totalWorkMinutes > 0 ? (double)breakMinutes / totalWorkMinutes : 0;
-            dayWorkMinutes = Math.Max(0, dayWorkMinutes - (dayWorkMinutes * breakRatio));
+            dayWorkMinutes = Math.Max(0, dayWorkMinutes - breakMinutes);
             // 分→時間に変換して返す
             return dayWorkMinutes / 60.0;
         }
@@ -170,11 +173,52 @@ namespace Ensyu_E_PAN.Services
                 currentTime = currentTime.Add(TimeSpan.FromHours(1));
             }
             // 休憩時間を全体労働時間で按分して夜間分を減算
-            var totalWorkMinutes = (workEnd - workStart).TotalMinutes;
-            var breakRatio = totalWorkMinutes > 0 ? (double)breakMinutes / totalWorkMinutes : 0;
-            nightWorkMinutes = Math.Max(0, nightWorkMinutes - (nightWorkMinutes * breakRatio));
+            nightWorkMinutes = Math.Max(0, nightWorkMinutes - breakMinutes);
             // 分→時間に変換して返す
             return nightWorkMinutes / 60.0;
         }
+
+        //休憩時間を算出するメソッド
+        private (int dayMinutes, int nightMinutes) SplitBreakByTimeOfDay(DateTime breakStart, DateTime breakEnd)
+        {
+            TimeSpan DayStart = TimeSpan.FromHours(5);
+            TimeSpan DayEnd = TimeSpan.FromHours(22);
+            // 日中帯：5:00～22:00、夜間帯：22:00〜翌5:00
+            if (breakEnd <= breakStart) breakEnd = breakEnd.AddDays(1);
+
+            var dayStartDt = breakStart.Date.Add(DayStart);
+            var dayEndDt = breakStart.Date.Add(DayEnd);
+            if (dayEndDt <= dayStartDt) dayEndDt = dayEndDt.AddDays(1);
+
+            var night1Start = breakStart.Date;
+            var night1End = breakStart.Date.Add(DayStart);
+            var night2Start = breakStart.Date.Add(DayEnd);
+            var night2End = night2Start.AddHours(7); // 22:00〜翌5:00
+
+            double dayMinutes = 0;
+            double nightMinutes = 0;
+
+            // 日中帯重複
+            var dayOverlapStart = breakStart < dayStartDt ? dayStartDt : breakStart;
+            var dayOverlapEnd = breakEnd > dayEndDt ? dayEndDt : breakEnd;
+            if (dayOverlapStart < dayOverlapEnd)
+                dayMinutes += (dayOverlapEnd - dayOverlapStart).TotalMinutes;
+
+            // 夜間帯（0:00〜5:00）
+            var night1OverlapStart = breakStart < night1Start ? night1Start : breakStart;
+            var night1OverlapEnd = breakEnd > night1End ? night1End : breakEnd;
+            if (night1OverlapStart < night1OverlapEnd)
+                nightMinutes += (night1OverlapEnd - night1OverlapStart).TotalMinutes;
+
+            // 夜間帯（22:00〜24:00以降）
+            var night2OverlapStart = breakStart < night2Start ? night2Start : breakStart;
+            var night2OverlapEnd = breakEnd > night2End ? night2End : breakEnd;
+            if (night2OverlapStart < night2OverlapEnd)
+                nightMinutes += (night2OverlapEnd - night2OverlapStart).TotalMinutes;
+
+            return ((int)Math.Round(dayMinutes), (int)Math.Round(nightMinutes));
+
+        }
+
     }
 } 

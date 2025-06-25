@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://localhost:7017/api', // 仮のバックエンドAPIのURL
+  baseURL: 'https://localhost:5011/api', // 仮のバックエンドAPIのURL
   headers: {
     'Content-Type': 'application/json',
   },

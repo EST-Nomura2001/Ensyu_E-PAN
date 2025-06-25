@@ -100,7 +100,7 @@
             </tr>
             <tr>
               <th>支払期日:</th>
-              <td><input type="text" v-model="purchaseOrder.PaymentDate" placeholder="yyyy/mm/dd"></td>
+              <td><input type="date" v-model="purchaseOrder.payment_Date"></td>
             </tr>
             <tr>
               <th>支払条件:</th>
@@ -169,12 +169,12 @@
       
       <!-- 下書き保存ボタン -->
       <button @click="handleSave(false)" class="action-btn save-btn" :disabled="isSaving">
-        {{ isSaving ? '保存中...' : (purchaseOrder.Id ? '下書きを更新' : '下書き保存') }}
+        {{ isSaving ? '保存中...' : (purchaseOrder.id ? '下書きを更新' : '下書き保存') }}
       </button>
       
       <!-- 確定保存ボタン -->
       <button @click="handleSave(true)" class="action-btn save-btn" :disabled="isSaving">
-        {{ isSaving ? '保存中...' : (purchaseOrder.Id ? '確定内容を更新' : '確定保存') }}
+        {{ isSaving ? '保存中...' : (purchaseOrder.id ? '確定内容を更新' : '確定保存') }}
       </button>
       
       <!-- 印刷ボタン -->
@@ -183,7 +183,7 @@
 
     <!-- 確定済みの場合の警告バナー -->
     <!-- v-ifは条件に合致する場合のみ要素を表示 -->
-    <div v-if="purchaseOrder.ConfirmFlg" class="confirmed-banner no-print">
+    <div v-if="purchaseOrder.confirm_Flg" class="confirmed-banner no-print">
       <p>この発注書は確定済みです。内容は変更できません。</p>
     </div>
   </div>
@@ -214,27 +214,49 @@ export default {
       // 発注書のデータ（resetForm or loadOrderで初期化される）
       purchaseOrder: {
         id: null,
-        title: '',
-        quotation: 0,
+        title: '本日',
+        quotation: 123456789,
         tax: 10,
-        order_Date: '',
-        delivery_Date: '',
-        payment_Date: '',
-        payment_Terms: '',
+        order_Date: '2025-06-23',
+        delivery_Date: '2025-06-25',
+        payment_Date: '2025-09-01',
+        payment_Terms: '月末締め',
         confirm_Flg: false,
-        company_Cd: null,
-        manager: '',
-        store_Cd: null,
+        company_Cd: 2222,
+        manager: 'ダミー担当者',
+        store_Cd: 1001,
         other: '',
+        Company: {
+          id: 1,
+          c_Name: 'ダミー会社'
+        },
+        Store: {
+          id: 1,
+          c_Name: 'ダミー店舗'
+        },
         orderItemLists: [
           {
             id: null,
             p_Order_List_Id: null,
-            item_Cd: null,
-            other_ItemName: '',
-            amount: 1
+            item_Cd: 1,
+            other_ItemName: 'ダミー商品',
+            amount: 1,
+            Item: {
+              id: 1,
+              item_Name: 'ダミー商品'
+            },
+            PurchaseOrder: {
+              id: 0
+            }
           }
-        ]
+        ],
+        Postal_Code: '123-4567',
+        Address1: '千葉県',
+        Address2: '柏市',
+        Tel: '080-1234-5678',
+        Fax: '03-1234-5678',
+        Email: 'dummy@example.com',
+        CustomerName: 'ダミー担当者'
       },
     };
   },
@@ -265,27 +287,50 @@ export default {
       
       // フォームを初期値でリセット
       this.purchaseOrder = {
-        Id: null,
-        Title: '',
-        Quotation: '',
-        Tax: 10,
-        Order_Date: '',
-        DeliveryDate: '',
-        PaymentDate: '',
-        PaymentTerms: '',
-        ConfirmFlg: false,
-        Company_Cd: '',   // 会社CD
-        Manager: '',
-        StoreCd: '',     // 事業所CD
-        Other: '',
-        OrderItemLists: [
+        id: null,
+        title: '本日',
+        quotation: 123456789,
+        tax: 10,
+        order_Date: '2025-06-23',
+        delivery_Date: '2025-06-25',
+        payment_Date: '2025-09-01',
+        payment_Terms: '月末締め',
+        confirm_Flg: false,
+        company_Cd: 2222,
+        manager: 'ダミー担当者',
+        store_Cd: 1001,
+        other: '',
+        Company: {
+          id: 1,
+          c_Name: 'ダミー会社'
+        },
+        Store: {
+          id: 1,
+          c_Name: 'ダミー店舗'
+        },
+        orderItemLists: [
           {
-            Id: null,                // ID
-            POrderListId: null,      // 発注書CD（親ID）
-            Item_Cd: '',              // 商品コード
-            Amount: 1                // 数量
+            id: null,
+            p_Order_List_Id: null,
+            item_Cd: 1,
+            other_ItemName: 'ダミー商品',
+            amount: 1,
+            Item: {
+              id: 1,
+              item_Name: 'ダミー商品'
+            },
+            PurchaseOrder: {
+              id: 0
+            }
           }
         ],
+        Postal_Code: '123-4567',
+        Address1: '千葉県',
+        Address2: '柏市',
+        Tel: '080-1234-5678',
+        Fax: '03-1234-5678',
+        Email: 'dummy@example.com',
+        CustomerName: 'ダミー担当者'
       };
     },
     
@@ -307,34 +352,27 @@ export default {
 
     // 商品行を追加する関数
     addItem() {
-      // 確定済みの場合は追加不可
-      if (this.purchaseOrder.ConfirmFlg) return;
-      
-      // 新しい商品行を配列に追加
-      this.purchaseOrder.OrderItemLists.push({ Id: null, POrderListId: null, Item_Cd: '', Amount: 1 });
+      if (this.purchaseOrder.confirm_Flg) return;
+      this.purchaseOrder.orderItemLists.push({ id: null, p_Order_List_Id: null, item_Cd: '', other_ItemName: '', amount: 1 });
     },
 
     // 商品行を削除する関数
     removeItem(index) {
-      // 確定済みの場合は削除不可
-      if (this.purchaseOrder.ConfirmFlg) return;
-      
-      if (this.purchaseOrder.OrderItemLists.length > 1) {
-        // 2行以上ある場合は指定した行を削除
-        this.purchaseOrder.OrderItemLists.splice(index, 1);
+      if (this.purchaseOrder.confirm_Flg) return;
+      if (this.purchaseOrder.orderItemLists.length > 1) {
+        this.purchaseOrder.orderItemLists.splice(index, 1);
       } else {
-        // 1行しかない場合は削除不可
         alert('最低1行は必要です。');
       }
     },
 
     // 保存ボタンが押されたときの処理
     handleSave(isConfirm) {
-      if (this.purchaseOrder.ConfirmFlg) {
+      if (this.purchaseOrder.confirm_Flg) {
         alert('この発注書は確定済みのため、保存できません。');
         return;
       }
-      this.purchaseOrder.ConfirmFlg = isConfirm;
+      this.purchaseOrder.confirm_Flg = isConfirm;
       this.saveOrder();
     },
 
@@ -342,7 +380,37 @@ export default {
     async saveOrder() {
       this.isSaving = true;
       try {
-        const payload = { ...this.purchaseOrder };
+        // 日付をISO8601形式に変換する関数
+        const toISO8601 = (dateStr) => {
+          if (!dateStr) return new Date().toISOString();
+          if (dateStr.length === 10) return dateStr + 'T00:00:00';
+          return dateStr;
+        };
+        // API仕様に合わせてpayloadを整理
+        const payload = {
+          id: Number(this.purchaseOrder.id) || 0, // 新規時は0
+          Order: this.purchaseOrder.Order || 1, // Orderフィールド（大文字）
+          title: this.purchaseOrder.title || 'ダミータイトル',
+          quotation: Number(this.purchaseOrder.quotation) || 99999999,
+          tax: Number(this.purchaseOrder.tax) || 10,
+          order_Date: toISO8601(this.purchaseOrder.order_Date),
+          delivery_Date: toISO8601(this.purchaseOrder.delivery_Date),
+          payment_Date: toISO8601(this.purchaseOrder.payment_Date),
+          payment_Terms: this.purchaseOrder.payment_Terms || '月末締め',
+          confirm_Flg: this.purchaseOrder.confirm_Flg,
+          company_Cd: Number(this.purchaseOrder.company_Cd) || 1,
+          manager: this.purchaseOrder.manager || 'ダミー担当',
+          store_Cd: Number(this.purchaseOrder.store_Cd) || 1,
+          other: this.purchaseOrder.other || '備考なし',
+          orderItemLists: this.purchaseOrder.orderItemLists.map((item, idx) => ({
+            id: Number(item.id) || 0,
+            p_Order_List_Id: Number(item.p_Order_List_Id) || 0,
+            item_Cd: Number(item.item_Cd) || (idx + 1),
+            other_ItemName: item.other_ItemName || 'ダミー商品',
+            amount: Number(item.amount) || 1
+          }))
+        };
+        console.log('送信payload', JSON.stringify(payload, null, 2));
         const response = await axios.post('http://localhost:5011/api/PurchaseOrders', payload);
         if (response.data && response.data.success) {
           alert('発注書が正常に保存されました。');
@@ -366,28 +434,38 @@ export default {
     async updateOrder() {
       this.isSaving = true;
       try {
+        // 日付をISO8601形式に変換する関数
+        const toISO8601 = (dateStr) => {
+          if (!dateStr) return new Date().toISOString();
+          if (dateStr.length === 10) return dateStr + 'T00:00:00';
+          return dateStr;
+        };
+        // API仕様に合わせてpayloadを整理
         const payload = {
-          Id: this.purchaseOrder.Id,
-          Title: this.purchaseOrder.Title,
-          Quotation: this.purchaseOrder.Quotation,
-          Tax: this.purchaseOrder.Tax,
-          Order_Date: this.purchaseOrder.Order_Date,
-          DeliveryDate: this.purchaseOrder.DeliveryDate,
-          PaymentDate: this.purchaseOrder.PaymentDate,
-          PaymentTerms: this.purchaseOrder.PaymentTerms,
-          ConfirmFlg: this.purchaseOrder.ConfirmFlg,
-          Company_Cd: this.purchaseOrder.Company_Cd,
-          Manager: this.purchaseOrder.Manager,
-          StoreCd: this.purchaseOrder.StoreCd,
-          Other: this.purchaseOrder.Other,
-          OrderItemLists: this.purchaseOrder.OrderItemLists.map(item => ({
-            Id: item.Id,
-            POrderListId: item.POrderListId,
-            Item_Cd: item.Item_Cd,
-            Amount: item.Amount
+          id: Number(this.purchaseOrder.id) || 1, // 更新時はidを必ずセット
+          Order: this.purchaseOrder.Order || 1, // Orderフィールド（大文字）
+          title: this.purchaseOrder.title || 'ダミータイトル',
+          quotation: Number(this.purchaseOrder.quotation) || 99999999,
+          tax: Number(this.purchaseOrder.tax) || 10,
+          order_Date: toISO8601(this.purchaseOrder.order_Date),
+          delivery_Date: toISO8601(this.purchaseOrder.delivery_Date),
+          payment_Date: toISO8601(this.purchaseOrder.payment_Date),
+          payment_Terms: this.purchaseOrder.payment_Terms || '月末締め',
+          confirm_Flg: this.purchaseOrder.confirm_Flg,
+          company_Cd: Number(this.purchaseOrder.company_Cd) || 1,
+          manager: this.purchaseOrder.manager || 'ダミー担当',
+          store_Cd: Number(this.purchaseOrder.store_Cd) || 1,
+          other: this.purchaseOrder.other || '備考なし',
+          orderItemLists: this.purchaseOrder.orderItemLists.map((item, idx) => ({
+            id: Number(item.id) || 0,
+            p_Order_List_Id: Number(item.p_Order_List_Id) || 0,
+            item_Cd: Number(item.item_Cd) || (idx + 1),
+            other_ItemName: item.other_ItemName || 'ダミー商品',
+            amount: Number(item.amount) || 1
           }))
         };
-        const response = await axios.put(`http://localhost:5011/api/PurchaseOrders/${this.purchaseOrder.Id}`, payload);
+        console.log('送信payload', JSON.stringify(payload, null, 2));
+        const response = await axios.put(`http://localhost:5011/api/PurchaseOrders/${this.purchaseOrder.id}`, payload);
         if (response.data && response.data.success) {
           alert('発注書が正常に更新されました。');
           this.purchaseOrder = response.data.data;
@@ -403,10 +481,10 @@ export default {
 
     async addOrderItem(item) {
       const payload = {
-        Item_Cd: item.Item_Cd,
-        Amount: item.Amount
+        item_Cd: item.item_Cd,
+        amount: item.amount
       };
-      await axios.post(`http://localhost:5011/api/PurchaseOrders/${this.purchaseOrder.Id}/items`, payload);
+      await axios.post(`http://localhost:5011/api/PurchaseOrders/${this.purchaseOrder.id}/items`, payload);
     },
   }
 };

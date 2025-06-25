@@ -6,3 +6,5 @@ out/
 Ensyu_E-PAN/bin/
 # ログファイル
 *.log
+
+Ensyu_E-PAN/*.db

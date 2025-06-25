@@ -15,6 +15,6 @@ namespace Ensyu_E_PAN.Models.Masters
         public bool IsAdmin { get; set; }
 
         //ナビゲーションプロパティ
-        public ICollection<User> Users { get; set; }
+        public ICollection<User>? Users { get; set; }
     }
 }

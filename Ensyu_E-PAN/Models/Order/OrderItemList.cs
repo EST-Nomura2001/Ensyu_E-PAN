@@ -24,8 +24,8 @@ namespace Ensyu_E_PAN.Models.Order
         public int Amount { get; set; }
 
         // ナビゲーションプロパティ
-        public PurchaseOrder PurchaseOrder { get; set; }
-        public Item Item { get; set; }
+        public PurchaseOrder? PurchaseOrder { get; set; }
+        public Item? Item { get; set; }
 
     }
 }

@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://localhost:5011/api', // 仮のバックエンドAPIのURL
+  baseURL: 'http://localhost:5011/api', // 仮のバックエンドAPIのURL
   headers: {
     'Content-Type': 'application/json',
   },
@@ -19,36 +19,33 @@ const router = useRouter();
 async function login() {
   loginError.value = '';
   try {
-    const response = await apiClient.post('/auth/login', {
-      loginId: loginId.value,
-      password: password.value,
+    const response = await apiClient.get('/Account/login', {
+      params: {
+        loginId: loginId.value,
+        password: password.value,
+      },
     });
-    const { role, name, storeId } = response.data;
-    
-    // sessionStorageにユーザー情報を保存
-    sessionStorage.setItem('userRole', role);
-    sessionStorage.setItem('userId', userId);
-    sessionStorage.setItem('storeId', storeId);
+    const data = response.data;
+    // sessionStorageに必要な情報だけ保存
+    sessionStorage.setItem('userId', data.id);
+    sessionStorage.setItem('isAdmin', data.role?.isAdmin);
+    sessionStorage.setItem('storeId', data.storeId ?? '');
 
     // 権限に応じてリダイレクト
-    switch (role) {
-      case 'admin':
-        router.push('/admin');
-        break;
-      case 'partTime':
-        router.push('/part-time');
-        break;
-      default:
-        loginError.value = '不明なユーザー権限です。';
-        sessionStorage.clear(); // 不正な場合はクリア
+    if (data.role?.isAdmin) {
+      router.push('/admin');
+    } else {
+      router.push('/part-time');
     }
   } catch (error) {
-    if (error.response && (error.response.status === 401 || error.response.status === 404)) {
-      loginError.value = 'ログインに失敗しました。IDまたはパスワードが間違っています。';
+    // コントローラーから返ってきたメッセージを表示
+    if (error.response && error.response.data) {
+      loginError.value = error.response.data;
     } else {
       loginError.value = 'サーバーとの通信中にエラーが発生しました。';
       console.error('Login error:', error);
     }
+    sessionStorage.clear(); // 失敗時はクリア
   }
 }
 

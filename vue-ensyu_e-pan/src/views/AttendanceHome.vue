@@ -5,9 +5,21 @@
   <div class="attendance-home">
     <div class="header">
       <h1>{{ storeName }}</h1>
-      <button @click="handleGenerateMonthly">翌月の新規作成</button>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <input
+          type="number"
+          v-model.number="selectedYear"
+          min="2000"
+          max="2100"
+          @input="validateYear"
+          style="width: 90px;"
+        />
+        <button @click="fetchShiftsByYear">指定年のシフト取得</button>
+        <button @click="handleGenerateMonthly">翌月の新規作成</button>
+      </div>
     </div>
-    <table>
+    <div v-if="noDataMessage" style="color: red; margin-bottom: 10px;">{{ noDataMessage }}</div>
+    <table v-if="shifts.length > 0">
       <thead>
         <tr>
           <th>月</th>
@@ -44,11 +56,12 @@
         </tr>
       </tbody>
     </table>
+    <div v-else style="margin-top: 20px; color: #666;">データがありません</div>
   </div>
 </template>
 
 <script>
-import { getAttendanceData, updateAttendanceData, getUserInfo, getStoreInfo, generateMonthly } from '@/services/api';
+import { getAttendanceData, updateAttendanceData, getUserInfo, getStoreInfo, generateMonthly, getAllShiftsForAllMonths } from '@/services/api';
 import CommonHeader from '../components/CommonHeader.vue';
 
 export default {
@@ -59,46 +72,50 @@ export default {
     return {
       shifts: [], // APIから取得したデータを格納
       storeName: '〇〇店', // 初期値
-      // ↓↓↓ デモデータ（API連携できない場合用、後で削除）
-      demoShifts: [
-        {
-          id: 1,
-          date: '2024-07-01',
-          recFlg: true,
-          fixedDate: '2024-07-10T00:00:00',
-          confirmFlg: true,
-          sendingFlg: false,
-          isEditingDeadline: false,
-          editableDeadline: '2024-07-10',
-        },
-        {
-          id: 2,
-          date: '2024-08-01',
-          recFlg: false,
-          fixedDate: '2024-08-12T00:00:00',
-          confirmFlg: false,
-          sendingFlg: true,
-          isEditingDeadline: false,
-          editableDeadline: '2024-08-12',
-        },
-      ],
-      // ↑↑↑ デモデータここまで
+      selectedYear: new Date().getFullYear(),
+      noDataMessage: '',
     };
   },
   methods: {
-    async fetchInitialData() {
-      await this.fetchShifts();
-      await this.fetchStoreName();
+    validateYear() {
+      if (this.selectedYear < 2000) this.selectedYear = 2000;
+      if (this.selectedYear > 2100) this.selectedYear = 2100;
+    },
+    async fetchShiftsByYear() {
+      this.noDataMessage = '';
+      try {
+        const allShifts = await getAllShiftsForAllMonths(this.selectedYear);
+        if (allShifts.length === 0) {
+          this.shifts = [];
+          this.noDataMessage = '指定した年のデータがありません';
+        } else {
+          // ALL_SHIFTSテーブルのカラム名に合わせてマッピング
+          this.shifts = allShifts.map(shift => ({
+            id: shift.ID || shift.id, // ID
+            date: shift.DATE || shift.date, // 月
+            recFlg: shift.REC_FLG ?? shift.recFlg, // 希望収集
+            fixedDate: shift.FIXED_DATE || shift.fixedDate, // シフト提出期限
+            confirmFlg: shift.CONFIRM_FLG ?? shift.confirmFlg, // シフト編集状態
+            sendingFlg: shift.SENDING_FLG ?? shift.sendingFlg, // 勤怠送付
+            // 既存のUI用プロパティ
+            isEditingDeadline: false,
+            editableDeadline: (shift.FIXED_DATE || shift.fixedDate) ? (shift.FIXED_DATE || shift.fixedDate).split('T')[0] : '',
+          }));
+        }
+      } catch (error) {
+        this.shifts = [];
+        this.noDataMessage = 'データ取得に失敗しました';
+        console.error('シフト情報の取得に失敗しました。', error);
+      }
     },
     async fetchStoreName() {
       try {
-        // TODO: 実際のログインユーザーIDを使用するように変更
-        const userId = 1; 
-        const userInfoResponse = await getUserInfo(userId);
-        const storeId = userInfoResponse.data.storesCd; // STORES_CD に対応
+        const storeId = sessionStorage.getItem('storeId');
         if (storeId) {
           const storeInfoResponse = await getStoreInfo(storeId);
           this.storeName = storeInfoResponse.data.c_name;
+        } else {
+          this.storeName = '店舗ID未設定';
         }
       } catch (error) {
         console.error('店舗名の取得に失敗しました。', error);
@@ -167,7 +184,7 @@ export default {
       try {
         const response = await generateMonthly();
         alert(response.data || '翌月のシフトデータを作成しました。');
-        this.fetchShifts();
+        this.fetchShiftsByYear();
       } catch (error) {
         alert('翌月の新規作成に失敗しました。'|| response.data);
         console.error(error);
@@ -175,7 +192,8 @@ export default {
     },
   },
   created() {
-    this.fetchInitialData();
+    this.fetchShiftsByYear();
+    this.fetchStoreName();
   }
 };
 </script>

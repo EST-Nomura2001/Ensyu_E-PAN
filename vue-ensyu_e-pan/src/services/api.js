@@ -59,9 +59,8 @@ export const submitUserShifts = (userId, shifts) => {
  * @returns {Promise<Object>} { name } を含むユーザー情報のPromiseオブジェクト
  */
 export const getUserInfo = (userId) => {
-    // バックエンド側で、USERSテーブルから該当ユーザーの情報を取得します。
     // GET /api/users/{userId}
-    return apiClient.get(`/users/${userId}`);
+    return axios.get(`http://localhost:5011/api/users/${userId}`);
 };
 
 /**
@@ -88,7 +87,7 @@ export const updateAttendanceData = (id, data) => {
  * @returns {Promise<Object>} 店舗情報
  */
 export const getStoreInfo = (storeId) => {
-    return apiClient.get(`/stores/${storeId}`);
+    return axios.get(`http://localhost:5011/api/stores/${storeId}`);
 };
 
 /**
@@ -306,4 +305,21 @@ export async function getDateSchedulesByDate(today) {
   // todayは "YYYY-MM-DD" 形式で渡すことを推奨
   const response = await axios.get(`http://localhost:5011/api/Attendance/DateSchedules/${today}`);
   return response.data;
+}
+
+/**
+ * 指定した年の1～12月分のAllShiftSchedulesを一括取得します。
+ * @param {number} year - 取得したい年
+ * @returns {Promise<Array>} - 12ヶ月分のデータをまとめた配列
+ */
+export async function getAllShiftsForAllMonths(year) {
+  // 1月～12月分をまとめて取得
+  const API_BASE_URL = 'http://localhost:5011/api';
+  const requests = Array.from({ length: 12 }, (_, i) =>
+    axios.get(`${API_BASE_URL}/Attendance/AllShiftSchedules/${year}/${i + 1}`)
+      .then(res => res.data)
+      .catch(() => []) // 1ヶ月分の取得失敗時は空配列
+  );
+  const results = await Promise.all(requests);
+  return results.flat();
 } 

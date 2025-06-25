@@ -1,26 +1,29 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+    <nav>
+      
+      <!--テスト用-->
+      <h3>テスト用各ページリンク</h3>
+      <RouterLink to="/admin">アカウント管理・登録</RouterLink>
+      <RouterLink to="/part-time">アルバイトページ</RouterLink>
+      <RouterLink to="/attendance-management">勤怠登録</RouterLink>
+      <RouterLink to="/purchase-order">発注書作成</RouterLink>
+      <RouterLink to="/admin">管理者ページ</RouterLink>
+      <RouterLink to="/kibou-form">希望フォーム</RouterLink>
+      <RouterLink to="/Attendance-home">勤怠ホーム</RouterLink>
+      <RouterLink to="/Make-Attendance">シフト調整</RouterLink>
+      <RouterLink to="/Check-Attendance">シフト確認</RouterLink>
+      <RouterLink to="/Record-Attendance">勤怠確認</RouterLink>
+      <br>
+      
+      
+    </nav>
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-        
-        <!--テスト用-->
-        <RouterLink to="/kibou-form">希望フォーム</RouterLink>
-        <RouterLink to="/Attendance-home">勤怠ホーム</RouterLink>
-        
-        
-      </nav>
-    </div>
   </header>
 
   <RouterView />

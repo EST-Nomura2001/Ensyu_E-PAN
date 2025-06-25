@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Ensyu_E_PAN.Models.Masters;
 
 namespace Ensyu_E_PAN.Models.Attendance
 {
@@ -8,6 +10,10 @@ namespace Ensyu_E_PAN.Models.Attendance
 
         [Key]
         public int Id { get; set; }
+
+        [Required]
+        [ForeignKey("Store")]
+        public int Store_ID { get; set; }
 
         [Required]
         public DateTime Date { get; set; }//年月
@@ -30,5 +36,9 @@ namespace Ensyu_E_PAN.Models.Attendance
         [Required]
         public bool Rec_Flg { get; set; }//シフト希望収集中フラグ
 
+        //ナビゲーション
+        public Store? Store { get; set; }
+        public ICollection<DayShift>? DayShifts { get; set; }
+        public ICollection<UserShift>? UserShifts { get; set; }
     }
 }

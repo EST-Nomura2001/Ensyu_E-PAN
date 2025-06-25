@@ -1,1 +1,12 @@
 .vs/
+# ビルド出力
+bin/
+obj/
+out/
+# ビルド成果物を無視
+Ensyu_E-PAN/bin/
+Ensyu_E-PAN/obj/
+# ログファイル
+*.log
+
+

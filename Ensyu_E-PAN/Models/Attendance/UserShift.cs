@@ -32,14 +32,10 @@ namespace Ensyu_E_PAN.Models.Attendance
         [Required]
         public bool U_Confirm_Flg { get; set; }
 
-        [Required]
-        [ForeignKey("UserDateShift")]
-        public int Date_Shift_Cd { get; set; }
-
         // ナビゲーションプロパティ（必要に応じて）
-        public User User { get; set; }
-        public AllShift AllShift { get; set; }
-        public UserDateShift UserDateShift { get; set; }
+        public User? User { get; set; }
+        public AllShift? AllShift { get; set; }
+        public ICollection<UserDateShift>? UserDateShifts { get; set; }
 
     }
 }

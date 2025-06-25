@@ -18,12 +18,14 @@ namespace Ensyu_E_PAN.Models.Order
         [ForeignKey("Item")]
         public int Item_Cd { get; set; }
 
+        public string Other_ItemName { get; set; } = string.Empty;//Itemがその他の場合に利用
+
         [Required]
         public int Amount { get; set; }
 
         // ナビゲーションプロパティ
-        public PurchaseOrder PurchaseOrder { get; set; }
-        public Item Item { get; set; }
+        public PurchaseOrder? PurchaseOrder { get; set; }
+        public Item? Item { get; set; }
 
     }
 }

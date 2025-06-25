@@ -1,4 +1,5 @@
 <template>
+  <CommonHeader />
   <div class="shift-submission-form">
     <h1>希望シフト提出</h1>
     <div v-if="!isLoading && year && month">
@@ -43,6 +44,9 @@
 <script>
 import * as api from '@/services/api';
 
+//ヘッダー用
+import CommonHeader from '../components/CommonHeader.vue';
+
 export default {
   props: {
     // ログイン機能実装後、外部からユーザーIDを受け取る
@@ -63,7 +67,26 @@ export default {
     };
   },
   async created() {
-    await this.fetchInitialData();
+    // DEMO: 静的デモデータを使用（後で削除してください）
+    this.isLoading = false;
+    this.year = 2025;
+    this.month = 6;
+    this.deadline = '5月20日';
+    this.userName = '山田太郎';
+    this.status = '未提出';
+    // 6月分のデモシフトデータ
+    this.shifts = [
+      { date: 1, startTime: '09:00', endTime: '18:00' },
+      { date: 2, startTime: '', endTime: '' },
+      { date: 3, startTime: '10:00', endTime: '17:00' },
+      { date: 4, startTime: '', endTime: '' },
+      { date: 5, startTime: '', endTime: '' },
+      { date: 6, startTime: '09:00', endTime: '18:00' },
+      { date: 7, startTime: '', endTime: '' },
+      // ... 必要に応じて追加 ...
+    ];
+    // 本来はAPIから取得する
+    // await this.fetchInitialData();
   },
   methods: {
     async fetchInitialData() {
@@ -125,6 +148,10 @@ export default {
         alert('シフトの提出に失敗しました。');
       }
     },
+  },
+  //ヘッダー用
+  components: {
+    CommonHeader
   },
 };
 </script>

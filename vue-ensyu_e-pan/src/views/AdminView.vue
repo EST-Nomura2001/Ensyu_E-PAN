@@ -62,7 +62,6 @@ async function fetchUsers() {
 const userListForDisplay = computed(() => {
   return userList.value.map(user => {
     const roleLabel = user.role === 'partTime' ? 'アルバイト'
-                    : user.role === 'employee' ? '社員'
                     : user.role === 'admin' ? '管理者'
                     : '不明';
     return { id: user.id, label: `・${user.loginId}（${roleLabel}）` };
@@ -92,7 +91,7 @@ onMounted(() => {
     <input type="password" v-model="newUserPw" placeholder="パスワード">
     <select v-model="newUserRole">
       <option value="partTime">アルバイト</option>
-      <option value="employee">社員</option>
+      <option value="admin">管理者</option>
     </select>
     <button @click="registerUser">登録</button>
     <p v-if="registerMsg" class="message" :class="{ success: registerMsgIsSuccess }">{{ registerMsg }}</p>

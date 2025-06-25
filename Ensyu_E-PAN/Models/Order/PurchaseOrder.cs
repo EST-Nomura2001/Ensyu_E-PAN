@@ -42,8 +42,9 @@ namespace Ensyu_E_PAN.Models.Order
         public string Other { get; set; }
 
         // ナビゲーションプロパティ
-        public Company Company { get; set; }
-        public Store Store { get; set; }
+        public Company? Company { get; set; }
+        public Store? Store { get; set; }
+        public ICollection<OrderItemList>? OrderItemLists { get; set; }
 
     }
 }

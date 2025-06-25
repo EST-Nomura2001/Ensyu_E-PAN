@@ -1,0 +1,12 @@
+削除検討　　　　　　AboutView.vue
+削除検討　　　　　　AdminView.vue
+勤怠ホーム　　　　　AttendanceHome.vue
+勤怠マネジメント　　AttendanceManagement.vue
+従業員用ページ　　　EmployeeView.vue
+削除検討　　　　　　HomeView.vue
+希望フォーム　　　　KibouForm.vue
+ログインページ　　　LoginPageView.vue
+シフト確定フォーム　MakeAttendance.vue
+アルバイト用ページ　PartTimeView.vue
+発注ページ　　　　　　PurchaseOrder.vue
+発注保存ページ　　　SavedOrders.vue

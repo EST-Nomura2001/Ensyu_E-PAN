@@ -22,7 +22,8 @@ namespace Ensyu_E_PAN.Models.Attendance
         public int Sum_TotalCost { get; set; }
 
         // ナビゲーションプロパティ（必要に応じて）
-        public AllShift AllShift { get; set; }
+        public AllShift? AllShift { get; set; }
+        public ICollection<DateSchedule>? DateSchedules { get; set; }
 
     }
 }

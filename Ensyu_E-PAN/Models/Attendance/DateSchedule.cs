@@ -50,9 +50,10 @@ namespace Ensyu_E_PAN.Models.Attendance
         public int? T_DayPrice { get; set; }//日給計
 
         // ナビゲーションプロパティ
-        public User User { get; set; }
-        public WorkRoll WorkRoll { get; set; }
-        public DayShift DayShift { get; set; }
+        public User? User { get; set; }
+        public WorkRoll? WorkRoll { get; set; }
+        public DayShift? DayShift { get; set; }
+        public ICollection<UserDateShift>? UserDateShifts { get; set; }  
 
 
     }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Ensyu_E_PAN.Models.Order;
 
 namespace Ensyu_E_PAN.Models.Masters
 {
@@ -10,5 +11,7 @@ namespace Ensyu_E_PAN.Models.Masters
         [Required]
         public string Item_Name { get; set; }
 
+        //ナビゲーション
+        public ICollection<OrderItemList>? OrderItemLists { get; set; }
     }
 }

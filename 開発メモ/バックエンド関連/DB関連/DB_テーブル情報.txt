@@ -1,0 +1,326 @@
+sqlite> .mode line
+sqlite> select * from sqlite_master;
+    type = table
+    name = __EFMigrationsLock
+tbl_name = __EFMigrationsLock
+rootpage = 2
+     sql = CREATE TABLE "__EFMigrationsLock" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK___EFMigrationsLock" PRIMARY KEY,
+    "Timestamp" TEXT NOT NULL
+)
+
+    type = table
+    name = __EFMigrationsHistory
+tbl_name = __EFMigrationsHistory
+rootpage = 3
+     sql = CREATE TABLE "__EFMigrationsHistory" (
+    "MigrationId" TEXT NOT NULL CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY,
+    "ProductVersion" TEXT NOT NULL
+)
+
+    type = index
+    name = sqlite_autoindex___EFMigrationsHistory_1
+tbl_name = __EFMigrationsHistory
+rootpage = 4
+     sql =
+
+    type = table
+    name = All_Shifts
+tbl_name = All_Shifts
+rootpage = 5
+     sql = CREATE TABLE "All_Shifts" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_All_Shifts" PRIMARY KEY AUTOINCREMENT,
+    "Date" TEXT NOT NULL,
+    "Confirm_Flg" INTEGER NOT NULL,
+    "Fixed_Date" TEXT NOT NULL,
+    "Sending_Flg" INTEGER NOT NULL,
+    "Cost" INTEGER NOT NULL,
+    "Sum_WorkTime" TEXT NOT NULL,
+    "Rec_Flg" INTEGER NOT NULL
+)
+
+    type = table
+    name = sqlite_sequence
+tbl_name = sqlite_sequence
+rootpage = 6
+     sql = CREATE TABLE sqlite_sequence(name,seq)
+
+    type = table
+    name = Companies
+tbl_name = Companies
+rootpage = 7
+     sql = CREATE TABLE "Companies" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Companies" PRIMARY KEY AUTOINCREMENT,
+    "C_Name" TEXT NOT NULL,
+    "Post_Code" INTEGER NOT NULL,
+    "Address1" TEXT NOT NULL,
+    "Address2" TEXT NOT NULL,
+    "Tel" INTEGER NULL,
+    "Fax" INTEGER NULL,
+    "Mail" TEXT NOT NULL
+)
+
+    type = table
+    name = Items
+tbl_name = Items
+rootpage = 8
+     sql = CREATE TABLE "Items" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Items" PRIMARY KEY AUTOINCREMENT,
+    "Item_Name" TEXT NOT NULL
+)
+
+    type = table
+    name = Roll_Lists
+tbl_name = Roll_Lists
+rootpage = 9
+     sql = CREATE TABLE "Roll_Lists" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Roll_Lists" PRIMARY KEY AUTOINCREMENT,
+    "Name" TEXT NOT NULL
+)
+
+    type = table
+    name = Stores
+tbl_name = Stores
+rootpage = 10
+     sql = CREATE TABLE "Stores" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Stores" PRIMARY KEY AUTOINCREMENT,
+    "C_Name" TEXT NOT NULL,
+    "Post_Code" INTEGER NOT NULL,
+    "Address1" TEXT NOT NULL,
+    "Address2" TEXT NOT NULL,
+    "Tel" INTEGER NULL,
+    "Fax" INTEGER NULL,
+    "Mail" TEXT NOT NULL
+)
+
+    type = table
+    name = WorkRoll_Lists
+tbl_name = WorkRoll_Lists
+rootpage = 11
+     sql = CREATE TABLE "WorkRoll_Lists" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_WorkRoll_Lists" PRIMARY KEY AUTOINCREMENT,
+    "Name" TEXT NOT NULL
+)
+
+    type = table
+    name = Day_Shifts
+tbl_name = Day_Shifts
+rootpage = 12
+     sql = CREATE TABLE "Day_Shifts" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Day_Shifts" PRIMARY KEY AUTOINCREMENT,
+    "Date" TEXT NOT NULL,
+    "All_Shift_Id" INTEGER NOT NULL,
+    "Sum_WorkTime" TEXT NOT NULL,
+    "Sum_TotalCost" INTEGER NOT NULL,
+    CONSTRAINT "FK_Day_Shifts_All_Shifts_All_Shift_Id" FOREIGN KEY ("All_Shift_Id") REFERENCES "All_Shifts" ("Id") ON DELETE CASCADE
+)
+
+    type = table
+    name = Purchase_Orders
+tbl_name = Purchase_Orders
+rootpage = 13
+     sql = CREATE TABLE "Purchase_Orders" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Purchase_Orders" PRIMARY KEY AUTOINCREMENT,
+    "Title" TEXT NOT NULL,
+    "Quotation" INTEGER NOT NULL,
+    "Tax" INTEGER NULL,
+    "Order_Date" TEXT NULL,
+    "Delivery_Date" TEXT NULL,
+    "Payment_Date" TEXT NULL,
+    "Payment_Terms" TEXT NOT NULL,
+    "Confirm_Flg" INTEGER NOT NULL,
+    "Company_Cd" INTEGER NOT NULL,
+    "Manager" TEXT NOT NULL,
+    "Store_Cd" INTEGER NOT NULL,
+    "Other" TEXT NOT NULL,
+    CONSTRAINT "FK_Purchase_Orders_Companies_Company_Cd" FOREIGN KEY ("Company_Cd") REFERENCES "Companies" ("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_Purchase_Orders_Stores_Store_Cd" FOREIGN KEY ("Store_Cd") REFERENCES "Stores" ("Id") ON DELETE CASCADE
+)
+
+    type = table
+    name = Users
+tbl_name = Users
+rootpage = 14
+     sql = CREATE TABLE "Users" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Users" PRIMARY KEY AUTOINCREMENT,
+    "Login_Id" TEXT NOT NULL,
+    "Name" TEXT NOT NULL,
+    "Roll_Cd" INTEGER NOT NULL,
+    "Password" TEXT NOT NULL,
+    "Stores_Cd" INTEGER NOT NULL,
+    "TimePrice_D" INTEGER NOT NULL,
+    "TimePrice_N" INTEGER NOT NULL,
+    CONSTRAINT "FK_Users_Roll_Lists_Roll_Cd" FOREIGN KEY ("Roll_Cd") REFERENCES "Roll_Lists" ("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_Users_Stores_Stores_Cd" FOREIGN KEY ("Stores_Cd") REFERENCES "Stores" ("Id") ON DELETE CASCADE
+)
+
+    type = table
+    name = Order_Item_Lists
+tbl_name = Order_Item_Lists
+rootpage = 16
+     sql = CREATE TABLE "Order_Item_Lists" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Order_Item_Lists" PRIMARY KEY AUTOINCREMENT,
+    "P_Order_List_Id" INTEGER NOT NULL,
+    "Item_Cd" INTEGER NOT NULL,
+    "Amount" INTEGER NOT NULL, "Other_ItemName" TEXT NOT NULL DEFAULT '',
+    CONSTRAINT "FK_Order_Item_Lists_Items_Item_Cd" FOREIGN KEY ("Item_Cd") REFERENCES "Items" ("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_Order_Item_Lists_Purchase_Orders_P_Order_List_Id" FOREIGN KEY ("P_Order_List_Id") REFERENCES "Purchase_Orders" ("Id") ON DELETE CASCADE
+)
+
+    type = table
+    name = Date_Schedules
+tbl_name = Date_Schedules
+rootpage = 18
+     sql = CREATE TABLE "Date_Schedules" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Date_Schedules" PRIMARY KEY AUTOINCREMENT,
+    "Today" TEXT NOT NULL,
+    "User_Id" INTEGER NOT NULL,
+    "Work_Roll_Id" INTEGER NOT NULL,
+    "Day_Shift_Id" INTEGER NOT NULL,
+    "P_Start_WorkTime" TEXT NULL,
+    "P_End_WorkTime" TEXT NULL,
+    "U_Start_WorkTime" TEXT NULL,
+    "U_End_WorkTime" TEXT NULL,
+    "Start_WorkTime" TEXT NULL,
+    "End_WorkTime" TEXT NULL,
+    "Start_BreakTime" TEXT NULL,
+    "End_BreakTime" TEXT NULL,
+    "T_WorkTime_D" TEXT NULL,
+    "T_WorkTime_N" TEXT NULL,
+    "T_WorkTime_All" TEXT NULL,
+    "D_DayPrice" INTEGER NULL,
+    "N_DayPrice" INTEGER NULL,
+    "T_DayPrice" INTEGER NULL,
+    CONSTRAINT "FK_Date_Schedules_Day_Shifts_Day_Shift_Id" FOREIGN KEY ("Day_Shift_Id") REFERENCES "Day_Shifts" ("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_Date_Schedules_Users_User_Id" FOREIGN KEY ("User_Id") REFERENCES "Users" ("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_Date_Schedules_WorkRoll_Lists_Work_Roll_Id" FOREIGN KEY ("Work_Roll_Id") REFERENCES "WorkRoll_Lists" ("Id") ON DELETE RESTRICT
+)
+
+    type = table
+    name = User_Shifts
+tbl_name = User_Shifts
+rootpage = 19
+     sql = CREATE TABLE "User_Shifts" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_User_Shifts" PRIMARY KEY AUTOINCREMENT,
+    "User_Id" INTEGER NOT NULL,
+    "Shift_Id" INTEGER NOT NULL,
+    "Day_Shifts_Id" INTEGER NOT NULL,
+    "Date_Ym" TEXT NOT NULL,
+    "List_Status" INTEGER NOT NULL,
+    "Total_WorkTime" TEXT NOT NULL,
+    "Month_Price" INTEGER NOT NULL,
+    "U_Confirm_Flg" INTEGER NOT NULL,
+    CONSTRAINT "FK_User_Shifts_All_Shifts_Shift_Id" FOREIGN KEY ("Shift_Id") REFERENCES "All_Shifts" ("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_User_Shifts_Day_Shifts_Day_Shifts_Id" FOREIGN KEY ("Day_Shifts_Id") REFERENCES "Day_Shifts" ("Id") ON DELETE RESTRICT,
+    CONSTRAINT "FK_User_Shifts_Users_User_Id" FOREIGN KEY ("User_Id") REFERENCES "Users" ("Id") ON DELETE CASCADE
+)
+
+    type = table
+    name = USER_DATE_SHIFTS
+tbl_name = USER_DATE_SHIFTS
+rootpage = 20
+     sql = CREATE TABLE "USER_DATE_SHIFTS" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_USER_DATE_SHIFTS" PRIMARY KEY AUTOINCREMENT,
+    "User_Shift_Id" INTEGER NOT NULL,
+    "Shift_Date" TEXT NOT NULL,
+    "Date_Schedule_Id" INTEGER NOT NULL,
+    CONSTRAINT "FK_USER_DATE_SHIFTS_Date_Schedules_Date_Schedule_Id" FOREIGN KEY ("Date_Schedule_Id") REFERENCES "Date_Schedules" ("Id") ON DELETE RESTRICT,
+    CONSTRAINT "FK_USER_DATE_SHIFTS_User_Shifts_User_Shift_Id" FOREIGN KEY ("User_Shift_Id") REFERENCES "User_Shifts" ("Id") ON DELETE RESTRICT
+)
+
+    type = index
+    name = IX_Date_Schedules_Day_Shift_Id
+tbl_name = Date_Schedules
+rootpage = 21
+     sql = CREATE INDEX "IX_Date_Schedules_Day_Shift_Id" ON "Date_Schedules" ("Day_Shift_Id")
+
+    type = index
+    name = IX_Date_Schedules_User_Id
+tbl_name = Date_Schedules
+rootpage = 22
+     sql = CREATE INDEX "IX_Date_Schedules_User_Id" ON "Date_Schedules" ("User_Id")
+
+    type = index
+    name = IX_Date_Schedules_Work_Roll_Id
+tbl_name = Date_Schedules
+rootpage = 23
+     sql = CREATE INDEX "IX_Date_Schedules_Work_Roll_Id" ON "Date_Schedules" ("Work_Roll_Id")
+
+    type = index
+    name = IX_Day_Shifts_All_Shift_Id
+tbl_name = Day_Shifts
+rootpage = 24
+     sql = CREATE INDEX "IX_Day_Shifts_All_Shift_Id" ON "Day_Shifts" ("All_Shift_Id")
+
+    type = index
+    name = IX_Order_Item_Lists_Item_Cd
+tbl_name = Order_Item_Lists
+rootpage = 25
+     sql = CREATE INDEX "IX_Order_Item_Lists_Item_Cd" ON "Order_Item_Lists" ("Item_Cd")
+
+    type = index
+    name = IX_Order_Item_Lists_P_Order_List_Id
+tbl_name = Order_Item_Lists
+rootpage = 26
+     sql = CREATE INDEX "IX_Order_Item_Lists_P_Order_List_Id" ON "Order_Item_Lists" ("P_Order_List_Id")
+
+    type = index
+    name = IX_Purchase_Orders_Company_Cd
+tbl_name = Purchase_Orders
+rootpage = 27
+     sql = CREATE INDEX "IX_Purchase_Orders_Company_Cd" ON "Purchase_Orders" ("Company_Cd")
+
+    type = index
+    name = IX_Purchase_Orders_Store_Cd
+tbl_name = Purchase_Orders
+rootpage = 29
+     sql = CREATE INDEX "IX_Purchase_Orders_Store_Cd" ON "Purchase_Orders" ("Store_Cd")
+
+    type = index
+    name = IX_USER_DATE_SHIFTS_Date_Schedule_Id
+tbl_name = USER_DATE_SHIFTS
+rootpage = 30
+     sql = CREATE INDEX "IX_USER_DATE_SHIFTS_Date_Schedule_Id" ON "USER_DATE_SHIFTS" ("Date_Schedule_Id")
+
+    type = index
+    name = IX_USER_DATE_SHIFTS_User_Shift_Id
+tbl_name = USER_DATE_SHIFTS
+rootpage = 31
+     sql = CREATE INDEX "IX_USER_DATE_SHIFTS_User_Shift_Id" ON "USER_DATE_SHIFTS" ("User_Shift_Id")
+
+    type = index
+    name = IX_User_Shifts_Day_Shifts_Id
+tbl_name = User_Shifts
+rootpage = 32
+     sql = CREATE INDEX "IX_User_Shifts_Day_Shifts_Id" ON "User_Shifts" ("Day_Shifts_Id")
+
+    type = index
+    name = IX_User_Shifts_Shift_Id
+tbl_name = User_Shifts
+rootpage = 33
+     sql = CREATE INDEX "IX_User_Shifts_Shift_Id" ON "User_Shifts" ("Shift_Id")
+
+    type = index
+    name = IX_User_Shifts_User_Id
+tbl_name = User_Shifts
+rootpage = 34
+     sql = CREATE INDEX "IX_User_Shifts_User_Id" ON "User_Shifts" ("User_Id")
+
+    type = index
+    name = IX_Users_Login_Id
+tbl_name = Users
+rootpage = 35
+     sql = CREATE UNIQUE INDEX "IX_Users_Login_Id" ON "Users" ("Login_Id")
+
+    type = index
+    name = IX_Users_Roll_Cd
+tbl_name = Users
+rootpage = 36
+     sql = CREATE INDEX "IX_Users_Roll_Cd" ON "Users" ("Roll_Cd")
+
+    type = index
+    name = IX_Users_Stores_Cd
+tbl_name = Users
+rootpage = 37
+     sql = CREATE INDEX "IX_Users_Stores_Cd" ON "Users" ("Stores_Cd")
+sqlite>

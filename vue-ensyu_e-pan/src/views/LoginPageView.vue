@@ -23,19 +23,17 @@ async function login() {
       loginId: loginId.value,
       password: password.value,
     });
-    const { role, name } = response.data;
+    const { role, name, storeName } = response.data;
     
     // sessionStorageにユーザー情報を保存
     sessionStorage.setItem('userRole', role);
     sessionStorage.setItem('userName', name);
+    sessionStorage.setItem('storeName', storeName);
 
     // 権限に応じてリダイレクト
     switch (role) {
       case 'admin':
         router.push('/admin');
-        break;
-      case 'employee':
-        router.push('/employee');
         break;
       case 'partTime':
         router.push('/part-time');

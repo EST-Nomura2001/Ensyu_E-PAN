@@ -3,6 +3,7 @@
   このコンポーネントは発注書を作成・編集・印刷する機能を持っています
 -->
 <template>
+  <CommonHeader />  <!--未テスト-->
     <div id="purchase-order-page">
       <div id="purchase-order-container">
         <!-- 発注書ヘッダー部分 -->
@@ -189,6 +190,9 @@
   <script>
   // Axiosライブラリをインポート（HTTP通信を行うためのライブラリ）
   import axios from 'axios';
+
+  //ヘッダー用
+  import CommonHeader from '../components/CommonHeader.vue';
   
   // APIサーバーのベースURL
   const API_BASE_URL = 'http://localhost:3000';
@@ -425,8 +429,13 @@
         };
         await axios.post(`http://localhost:5000/api/PurchaseOrders/${this.orderData.id}/items`, payload);
       },
-    }
-  };
+    },
+
+    //ヘッダー用
+    components: {
+    CommonHeader
+  },
+};
   </script>
   
   <!-- 

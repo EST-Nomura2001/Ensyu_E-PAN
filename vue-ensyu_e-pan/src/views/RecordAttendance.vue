@@ -84,9 +84,12 @@ export default {
     };
   },
   async mounted() {
-    const now = new Date();
-    let year = now.getFullYear();
-    let month = now.getMonth() + 1;
+    // ★初回表示は2025年7月に固定（本実装時は下記2行を有効化）
+    let year = 2025;
+    let month = 7;
+    // const now = new Date();
+    // let year = now.getFullYear();
+    // let month = now.getMonth() + 1;
     let dateSchedules = [];
     try {
       dateSchedules = await fetchAllShiftSchedules(year, month);
@@ -94,6 +97,7 @@ export default {
         dateSchedules = dateSchedules.$values;
       }
     } catch (e) {
+      console.error('API error:', e);
       dateSchedules = [];
     }
     if (!Array.isArray(dateSchedules)) dateSchedules = [];
@@ -106,7 +110,13 @@ export default {
       }
     }
     // --- 全日付（DATE_SCHEDULES.TODAY）をユニークかつ昇順で抽出 ---
-    const allDates = Array.from(new Set(dateSchedules.map(ds => ds.today))).sort();
+    function toDateString(dateStr) {
+      if (!dateStr) return '';
+      return new Date(dateStr).toISOString().split('T')[0];
+    }
+    const allDates = Array.from(
+      new Set(dateSchedules.map(ds => toDateString(ds.today)).filter(Boolean))
+    ).sort();
     // --- 合計行各日付（DAY_SHIFTS.SUM_WORKTIME） ---
     const dayShiftMap = {};
     dateSchedules.forEach(ds => {
@@ -116,31 +126,8 @@ export default {
     });
     const dayShifts = Object.values(dayShiftMap).sort((a, b) => new Date(a.date) - new Date(b.date));
     // --- 合計列個人行（USER_SHIFTS.TOTAL_WORKTIME） ---
-    // ユーザーごとにグループ化し、daysを日付順で揃える
-    const userMap = {};
-    dateSchedules.forEach(ds => {
-      const userId = ds.user?.id || ds.user_Id || '不明';
-      if (!userMap[userId]) {
-        const userShift = ds.user?.userShifts?.$values?.[0];
-        userMap[userId] = {
-          name: ds.user?.name || '不明',
-          wage: ds.user?.timePrice_D || '',
-          totalWorkTime: userShift?.total_WorkTime || '',
-          monthPrice: userShift?.month_Price || '',
-          daysObj: {} // 一時的に日付→データで保持
-        };
-      }
-      userMap[userId].daysObj[ds.today] = {
-        workTime: ds.t_WorkTime_All?.toString() || '',
-        dayPrice: ds.t_DayPrice?.toString() || ''
-      };
-    });
-    // days配列を「日付順」で作る
-    Object.values(userMap).forEach(u => {
-      u.days = allDates.map(date => u.daysObj[date] || { workTime: '', dayPrice: '' });
-      delete u.daysObj;
-    });
-    this.users = Object.values(userMap);
+    // ユーザーごとの列は一旦空配列にする（別メソッドで取得予定）
+    this.users = [];
     // 合計行・合計列はusersから算出
     this.status = '';
     this.storeName = '';
@@ -178,6 +165,7 @@ export default {
           dateSchedules = dateSchedules.$values;
         }
       } catch (e) {
+        console.error('API error:', e);
         dateSchedules = [];
       }
       if (!Array.isArray(dateSchedules)) dateSchedules = [];

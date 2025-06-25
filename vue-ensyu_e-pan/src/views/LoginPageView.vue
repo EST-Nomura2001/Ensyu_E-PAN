@@ -27,7 +27,7 @@ async function login() {
     
     // sessionStorageにユーザー情報を保存
     sessionStorage.setItem('userRole', role);
-    sessionStorage.setItem('userName', name);
+    sessionStorage.setItem('userId', userId);
     sessionStorage.setItem('storeId', storeId);
 
     // 権限に応じてリダイレクト

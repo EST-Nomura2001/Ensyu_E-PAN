@@ -1,5 +1,25 @@
 <!--田村担当-->
+<!-- 
+## 1. fetchShiftsByYear
+- 使用API: `getAllShiftsForAllMonths`
+- 内容: 指定した年の全月分のシフトデータを取得します。
 
+## 2. fetchStoreName
+- 使用API: `getStoreInfo`
+- 内容: sessionStorageからstoreIdを取得し、店舗名をAPIで取得します。
+
+## 3. toggleRecruiting
+- 使用API: `updateAttendanceData`
+- 内容: 希望収集フラグ（recFlg）を切り替えてAPIで更新します。
+
+## 4. saveDeadline
+- 使用API: `updateAttendanceData`
+- 内容: シフト提出期限（fixedDate）をAPIで更新します。
+
+## 5. handleGenerateMonthly
+- 使用API: `generateMonthly`
+- 内容: 翌月のシフトデータを新規作成するAPIを呼び出します。
+ -->
 <template>
   <CommonHeader />
   <div class="attendance-home">
@@ -122,21 +142,6 @@ export default {
         this.storeName = '店舗名取得エラー';
       }
     },
-    async fetchShifts() {
-      try {
-        const response = await getAttendanceData();
-        this.shifts = response.data.map(shift => ({
-          ...shift,
-          isEditingDeadline: false,
-          editableDeadline: shift.fixedDate ? shift.fixedDate.split('T')[0] : '',
-        }));
-      } catch (error) {
-        console.error('シフト情報の取得に失敗しました。', error);
-        // ↓↓↓ デモデータ（API連携できない場合用、後で削除）
-        this.shifts = this.demoShifts.map(shift => ({ ...shift }));
-        // ↑↑↑ デモデータここまで
-      }
-    },
     async toggleRecruiting(shift) {
       try {
         const response = await updateAttendanceData(shift.id, { recFlg: !shift.recFlg });
@@ -182,11 +187,18 @@ export default {
     },
     async handleGenerateMonthly() {
       try {
-        const response = await generateMonthly();
+        // 今日の日付をYYYY-MM-DD形式で取得
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const postDate = `${yyyy}-${mm}-${dd}`;
+
+        const response = await generateMonthly(postDate);
         alert(response.data || '翌月のシフトデータを作成しました。');
         this.fetchShiftsByYear();
       } catch (error) {
-        alert('翌月の新規作成に失敗しました。'|| response.data);
+        alert('翌月の新規作成に失敗しました。'|| (error && error.response && error.response.data));
         console.error(error);
       }
     },

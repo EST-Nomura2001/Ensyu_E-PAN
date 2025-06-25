@@ -86,7 +86,8 @@ export default {
         status: false, // ALL_SHIFTS.SENDING_FLG
         storeName: '〇店', // STORES.C_NAME
         yearMonth: '2025年6月', // ALL_SHIFTS.DATE
-        dayShifts: Array.from({ length: 31 }, (_, i) => ({
+        // 6月は30日なので30日分だけ生成
+        dayShifts: Array.from({ length: 30 }, (_, i) => ({
           date: `2025-06-${(i+1).toString().padStart(2, '0')}`,
           sumWorkTime: i % 2 === 0 ? 8.0 : 0,
           sumTotalCost: i % 2 === 0 ? 7600 : 0,
@@ -100,21 +101,22 @@ export default {
             wage: 950,    // USERS.TIMEPRICE_D
             totalWorkTime: '40.0', // USER_SHIFTS.TOTAL_WORKTIME
             monthPrice: '38000',   // USER_SHIFTS.MONTH_PRICE
-            days: Array.from({ length: 31 }, (_, i) => ({
+            // 6月は30日分だけ生成
+            days: Array.from({ length: 30 }, (_, i) => ({
               workTime: i % 2 === 0 ? '8.0' : '', // DATE_SCHEDULES.T_WORKTIME_ALL
               dayPrice: i % 2 === 0 ? '7600' : '', // DATE_SCHEDULES.T_DAY_PRICE
             })),
           },
           {
             name: '名前2', wage: 1000, totalWorkTime: '30.0', monthPrice: '30000',
-            days: Array.from({ length: 31 }, (_, i) => ({
+            days: Array.from({ length: 30 }, (_, i) => ({
               workTime: i % 3 === 0 ? '6.0' : '',
               dayPrice: i % 3 === 0 ? '6000' : '',
             })),
           },
           {
             name: '名前3', wage: 850, totalWorkTime: '20.0', monthPrice: '17000',
-            days: Array.from({ length: 31 }, (_, i) => ({
+            days: Array.from({ length: 30 }, (_, i) => ({
               workTime: i % 5 === 0 ? '4.0' : '',
               dayPrice: i % 5 === 0 ? '3400' : '',
             })),
@@ -139,7 +141,12 @@ export default {
       summary = await fetchAllShiftsSummary(year, month);
     } catch (e) {
       // API取得失敗時はデモデータを利用
-      dateSchedules = this.staticDemoData.users.flatMap(u => u.days);
+      // ユーザーごとにdaysを持つ形で渡す
+      dateSchedules = this.staticDemoData.users.map(u => ({
+        name: u.name,
+        wage: u.wage,
+        days: u.days
+      }));
       summary = {
         status: this.staticDemoData.status,
         storeName: this.staticDemoData.storeName,
@@ -152,7 +159,18 @@ export default {
     // 取得したdateSchedulesをusers配列に整形してセット
     // ここではAPIの返却構造に応じて整形処理が必要です
     // 例：dateSchedulesをユーザーごとにグループ化し、users配列を作成
-    this.users = this.formatUsersFromDateSchedules(dateSchedules);
+    // デモデータ時はすでに整形済みなので分岐
+    if (dateSchedules.length > 0 && dateSchedules[0].days) {
+      this.users = dateSchedules.map(u => ({
+        name: u.name,
+        wage: u.wage,
+        totalWorkTime: u.days.reduce((sum, d) => sum + Number(d.workTime || 0), 0).toFixed(1),
+        monthPrice: u.days.reduce((sum, d) => sum + Number(d.dayPrice || 0), 0).toString(),
+        days: u.days
+      }));
+    } else {
+      this.users = this.formatUsersFromDateSchedules(dateSchedules);
+    }
     // 合計行・合計列はsummaryからセット
     this.status = summary.status;
     this.storeName = summary.storeName;
@@ -191,18 +209,43 @@ export default {
         dateSchedules = await fetchAllShiftSchedules(year, month);
         summary = await fetchAllShiftsSummary(year, month);
       } catch (e) {
-        dateSchedules = this.staticDemoData.users.flatMap(u => u.days);
+        // デモデータの長さを月ごとに調整
+        const daysInMonth = new Date(year, month, 0).getDate();
+        const demoDayShifts = Array.from({ length: daysInMonth }, (_, i) => ({
+          date: `${year}-${month.toString().padStart(2, '0')}-${(i+1).toString().padStart(2, '0')}`,
+          sumWorkTime: i % 2 === 0 ? 8.0 : 0,
+          sumTotalCost: i % 2 === 0 ? 7600 : 0,
+        }));
+        const demoUsers = this.staticDemoData.users.map(u => ({
+          name: u.name,
+          wage: u.wage,
+          days: Array.from({ length: daysInMonth }, (_, i) => ({
+            workTime: u.days[i % u.days.length]?.workTime || '',
+            dayPrice: u.days[i % u.days.length]?.dayPrice || '',
+          }))
+        }));
+        dateSchedules = demoUsers;
         summary = {
           status: this.staticDemoData.status,
           storeName: this.staticDemoData.storeName,
-          yearMonth: this.staticDemoData.yearMonth,
-          dayShifts: this.staticDemoData.dayShifts,
+          yearMonth: `${year}年${month}月`,
+          dayShifts: demoDayShifts,
           totalWorkTime: this.staticDemoData.totalWorkTime,
           totalCost: this.staticDemoData.totalCost,
         };
       }
-      // 取得したdateSchedulesをusers配列に整形してセット
-      this.users = this.formatUsersFromDateSchedules(dateSchedules);
+      // デモデータ時はすでに整形済みなので分岐
+      if (dateSchedules.length > 0 && dateSchedules[0].days) {
+        this.users = dateSchedules.map(u => ({
+          name: u.name,
+          wage: u.wage,
+          totalWorkTime: u.days.reduce((sum, d) => sum + Number(d.workTime || 0), 0).toFixed(1),
+          monthPrice: u.days.reduce((sum, d) => sum + Number(d.dayPrice || 0), 0).toString(),
+          days: u.days
+        }));
+      } else {
+        this.users = this.formatUsersFromDateSchedules(dateSchedules);
+      }
       // 合計行・合計列はsummaryからセット
       this.status = summary.status;
       this.storeName = summary.storeName;

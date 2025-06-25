@@ -6,7 +6,9 @@ using Ensyu_E_PAN.Data;
 using Ensyu_E_PAN.Models.Attendance;
 using Ensyu_E_PAN.Services;
 using Ensyu_E_PAN.DTOs;
-using Microsoft.EntityFrameworkCore; // Includeメソッドのため
+using Ensyu_E_PAN.DTOs.UpDateAttendance;
+using Microsoft.EntityFrameworkCore;
+using Ensyu_E_PAN.DTOs.UpdateAttendance; // Includeメソッドのため
 
 namespace Ensyu_E_PAN.Controllers
 {
@@ -281,7 +283,99 @@ namespace Ensyu_E_PAN.Controllers
             await _context.SaveChangesAsync();
             return Ok("スケジュールを更新しました。");
         }
+        //希望シフトの提出
+        [HttpPut("user/{userId}/schedule-update")]
+        public async Task<IActionResult> UpdateUserShiftAndSchedule(int userId, [FromBody] UpdateUserShiftRequest request)
+        {
+            // 該当ユーザーの DateSchedule を取得
+            var dateSchedule = await _context.Date_Schedules
+                .FirstOrDefaultAsync(ds => ds.User_Id == userId && ds.Today.Date == request.TargetDate.Date);
 
+            if (dateSchedule == null)
+            {
+                return NotFound("DateSchedule not found.");
+            }
+
+            // 勤務希望時間を更新
+            dateSchedule.U_Start_WorkTime = request.U_Start_WorkTime;
+            dateSchedule.U_End_WorkTime = request.U_End_WorkTime;
+
+            // 該当ユーザーのUserShiftを取得
+            var userShift = await _context.User_Shifts
+                .FirstOrDefaultAsync(us => us.User_Id == userId && us.Date_Ym.Month == request.TargetDate.Month && us.Date_Ym.Year == request.TargetDate.Year);
+
+            if (userShift == null)
+            {
+                return NotFound("UserShift not found.");
+            }
+
+            // 確認フラグを更新
+            userShift.U_Confirm_Flg = request.U_Confirm_Flg;
+
+            // DB保存
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        //予定シフトの設定
+        [HttpPut("user/{userId}/schedule-plan")]
+        public async Task<IActionResult> UpdatePlannedWorkTime(int userId, [FromBody] UpdatePlannedWorkTimeRequest request)
+        {
+            var dateSchedule = await _context.Date_Schedules
+                .FirstOrDefaultAsync(ds => ds.User_Id == userId && ds.Today.Date == request.TargetDate.Date);
+
+            if (dateSchedule == null)
+            {
+                return NotFound("DateSchedule not found.");
+            }
+
+            dateSchedule.P_Start_WorkTime = request.P_Start_WorkTime;
+            dateSchedule.P_End_WorkTime = request.P_End_WorkTime;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        //AllShiftsの各フラグ更新
+        //シフト確定フラグ
+        [HttpPut("allshift/{id}/confirm-flag")]
+        public async Task<IActionResult> UpdateConfirmFlag(int id, [FromBody] bool confirmFlg)
+        {
+            var allShift = await _context.All_Shifts.FindAsync(id);
+            if (allShift == null)
+                return NotFound("AllShift not found.");
+
+            allShift.Confirm_Flg = confirmFlg;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        //送付フラグ
+        [HttpPut("allshift/{id}/sending-flag")]
+        public async Task<IActionResult> UpdateSendingFlag(int id, [FromBody] bool sendingFlg)
+        {
+            var allShift = await _context.All_Shifts.FindAsync(id);
+            if (allShift == null)
+                return NotFound("AllShift not found.");
+
+            allShift.Sending_Flg = sendingFlg;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        //シフト希望募集中フラグ
+        [HttpPut("allshift/{id}/rec-flag")]
+        public async Task<IActionResult> UpdateRecFlag(int id, [FromBody] bool recFlg)
+        {
+            var allShift = await _context.All_Shifts.FindAsync(id);
+            if (allShift == null)
+                return NotFound("AllShift not found.");
+
+            allShift.Rec_Flg = recFlg;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
         //Put処理
     }
 } 

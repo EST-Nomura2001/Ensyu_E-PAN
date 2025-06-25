@@ -281,5 +281,7 @@ namespace Ensyu_E_PAN.Controllers
             await _context.SaveChangesAsync();
             return Ok("スケジュールを更新しました。");
         }
+
+        //Put処理
     }
 } 

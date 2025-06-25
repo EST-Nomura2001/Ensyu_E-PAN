@@ -10,3 +10,4 @@
 アルバイト用ページ　PartTimeView.vue
 発注ページ　　　　　　PurchaseOrder.vue
 発注保存ページ　　　SavedOrders.vue
+S

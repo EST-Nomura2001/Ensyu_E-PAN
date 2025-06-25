@@ -12,7 +12,7 @@ export default defineConfig({
       '/api': {
         // 転送先を指定します
         // このURLはご自身のASP.NET Web APIの実行環境に合わせて変更してください
-        target: 'http://localhost:5011',
+        target: 'https://localhost:5011',
         // オリジンを変更してCORSエラーを回避します
         changeOrigin: true,
         // HTTPSの証明書検証を無効にします (自己署名証明書の場合に必要)

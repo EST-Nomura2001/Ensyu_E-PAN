@@ -1,3 +1,5 @@
+<!-- 担当業務の更新と時給の表示が未実装 -->
+
 <style scoped>
   body {
     font-family: sans-serif;
@@ -20,7 +22,8 @@
   }
   th.time-header {
     text-align: left;
-    width: 60px;
+    width: 30px;
+    padding-left: 3px;
     font-size: 10px;
   }
   th.event-col {
@@ -32,6 +35,10 @@
     color: #aaa;
   }
   td.event-block {
+    background-color: #b0d8a0;
+    font-weight: bold;
+  }
+  td.event-block-dark {
     background-color: #d0f0c0;
     font-weight: bold;
   }
@@ -144,7 +151,8 @@
           <th>担当業務</th>
           <th>出勤時間</th>
           <th>退勤時間</th>
-          <th v-for="time in timeHeaders" :key="time" class="time-header" colspan="2">{{ time }}</th>
+          <th>取消</th>
+          <th v-for="h in (endHour - startHour)" :key="h" class="time-header" :colspan="6">{{ String(startHour + h - 1).padStart(2, '0') }}:00</th>
         </tr>
       </thead>
       <tbody>
@@ -157,6 +165,7 @@
             <td rowspan="2"><input type="text" v-model="schedule.workRollName"></td>
             <td>{{ schedule.hopeStart }}</td>
             <td>{{ schedule.hopeEnd }}</td>
+            <td></td>
             <template v-for="(cell, cellIndex) in calculateRow(schedule.hopeStart, schedule.hopeEnd)" :key="cellIndex">
               <td v-if="cell.type === 'event'" :colspan="cell.colspan" class="event-block">希望</td>
               <td v-if="cell.type === 'empty'" class="empty">&nbsp;</td>
@@ -164,22 +173,25 @@
           </tr>
           <tr><!--下段: 予定シフト-->
             <td>
-              <input type="time" v-model="schedule.plannedStart">
+              <input type="time" v-model="schedule.plannedStart" @input="validatePlannedShift(index)" step="600">
               <div v-if="errors[index]?.start" class="error-message">{{ errors[index].start }}</div>
             </td>
             <td>
-              <input type="time" v-model="schedule.plannedEnd">
+              <input type="time" v-model="schedule.plannedEnd" @input="validatePlannedShift(index)" step="600">
               <div v-if="errors[index]?.end" class="error-message">{{ errors[index].end }}</div>
             </td>
+            <td>
+              <button type="button" @click="resetPlannedShift(index)">取消</button>
+            </td>
             <template v-for="(cell, cellIndex) in calculateRow(schedule.plannedStart, schedule.plannedEnd)" :key="cellIndex">
-              <td v-if="cell.type === 'event'" :colspan="cell.colspan" class="event-block">予定</td>
+              <td v-if="cell.type === 'event'" :colspan="cell.colspan" class="event-block-dark">予定</td>
               <td v-if="cell.type === 'empty'" class="empty">&nbsp;</td>
             </template>
           </tr>
         </template>
       </tbody>
     </table>
-    <div style="text-align: right; margin-top: 1rem;">
+    <div style="text-align: left; margin-top: 1rem;">
       <button @click="saveChanges" :disabled="!isDirty">保存</button>
     </div>
 
@@ -224,6 +236,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { getDateSchedulesByDate, updateSchedulesBulk } from '../services/api.js';
 import { isEqual } from 'lodash-es';
 import { useRoute, useRouter } from 'vue-router';
+import axios from 'axios';
 
 //ヘッダー用
 import CommonHeader from '../components/CommonHeader.vue';
@@ -244,8 +257,8 @@ const apiError = ref(null);
 
 // --- Constants ---
 const startHour = 9;
-const endHour = 24;
-const intervalMinutes = 30;
+const endHour = 22;
+const intervalMinutes = 10;
 
 // --- Computed Properties ---
 const formattedDate = computed(() => {
@@ -358,16 +371,23 @@ const fetchShifts = async (date) => {
     const data = await getDateSchedulesByDate(dateString);
     console.log('APIレスポンス', data);
     const rawSchedules = Array.isArray(data) ? data : (data.$values || []);
-    schedules.value = rawSchedules.map(ds => ({
-      scheduleId: ds.id,
-      userName: ds.user?.name || '',
-      hourlyWage: ds.user?.hourlyWage || '',
-      workRollName: ds.workRoll?.name || '',
-      plannedStart: ds.pStartWorktime ? ds.pStartWorktime.substring(11, 16) : '',
-      plannedEnd: ds.pEndWorktime ? ds.pEndWorktime.substring(11, 16) : '',
-      hopeStart: ds.uStartWorktime ? ds.uStartWorktime.substring(11, 16) : '',
-      hopeEnd: ds.uEndWorktime ? ds.uEndWorktime.substring(11, 16) : ''
-    }));
+    schedules.value = rawSchedules.map(ds => {
+      // userDateShiftsが配列であることを確認
+      const userDateShift = ds.userDateShifts?.$values?.[0];
+      const dateSchedule = userDateShift?.dateSchedule || {};
+
+      return {
+        scheduleId: dateSchedule.id,
+        userId: ds.user_Id,
+        userName: ds.userName || '',
+        hourlyWage: '', // 必要ならAPIで返すようにする
+        workRollName: dateSchedule.workRollName || '',
+        plannedStart: dateSchedule.p_Start_WorkTime ? dateSchedule.p_Start_WorkTime.substring(11, 16) : '',
+        plannedEnd: dateSchedule.p_End_WorkTime ? dateSchedule.p_End_WorkTime.substring(11, 16) : '',
+        hopeStart: dateSchedule.u_Start_WorkTime ? dateSchedule.u_Start_WorkTime.substring(11, 16) : '',
+        hopeEnd: dateSchedule.u_End_WorkTime ? dateSchedule.u_End_WorkTime.substring(11, 16) : ''
+      };
+    });
     originalSchedules.value = JSON.parse(JSON.stringify(schedules.value));
     storeName.value = rawSchedules.length > 0 && rawSchedules[0].storeName ? rawSchedules[0].storeName : '';
     isDirty.value = false;
@@ -421,15 +441,69 @@ const changeDay = (days) => {
 
 const saveChanges = async () => {
   try {
-    await updateSchedulesBulk(schedules.value);
+    const yyyy = currentDate.value.getFullYear();
+    const mm = String(currentDate.value.getMonth() + 1).padStart(2, '0');
+    const dd = String(currentDate.value.getDate()).padStart(2, '0');
+    const dateString = `${yyyy}-${mm}-${dd}`;
+
+    // 全員分まとめてPUT
+    await Promise.all(schedules.value.map(async (schedule) => {
+      // 入力が空の場合はスキップ
+      if (!schedule.plannedStart || !schedule.plannedEnd) return;
+      // ISO形式に変換
+      const toISO = (date, time) => `${date}T${time}:00.000Z`;
+      const body = {
+        targetDate: toISO(dateString, schedule.plannedStart), // targetDateは開始時刻で送信
+        p_Start_WorkTime: toISO(dateString, schedule.plannedStart),
+        p_End_WorkTime: toISO(dateString, schedule.plannedEnd)
+      };
+      await axios.put(
+        `http://localhost:5011/api/Attendance/user/${schedule.userId}/schedule-plan`,
+        body
+      );
+    }));
     originalSchedules.value = JSON.parse(JSON.stringify(schedules.value));
     isDirty.value = false;
     alert('保存しました。');
+    // 再読込
+    fetchShifts(currentDate.value);
   } catch (error) {
     alert('保存に失敗しました。');
     console.error('Failed to save changes:', error);
   }
 };
+
+// KibouForm.vueのバリデーションを参考にした関数
+function validatePlannedShift(idx) {
+  const schedule = schedules.value[idx];
+  errors.value[idx] = { start: '', end: '' };
+  // 両方未入力はOK
+  if (!schedule.plannedStart && !schedule.plannedEnd) return;
+  // 片方だけ入力はNG
+  if (!schedule.plannedStart || !schedule.plannedEnd) {
+    errors.value[idx].start = '出勤・退勤時間は両方入力、または両方未入力にしてください。';
+    errors.value[idx].end = '';
+    return;
+  }
+  // 出勤時間9:00未満はNG
+  if (schedule.plannedStart < '09:00') {
+    errors.value[idx].start = '出勤時間は9:00以降にしてください。';
+  }
+  // 退勤時間24:00超はNG
+  if (schedule.plannedEnd > '24:00') {
+    errors.value[idx].end = '退勤時間は24:00までにしてください。';
+  }
+  // 退勤時間が出勤時間以前はNG
+  if (schedule.plannedEnd && schedule.plannedStart && schedule.plannedEnd <= schedule.plannedStart) {
+    errors.value[idx].end = '退勤時間は出勤時間より後にしてください。';
+  }
+}
+
+function resetPlannedShift(idx) {
+  schedules.value[idx].plannedStart = '';
+  schedules.value[idx].plannedEnd = '';
+  validatePlannedShift(idx);
+}
 
 // --- Watchers ---
 watch(schedules, (newSchedules) => {

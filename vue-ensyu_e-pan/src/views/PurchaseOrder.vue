@@ -202,6 +202,12 @@ export default {
   
   // データ定義：このコンポーネントで管理する変数
   data() {
+    // 今日の日付をYYYY-MM-DD形式で取得
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
     return {
       isSaving: false, // 保存中かどうかを管理するフラグ
       
@@ -213,49 +219,30 @@ export default {
       // 発注書のデータ（resetForm or loadOrderで初期化される）
       purchaseOrder: {
         Id: null,
-        Title: '本日',
-        Quotation: 123456789,
+        Title: '',
+        Quotation: '',
         Tax: 10,
-        Order_Date: '2025-06-23',
-        Delivery_Date: '2025-06-25',
-        Payment_Date: '2025-09-01',
-        Payment_Terms: '月末締め',
+        Order_Date: todayStr,
+        Delivery_Date: '',
+        Payment_Date: '',
+        Payment_Terms: '',
         Confirm_Flg: false,
-        Company_Cd: 2222,
-        Manager: 'ダミー担当者',
-        Store_Cd: 1001,
+        Company_Cd: '',
+        Manager: '',
+        Store_Cd: '',
         Other: '',
-        Company: {
-          Id: 1,
-          C_Name: 'ダミー会社'
-        },
-        Store: {
-          Id: 1,
-          C_Name: 'ダミー店舗'
-        },
+        Company: null,
+        Store: null,
         OrderItemLists: [
-          {
-            Id: null,
-            P_Order_List_Id: null,
-            Item_Cd: 1,
-            Other_ItemName: 'ダミー商品',
-            Amount: 1,
-            Item: {
-              Id: 1,
-              Item_Name: 'ダミー商品'
-            },
-            PurchaseOrder: {
-              Id: 0
-            }
-          }
+          { Id: null, P_Order_List_Id: null, Item_Cd: '', Other_ItemName: '', Amount: 1, Item: null, PurchaseOrder: null }
         ],
-        Postal_Code: '123-4567',
-        Address1: '千葉県',
-        Address2: '柏市',
-        Tel: '080-1234-5678',
-        Fax: '03-1234-5678',
-        Email: 'dummy@example.com',
-        CustomerName: 'ダミー担当者'
+        Postal_Code: '',
+        Address1: '',
+        Address2: '',
+        Tel: '',
+        Fax: '',
+        Email: '',
+        CustomerName: ''
       },
     };
   },
@@ -281,55 +268,38 @@ export default {
   methods: {
     // 新規作成用のフォーム初期化
     resetForm() {
-      // URLを新規作成用に変更
       this.$router.push({ name: 'PurchaseOrder' });
-      
-      // フォームを初期値でリセット
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const todayStr = `${yyyy}-${mm}-${dd}`;
       this.purchaseOrder = {
         Id: null,
-        Title: '本日',
-        Quotation: null,
+        Title: '',
+        Quotation: '',
         Tax: 10,
-        Order_Date: '2025-06-23',
-        Delivery_Date: '2025-06-25',
-        Payment_Date: '2025-09-01',
-        Payment_Terms: '月末締め',
+        Order_Date: todayStr,
+        Delivery_Date: '',
+        Payment_Date: '',
+        Payment_Terms: '',
         Confirm_Flg: false,
-        Company_Cd: 2222,
-        Manager: 'ダミー担当者',
-        Store_Cd: 1001,
+        Company_Cd: '',
+        Manager: '',
+        Store_Cd: '',
         Other: '',
-        Company: {
-          Id: 1,
-          C_Name: 'ダミー会社'
-        },
-        Store: {
-          Id: 1,
-          C_Name: 'ダミー店舗'
-        },
+        Company: null,
+        Store: null,
         OrderItemLists: [
-          {
-            Id: null,
-            P_Order_List_Id: null,
-            Item_Cd: 1,
-            Other_ItemName: 'ダミー商品',
-            Amount: 1,
-            Item: {
-              Id: 1,
-              Item_Name: 'ダミー商品'
-            },
-            PurchaseOrder: {
-              Id: 0
-            }
-          }
+          { Id: null, P_Order_List_Id: null, Item_Cd: '', Other_ItemName: '', Amount: 1, Item: null, PurchaseOrder: null }
         ],
-        Postal_Code: '123-4567',
-        Address1: '千葉県',
-        Address2: '柏市',
-        Tel: '080-1234-5678',
-        Fax: '03-1234-5678',
-        Email: 'dummy@example.com',
-        CustomerName: 'ダミー担当者'
+        Postal_Code: '',
+        Address1: '',
+        Address2: '',
+        Tel: '',
+        Fax: '',
+        Email: '',
+        CustomerName: ''
       };
     },
     
@@ -379,38 +349,9 @@ export default {
     async saveOrder() {
       this.isSaving = true;
       try {
-        // 日付をISO8601形式に変換する関数
-        const toISO8601 = (dateStr) => {
-          if (!dateStr) return new Date().toISOString();
-          if (dateStr.length === 10) return dateStr + 'T00:00:00';
-          return dateStr;
-        };
-        // API仕様に合わせてpayloadを整理
-        const payload = {
-          Id: Number(this.purchaseOrder.Id) || 0,
-          Title: this.purchaseOrder.Title || '本日',
-          Quotation: Number(this.purchaseOrder.Quotation) || 123456789,
-          Tax: Number(this.purchaseOrder.Tax) || 10,
-          Order_Date: toISO8601(this.purchaseOrder.Order_Date),
-          Delivery_Date: toISO8601(this.purchaseOrder.Delivery_Date),
-          Payment_Date: toISO8601(this.purchaseOrder.Payment_Date),
-          Payment_Terms: this.purchaseOrder.Payment_Terms || '月末締め',
-          Confirm_Flg: this.purchaseOrder.Confirm_Flg,
-          Company_Cd: Number(this.purchaseOrder.Company_Cd) || 1,
-          Manager: this.purchaseOrder.Manager || 'ダミー担当者',
-          Store_Cd: Number(this.purchaseOrder.Store_Cd) || 1,
-          Other: this.purchaseOrder.Other || '',
-          OrderItemLists: this.purchaseOrder.OrderItemLists.map((item, idx) => ({
-            Id: Number(item.Id) || 0,
-            P_Order_List_Id: Number(item.P_Order_List_Id) || 0,
-            Item_Cd: Number(item.Item_Cd) || (idx + 1),
-            Other_ItemName: item.Other_ItemName || 'ダミー商品',
-            Amount: Number(item.Amount) || 1
-          }))
-        };
-        console.log('送信payload', JSON.stringify(payload, null, 2));
-        const response = await axios.post('http://localhost:5011/api/PurchaseOrders', payload);
-        if (response.data && response.data.success) {
+        const payload = { ...this.purchaseOrder };
+        const response = await axios.post(`${API_BASE_URL}/api/PurchaseOrders`, payload);
+        if (response.data) {
           alert('発注書が正常に保存されました。');
           this.$router.push({ name: 'SavedOrders' });
         } else {

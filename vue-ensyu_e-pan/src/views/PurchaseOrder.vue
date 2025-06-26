@@ -202,21 +202,16 @@ export default {
   
   // データ定義：このコンポーネントで管理する変数
   data() {
-    // 今日の日付をYYYY-MM-DD形式で取得
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     const todayStr = `${yyyy}-${mm}-${dd}`;
     return {
-      isSaving: false, // 保存中かどうかを管理するフラグ
-      
-      // 商品名の候補リスト
+      isSaving: false,
       predefinedProducts: [
         'めん', 'スープ', '醤油', '味噌', '豚骨', '昆布', 'チャーシュー', 'メンマ', 'のり', 'ネギ', '卵', 'ラード', 'ごま油', 'ニンニク', 'ラー油', 'スパイス', 'お酢'
       ],
-      
-      // 発注書のデータ（resetForm or loadOrderで初期化される）
       purchaseOrder: {
         Id: null,
         Title: '',
@@ -227,12 +222,10 @@ export default {
         Payment_Date: '',
         Payment_Terms: '',
         Confirm_Flg: false,
-        Company_Cd: '',
+        Company_Cd: 1,
         Manager: '',
-        Store_Cd: '',
+        Store_Cd: 1,
         Other: '',
-        Company: null,
-        Store: null,
         OrderItemLists: [
           { Id: null, P_Order_List_Id: null, Item_Cd: '', Other_ItemName: '', Amount: 1, Item: null, PurchaseOrder: null }
         ],
@@ -284,12 +277,10 @@ export default {
         Payment_Date: '',
         Payment_Terms: '',
         Confirm_Flg: false,
-        Company_Cd: '',
+        Company_Cd: 1,
         Manager: '',
-        Store_Cd: '',
+        Store_Cd: 1,
         Other: '',
-        Company: null,
-        Store: null,
         OrderItemLists: [
           { Id: null, P_Order_List_Id: null, Item_Cd: '', Other_ItemName: '', Amount: 1, Item: null, PurchaseOrder: null }
         ],
@@ -306,9 +297,40 @@ export default {
     // 既存データの読み込み（非同期処理）
     async loadOrder(orderId) {
       try {
-        const response = await axios.get(`http://localhost:5011/api/PurchaseOrders/${orderId}`);
+        const response = await axios.get(`${API_BASE_URL}/api/PurchaseOrders/${orderId}`);
         if (response.data && response.data.success) {
-          this.purchaseOrder = response.data.data;
+          const d = response.data.data;
+          this.purchaseOrder = {
+            Id: d.id,
+            Title: d.title,
+            Quotation: d.quotation,
+            Tax: d.tax,
+            Order_Date: d.order_Date ? d.order_Date.substring(0, 10) : '',
+            Delivery_Date: d.delivery_Date ? d.delivery_Date.substring(0, 10) : '',
+            Payment_Date: d.payment_Date ? d.payment_Date.substring(0, 10) : '',
+            Payment_Terms: d.payment_Terms,
+            Confirm_Flg: d.confirm_Flg,
+            Company_Cd: d.company?.id || 1,
+            Manager: d.manager,
+            Store_Cd: d.store?.id || 1,
+            Other: d.other,
+            OrderItemLists: (d.orderItems && d.orderItems.$values) ? d.orderItems.$values.map(item => ({
+              Id: item.id || null,
+              P_Order_List_Id: item.p_Order_List_Id || null,
+              Item_Cd: item.item_Cd,
+              Other_ItemName: item.other_ItemName,
+              Amount: item.amount,
+              Item: null,
+              PurchaseOrder: null
+            })) : [],
+            Postal_Code: d.company?.post_Code || '',
+            Address1: d.company?.address1 || '',
+            Address2: d.company?.address2 || '',
+            Tel: d.company?.tel || '',
+            Fax: d.company?.fax || '',
+            Email: d.company?.mail || '',
+            CustomerName: d.company?.c_Name || ''
+          };
         } else {
           alert('発注書が見つかりません');
           this.resetForm();
@@ -349,7 +371,27 @@ export default {
     async saveOrder() {
       this.isSaving = true;
       try {
-        const payload = { ...this.purchaseOrder };
+        // orderItemsとして送信
+        const payload = {
+          id: this.purchaseOrder.Id,
+          title: this.purchaseOrder.Title,
+          quotation: this.purchaseOrder.Quotation,
+          tax: this.purchaseOrder.Tax,
+          order_Date: this.purchaseOrder.Order_Date,
+          delivery_Date: this.purchaseOrder.Delivery_Date,
+          payment_Date: this.purchaseOrder.Payment_Date,
+          payment_Terms: this.purchaseOrder.Payment_Terms,
+          confirm_Flg: this.purchaseOrder.Confirm_Flg,
+          company_Cd: this.purchaseOrder.Company_Cd,
+          manager: this.purchaseOrder.Manager,
+          store_Cd: this.purchaseOrder.Store_Cd,
+          other: this.purchaseOrder.Other,
+          orderItems: this.purchaseOrder.OrderItemLists.map(item => ({
+            item_Cd: item.Item_Cd,
+            amount: item.Amount,
+            other_ItemName: item.Other_ItemName
+          }))
+        };
         const response = await axios.post(`${API_BASE_URL}/api/PurchaseOrders`, payload);
         if (response.data) {
           alert('発注書が正常に保存されました。');

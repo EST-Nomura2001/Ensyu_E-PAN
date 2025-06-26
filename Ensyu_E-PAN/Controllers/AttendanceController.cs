@@ -97,7 +97,8 @@ namespace Ensyu_E_PAN.Controllers
                                 T_DayPrice = uds.DateSchedule.T_DayPrice,
                                 UserName = uds.DateSchedule.User?.Name,
                                 WorkRollName = uds.DateSchedule.WorkRoll?.Name,
-                                DayShiftDate = uds.DateSchedule.DayShift?.Date
+                                DayShiftDate = uds.DateSchedule.DayShift?.Date,
+                                U_Confirm_Flg = uds.UserShift?.U_Confirm_Flg
                             }
                         }).ToList()
                     };
@@ -173,7 +174,8 @@ namespace Ensyu_E_PAN.Controllers
                             T_DayPrice = uds.DateSchedule.T_DayPrice,
                             UserName = uds.DateSchedule.User?.Name,
                             WorkRollName = uds.DateSchedule.WorkRoll?.Name,
-                            DayShiftDate = uds.DateSchedule.DayShift?.Date
+                            DayShiftDate = uds.DateSchedule.DayShift?.Date,
+                            U_Confirm_Flg = uds.UserShift?.U_Confirm_Flg
                         }
                     }).ToList()
                 }).ToList()
@@ -215,7 +217,32 @@ namespace Ensyu_E_PAN.Controllers
                         .ThenInclude(us => us.AllShift)
                 .ToListAsync();
 
-            return Ok(schedules);
+            // DTOに変換。田村編集
+            var result = schedules.Select(ds => new Ensyu_E_PAN.DTOs.AttendanceDTO.DateScheduleDto
+            {
+                Id = ds.Id,
+                Today = ds.Today,
+                P_Start_WorkTime = ds.P_Start_WorkTime,
+                P_End_WorkTime = ds.P_End_WorkTime,
+                U_Start_WorkTime = ds.U_Start_WorkTime,
+                U_End_WorkTime = ds.U_End_WorkTime,
+                Start_WorkTime = ds.Start_WorkTime,
+                End_WorkTime = ds.End_WorkTime,
+                Start_BreakTime = ds.Start_BreakTime,
+                End_BreakTime = ds.End_BreakTime,
+                T_WorkTime_D = ds.T_WorkTime_D,
+                T_WorkTime_N = ds.T_WorkTime_N,
+                T_WorkTime_All = ds.T_WorkTime_All,
+                D_DayPrice = ds.D_DayPrice,
+                N_DayPrice = ds.N_DayPrice,
+                T_DayPrice = ds.T_DayPrice,
+                UserName = ds.User != null ? ds.User.Name : null,
+                WorkRollName = ds.WorkRoll != null ? ds.WorkRoll.Name : null,
+                DayShiftDate = ds.DayShift != null ? ds.DayShift.Date : null,
+                U_Confirm_Flg = ds.UserDateShifts?.FirstOrDefault()?.UserShift?.U_Confirm_Flg
+            }).ToList();
+
+            return Ok(result);
         }
         //Get処理↑
 

@@ -27,5 +27,6 @@
         public string WorkRollName { get; set; }
         public DateTime? DayShiftDate { get; set; }
 
+        public bool? U_Confirm_Flg { get; set; }
     }
 }

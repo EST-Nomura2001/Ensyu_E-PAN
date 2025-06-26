@@ -5,6 +5,7 @@ import AdminView from '../views/AdminView.vue'
 import PartTimeView from '../views/PartTimeView.vue'
 import AttendanceManagement from '../views/AttendanceManagement.vue'
 import PurchaseOrder from '../views/PurchaseOrder.vue'
+import SavedOrders from '@/views/SavedOrders.vue'
 
 
 const router = createRouter({
@@ -62,6 +63,12 @@ const router = createRouter({
       path: '/purchase-order',
       name: 'PurchaseOrder',
       component: () => import('../views/PurchaseOrder.vue'),
+      // meta: { requiresAuth: true }, ログイン機能
+    },
+    { //
+      path: '/saved-order',
+      name: 'SavedOrder',
+      component:SavedOrders,
       // meta: { requiresAuth: true }, ログイン機能
     },
     { //未整備？

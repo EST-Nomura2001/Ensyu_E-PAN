@@ -13,3 +13,4 @@ Ensyu_E-PAN/*.db
 Ensyu_E-PAN/*.db-shm
 Ensyu_E-PAN/*.db-wal
 
+Ensyu_E-PAN/app.db

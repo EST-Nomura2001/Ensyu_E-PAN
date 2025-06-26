@@ -186,25 +186,45 @@ namespace Ensyu_E_PAN.Controllers
         [HttpGet("/api/orders")]
         public async Task<IActionResult> GetAll()
         {
-            // 発注書一覧を取得（会社情報も含める）
-            var list = await _context.Purchase_Orders
+            var orders = await _context.Purchase_Orders
                 .Include(o => o.Company)
                 .OrderByDescending(o => o.Id)
-                .Select(o => new
-                {
-                    Id = o.Id,
-                    Quotation = o.Quotation,
-                    Title = o.Title,
-                    Company = o.Company, // 会社情報
-                    Order_Date = o.Order_Date,
-                    CreatedAt = o.Order_Date,
-                    Confirm_Flg = o.Confirm_Flg
-                })
                 .ToListAsync();
 
-            // 一覧を返す
-            return Ok(list);
+            var dtoList = orders.Select(o => new PurchaseOrderDto
+            {
+                Id = o.Id,
+                Title = o.Title,
+                Quotation = o.Quotation,
+                Tax = o.Tax,
+                Order_Date = o.Order_Date,
+                Delivery_Date = o.Delivery_Date,
+                Payment_Date = o.Payment_Date,
+                Payment_Terms = o.Payment_Terms,
+                Confirm_Flg = o.Confirm_Flg,
+                Manager = o.Manager,
+                Other = o.Other,
+
+                Company = new CompanyDto
+                {
+                    Id = o.Company.Id,
+                    C_Name = o.Company.C_Name,
+                    Address1 = o.Company.Address1,
+                    Address2 = o.Company.Address2,
+                    Post_Code = o.Company.Post_Code,
+                    Mail = o.Company.Mail,
+                    Tel = o.Company.Tel?.ToString(),
+                    Fax = o.Company.Fax?.ToString()
+                },
+
+                Store = null,              // 一覧では不要な場合は null または省略
+                OrderItems = null          // 詳細のみ必要なら null でOK
+            }).ToList();
+
+            return Ok(new { success = true, data = dtoList });
         }
+
+
 
         // =============================
         // 商品行追加API

@@ -56,7 +56,7 @@ const router = createRouter({
       path: '/kibou-form',
       name: 'kibou-form',
       component: () => import('../views/KibouForm.vue'),
-      meta: { requiresAuth: true }, //ログイン機能
+      // meta: { requiresAuth: true }, //ログイン機能
     },
     { //
       path: '/purchase-order',

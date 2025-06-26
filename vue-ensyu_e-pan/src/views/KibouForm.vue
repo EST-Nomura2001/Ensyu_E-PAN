@@ -1,5 +1,10 @@
 <template>
   <CommonHeader />
+  <div style="margin: 10px 0; padding: 10px; background: #f9f9f9; border: 1px solid #ccc;">
+    <label>テスト用ユーザーID: <input type="number" v-model.number="testUserId" style="width: 60px;" /></label>
+    <button @click="setTestUserId">設定</button>
+    <span style="margin-left: 10px;">現在のuserId: {{ currentUserId }}</span>
+  </div>
   <div class="shift-submission-form">
     <h1>希望シフト提出</h1>
     <div v-if="!isLoading && year && month">
@@ -42,6 +47,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import * as api from '@/services/api';
 
 //ヘッダー用
@@ -64,58 +70,51 @@ export default {
       userName: '',
       status: '未提出', // APIから取得する想定
       shifts: [],
+      currentUserId: null,
+      testUserId: '', // テスト用userId入力欄
     };
   },
   async created() {
-    // DEMO: 静的デモデータを使用（後で削除してください）
-    this.isLoading = false;
-    this.year = 2025;
-    this.month = 6;
-    this.deadline = '5月20日';
-    this.userName = '山田太郎';
-    this.status = '未提出';
-    // 6月分のデモシフトデータ
-    this.shifts = [
-      { date: 1, startTime: '09:00', endTime: '18:00' },
-      { date: 2, startTime: '', endTime: '' },
-      { date: 3, startTime: '10:00', endTime: '17:00' },
-      { date: 4, startTime: '', endTime: '' },
-      { date: 5, startTime: '', endTime: '' },
-      { date: 6, startTime: '09:00', endTime: '18:00' },
-      { date: 7, startTime: '', endTime: '' },
-      // ... 必要に応じて追加 ...
-    ];
-    // 本来はAPIから取得する
-    // await this.fetchInitialData();
+    await this.fetchInitialData();
   },
   methods: {
     async fetchInitialData() {
       this.isLoading = true;
       try {
-        // 1. 募集中のシフト情報を取得
-        const recruitingInfo = await api.getRecruitingShiftInfo();
-        // APIのレスポンスが { data: { year: 2025, month: 6, deadline: '5月20日' } } のような形式を想定
-        this.year = recruitingInfo.data.year;
-        this.month = recruitingInfo.data.month;
-        this.deadline = recruitingInfo.data.deadline;
+        // 1. ユーザーIDをsessionStorageから取得
+        const userId = Number(sessionStorage.getItem('userId'));
+        this.currentUserId = userId;
 
-        // 2. ユーザー情報を取得
-        const userInfo = await api.getUserInfo(this.userId);
-        // APIのレスポンスが { data: { name: '山田太郎' } } のような形式を想定
-        this.userName = userInfo.data.name;
+        // 2. 年月は「来月」
+        const today = new Date();
+        let nextMonth = today.getMonth() + 2; // 1月=0なので+2
+        let year = today.getFullYear();
+        if (nextMonth > 12) {
+          year += 1;
+          nextMonth = 1;
+        }
+        const month = nextMonth;
+        this.year = year;
+        this.month = month;
 
-        // 3. 既存の希望シフトを取得
-        const userShifts = await api.getUserShifts(this.userId, this.year, this.month);
-        // APIのレスポンスが { data: [{ date: 1, startTime: '09:00', endTime: '18:00' }, ...] } を想定
-        const existingShifts = userShifts.data;
+        // 3. API呼び出し
+        const url = `http://localhost:5011/api/Attendance/UserSchedule/Month/${userId}/${year}/${month}`;
+        const response = await axios.get(url);
+        const schedules = response.data;
+        const shiftArray = schedules && Array.isArray(schedules.$values) ? schedules.$values : [];
+        this.shifts = shiftArray.map(s => ({
+          date: new Date(s.today).getDate(),
+          startTime: s.u_Start_WorkTime ? s.u_Start_WorkTime.substring(11, 16) : '',
+          endTime: s.u_End_WorkTime ? s.u_End_WorkTime.substring(11, 16) : ''
+        }));
 
-        // 4. シフト表を初期化
-        this.initializeShifts(existingShifts);
-
+        // 5. その他の情報（必要に応じて）
+        // this.userName = ...;
+        // this.deadline = ...;
+        // this.status = ...;
       } catch (error) {
         console.error('データの取得に失敗しました。', error);
         alert('データの取得に失敗しました。APIサーバーが起動しているか確認してください。');
-        // 必要に応じてエラー表示用のUIをここに実装
       } finally {
         this.isLoading = false;
       }
@@ -140,12 +139,20 @@ export default {
     },
     async submitShifts() {
       try {
-        await api.submitUserShifts(this.userId, this.shifts);
+        await api.submitUserShifts(this.currentUserId, this.shifts);
         alert('シフトが提出されました。');
         this.status = '提出済み'; // 画面上のステータスを更新
       } catch (error) {
         console.error('シフトの提出に失敗しました。', error);
         alert('シフトの提出に失敗しました。');
+      }
+    },
+    setTestUserId() {
+      if (this.testUserId) {
+        sessionStorage.setItem('userId', this.testUserId);
+        this.fetchInitialData();
+      } else {
+        alert('ユーザーIDを入力してください');
       }
     },
   },

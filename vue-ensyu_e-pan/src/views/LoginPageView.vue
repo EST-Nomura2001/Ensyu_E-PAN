@@ -28,6 +28,7 @@ async function login() {
     const data = response.data;
     // sessionStorageに必要な情報だけ保存
     sessionStorage.setItem('userId', data.id);
+    sessionStorage.setItem('userName', data.name);
     sessionStorage.setItem('isAdmin', data.role?.isAdmin);
     sessionStorage.setItem('storeId', data.storeId ?? '');
 

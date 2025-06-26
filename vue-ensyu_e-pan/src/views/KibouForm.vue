@@ -1,4 +1,5 @@
-<!-- ユーザーID指定のみ、未テスト。田村 -->
+<!-- ユーザーID指定のみ、未テスト。ユーザー名と提出期限が未実装。
+ 田村 -->
 
 <template>
   <CommonHeader />
@@ -97,6 +98,7 @@ export default {
         // 1. ユーザーIDをsessionStorageから取得
         const userId = Number(sessionStorage.getItem('userId'));
         this.currentUserId = userId;
+        this.userName = sessionStorage.getItem('userName') || '';
 
         // 2. 年月は「来月」
         const today = new Date();
@@ -132,19 +134,6 @@ export default {
         alert('データの取得に失敗しました。APIサーバーが起動しているか確認してください。');
       } finally {
         this.isLoading = false;
-      }
-    },
-    initializeShifts(existingShifts = []) {
-      this.shifts = [];
-      const daysInMonth = new Date(this.year, this.month, 0).getDate();
-      for (let i = 1; i <= daysInMonth; i++) {
-        const existing = existingShifts.find(s => s.date === i);
-        this.shifts.push({
-          date: i,
-          startTime: existing ? existing.startTime : '',
-          endTime: existing ? existing.endTime : '',
-          error: { start: '', end: '' },
-        });
       }
     },
     getDayOfWeek(date) {

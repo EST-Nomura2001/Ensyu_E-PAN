@@ -20,7 +20,8 @@
   }
   th.time-header {
     text-align: left;
-    width: 60px;
+    width: 30px;
+    padding-left: 3px;
     font-size: 10px;
   }
   th.event-col {
@@ -30,10 +31,12 @@
   td.empty {
     background-color: #f8f8f8;
     color: #aaa;
+    width: 25px;
   }
   td.event-block {
     background-color: #d0f0c0;
     font-weight: bold;
+    width: 25px;
   }
   input[type="time"], input[type="text"] {
     width: 70px;
@@ -138,7 +141,7 @@
           <th>担当業務</th>
           <th>出勤時間</th>
           <th>退勤時間</th>
-          <th v-for="time in timeHeaders" :key="time" class="time-header" colspan="2">{{ time }}</th>
+          <th v-for="h in (endHour - startHour)" :key="h" class="time-header" :colspan="6">{{ String(startHour + h - 1).padStart(2, '0') }}:00</th>
         </tr>
       </thead>
       <tbody>
@@ -217,8 +220,8 @@ const apiError = ref(null);
 
 // --- Constants ---
 const startHour = 9;
-const endHour = 24;
-const intervalMinutes = 30;
+const endHour = 22;
+const intervalMinutes = 10;
 
 // --- Computed Properties ---
 const formattedDate = computed(() => {

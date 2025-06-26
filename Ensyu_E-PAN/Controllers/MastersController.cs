@@ -1,4 +1,5 @@
 ﻿using Ensyu_E_PAN.Data;
+using Ensyu_E_PAN.DTOs.Accounts;
 using Ensyu_E_PAN.DTOs.Master;
 using Ensyu_E_PAN.Services;
 using Microsoft.AspNetCore.Http;
@@ -53,6 +54,21 @@ namespace Ensyu_E_PAN.Controllers
             if (roll == null) return NotFound();
             return Ok(roll);
         }
+        [HttpGet("roles")]
+        public async Task<IActionResult> GetAllRoles()
+        {
+            var roles = await _context.Roll_Lists
+                .Select(r => new RoleDto
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    IsAdmin = r.IsAdmin
+                })
+                .ToListAsync();
+
+            return Ok(roles);
+        }
+
         [HttpGet("store/{id}")]
         public async Task<IActionResult> GetStoreById(int id)
         {
@@ -88,5 +104,20 @@ namespace Ensyu_E_PAN.Controllers
             if (workRoll == null) return NotFound();
             return Ok(workRoll);
         }
+        [HttpGet("workrolls")]
+        public async Task<IActionResult> GetAllWorkRolls()
+        {
+            var workRolls = await _context.WorkRoll_Lists
+                .Select(wr => new WorkRollDto
+                {
+                    Id = wr.Id,
+                    Name = wr.Name
+                })
+                .ToListAsync();
+
+            return Ok(workRolls);
+        }
+
+
     }
 }

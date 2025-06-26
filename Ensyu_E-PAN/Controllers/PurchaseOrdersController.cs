@@ -257,26 +257,5 @@ namespace Ensyu_E_PAN.Controllers
 
             return Ok(new { success = true, data = dtoList });
         }
-
-        // =============================
-        // 商品行追加API
-        // POST: api/PurchaseOrders/{id}/items
-        // =============================
-        [HttpPost("{id}/items")]
-        public async Task<IActionResult> AddItem(int id, [FromBody] OrderItemList item)
-        {
-            // 対象の発注書を取得
-            var order = await _context.Purchase_Orders
-                .Include(o => o.OrderItemLists)
-                .FirstOrDefaultAsync(o => o.Id == id);
-
-            if (order == null)
-                return NotFound();
-
-            // 商品行を追加
-            order.OrderItemLists.Add(item);
-            await _context.SaveChangesAsync();
-            return Ok(item);
-        }
     }
 }

@@ -1,5 +1,12 @@
+<!-- ユーザーID指定のみ、未テスト。田村 -->
+
 <template>
   <CommonHeader />
+  <div style="margin: 10px 0; padding: 10px; background: #f9f9f9; border: 1px solid #ccc;">
+    <label>テスト用ユーザーID: <input type="number" v-model.number="testUserId" style="width: 60px;" /></label>
+    <button @click="setTestUserId">設定</button>
+    <span style="margin-left: 10px;">現在のuserId: {{ currentUserId }}</span>
+  </div>
   <div class="shift-submission-form">
     <h1>希望シフト提出</h1>
     <div v-if="!isLoading && year && month">
@@ -17,17 +24,28 @@
               <th>曜日</th>
               <th>出勤時間</th>
               <th>退勤時間</th>
+              <th>取消</th>
+              <th style="width: 260px; min-width: 180px; max-width: 320px; white-space: normal; word-break: break-all;">注意事項</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="day in shifts" :key="day.date">
+            <tr v-for="(day, idx) in shifts" :key="day.date">
               <td>{{ day.date }}</td>
               <td>{{ getDayOfWeek(day.date) }}</td>
               <td>
-                <input type="time" v-model="day.startTime" />
+                <input type="time" v-model="day.startTime" @input="validateShift(idx)" />
               </td>
               <td>
-                <input type="time" v-model="day.endTime" />
+                <input type="time" v-model="day.endTime" @input="validateShift(idx)" />
+              </td>
+              <td>
+                <button type="button" @click="resetShift(day)">取消</button>
+              </td>
+              <td style="width: 260px; min-width: 180px; max-width: 320px; white-space: normal; word-break: break-all;">
+                <span v-if="day.error && (day.error.start || day.error.end)" style="color: red; font-size: 12px;">
+                  <span v-if="day.error.start">{{ day.error.start }}</span>
+                  <span v-else-if="day.error.end">{{ day.error.end }}</span>
+                </span>
               </td>
             </tr>
           </tbody>
@@ -42,6 +60,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import * as api from '@/services/api';
 
 //ヘッダー用
@@ -64,58 +83,53 @@ export default {
       userName: '',
       status: '未提出', // APIから取得する想定
       shifts: [],
+      currentUserId: null,
+      testUserId: '', // テスト用userId入力欄
     };
   },
   async created() {
-    // DEMO: 静的デモデータを使用（後で削除してください）
-    this.isLoading = false;
-    this.year = 2025;
-    this.month = 6;
-    this.deadline = '5月20日';
-    this.userName = '山田太郎';
-    this.status = '未提出';
-    // 6月分のデモシフトデータ
-    this.shifts = [
-      { date: 1, startTime: '09:00', endTime: '18:00' },
-      { date: 2, startTime: '', endTime: '' },
-      { date: 3, startTime: '10:00', endTime: '17:00' },
-      { date: 4, startTime: '', endTime: '' },
-      { date: 5, startTime: '', endTime: '' },
-      { date: 6, startTime: '09:00', endTime: '18:00' },
-      { date: 7, startTime: '', endTime: '' },
-      // ... 必要に応じて追加 ...
-    ];
-    // 本来はAPIから取得する
-    // await this.fetchInitialData();
+    await this.fetchInitialData();
   },
   methods: {
     async fetchInitialData() {
       this.isLoading = true;
       try {
-        // 1. 募集中のシフト情報を取得
-        const recruitingInfo = await api.getRecruitingShiftInfo();
-        // APIのレスポンスが { data: { year: 2025, month: 6, deadline: '5月20日' } } のような形式を想定
-        this.year = recruitingInfo.data.year;
-        this.month = recruitingInfo.data.month;
-        this.deadline = recruitingInfo.data.deadline;
+        // 1. ユーザーIDをsessionStorageから取得
+        const userId = Number(sessionStorage.getItem('userId'));
+        this.currentUserId = userId;
 
-        // 2. ユーザー情報を取得
-        const userInfo = await api.getUserInfo(this.userId);
-        // APIのレスポンスが { data: { name: '山田太郎' } } のような形式を想定
-        this.userName = userInfo.data.name;
+        // 2. 年月は「来月」
+        const today = new Date();
+        let nextMonth = today.getMonth() + 2; // 1月=0なので+2
+        let year = today.getFullYear();
+        if (nextMonth > 12) {
+          year += 1;
+          nextMonth = 1;
+        }
+        const month = nextMonth;
+        this.year = year;
+        this.month = month;
 
-        // 3. 既存の希望シフトを取得
-        const userShifts = await api.getUserShifts(this.userId, this.year, this.month);
-        // APIのレスポンスが { data: [{ date: 1, startTime: '09:00', endTime: '18:00' }, ...] } を想定
-        const existingShifts = userShifts.data;
+        // 3. API呼び出し
+        const url = `http://localhost:5011/api/Attendance/UserSchedule/Month/${userId}/${year}/${month}`;
+        const response = await axios.get(url);
+        const schedules = response.data;
+        const shiftArray = schedules && Array.isArray(schedules.$values) ? schedules.$values : [];
+        this.shifts = shiftArray.map(s => ({
+          date: new Date(s.today).getDate(),
+          startTime: s.u_Start_WorkTime ? s.u_Start_WorkTime.substring(11, 16) : '',
+          endTime: s.u_End_WorkTime ? s.u_End_WorkTime.substring(11, 16) : '',
+          error: { start: '', end: '' },
+        }));
 
-        // 4. シフト表を初期化
-        this.initializeShifts(existingShifts);
-
+        // U_Confirm_Flgの取得とstatusへの反映
+        // 1件でもtrueがあれば「シフト提出済み」、全てfalseまたはnullなら「シフト未提出」
+        const hasConfirmed = shiftArray.some(s => s.u_Confirm_Flg === true);
+        this.status = hasConfirmed ? 'シフト提出済み' : 'シフト未提出';
+        // ...他の情報（userName, deadline等）は必要に応じて
       } catch (error) {
         console.error('データの取得に失敗しました。', error);
         alert('データの取得に失敗しました。APIサーバーが起動しているか確認してください。');
-        // 必要に応じてエラー表示用のUIをここに実装
       } finally {
         this.isLoading = false;
       }
@@ -129,6 +143,7 @@ export default {
           date: i,
           startTime: existing ? existing.startTime : '',
           endTime: existing ? existing.endTime : '',
+          error: { start: '', end: '' },
         });
       }
     },
@@ -138,14 +153,100 @@ export default {
       const days = ['日', '月', '火', '水', '木', '金', '土'];
       return `(${days[day]})`;
     },
+    resetShift(day) {
+      day.startTime = '';
+      day.endTime = '';
+    },
+    validateShift(idx) {
+      const shift = this.shifts[idx];
+      shift.error = { start: '', end: '' };
+      // 両方未入力はOK
+      if (!shift.startTime && !shift.endTime) return;
+      // 片方だけ入力はNG（start側だけにエラー文セット）
+      if (!shift.startTime || !shift.endTime) {
+        shift.error.start = '出勤・退勤時間は両方入力、または両方未入力にしてください。';
+        shift.error.end = '';
+        return;
+      }
+      // 出勤時間9:00未満はNG
+      if (shift.startTime < '09:00') {
+        shift.error.start = '出勤時間は9:00以降にしてください。';
+      }
+      // 退勤時間24:00超はNG
+      if (shift.endTime > '24:00') {
+        shift.error.end = '退勤時間は24:00までにしてください。';
+      }
+      // 退勤時間が出勤時間以前はNG
+      if (shift.endTime && shift.startTime && shift.endTime <= shift.startTime) {
+        shift.error.end = '退勤時間は出勤時間より後にしてください。';
+      }
+    },
+    validateShifts() {
+      for (const shift of this.shifts) {
+        // 両方未入力はOK
+        if (!shift.startTime && !shift.endTime) continue;
+        // 片方だけ入力はNG
+        if (!shift.startTime || !shift.endTime) {
+          return '出勤・退勤時間は両方入力、または両方未入力にしてください。';
+        }
+        if (shift.startTime < '09:00') {
+          return '出勤時間は9:00以降にしてください。';
+        }
+        if (shift.endTime > '24:00') {
+          return '退勤時間は24:00までにしてください。';
+        }
+        if (shift.endTime <= shift.startTime) {
+          return '退勤時間は出勤時間より後にしてください。';
+        }
+      }
+      return null;
+    },
     async submitShifts() {
+      const error = this.validateShifts();
+      if (error) {
+        alert(error);
+        return;
+      }
       try {
-        await api.submitUserShifts(this.userId, this.shifts);
+        const userId = this.currentUserId;
+        const year = this.year;
+        const month = this.month;
+        const U_Confirm_Flg = true;
+
+        for (const shift of this.shifts) {
+          const yyyy = year;
+          const mm = String(month).padStart(2, '0');
+          const dd = String(shift.date).padStart(2, '0');
+          const dateStr = `${yyyy}-${mm}-${dd}`;
+          const targetDate = `${dateStr}T00:00:00`;
+          const uStart = shift.startTime ? `${dateStr}T${shift.startTime}:00` : null;
+          const uEnd = shift.endTime ? `${dateStr}T${shift.endTime}:00` : null;
+
+          await axios.put(
+            `http://localhost:5011/api/Attendance/user/${userId}/schedule-update`,
+            {
+              TargetDate: targetDate,
+              U_Start_WorkTime: uStart,
+              U_End_WorkTime: uEnd,
+              U_Confirm_Flg: U_Confirm_Flg
+            }
+          );
+        }
+
         alert('シフトが提出されました。');
-        this.status = '提出済み'; // 画面上のステータスを更新
+        // 提出後は「シフト提出済み」に更新
+        this.status = 'シフト提出済み';
       } catch (error) {
         console.error('シフトの提出に失敗しました。', error);
         alert('シフトの提出に失敗しました。');
+      }
+    },
+    setTestUserId() {
+      if (this.testUserId) {
+        sessionStorage.setItem('userId', this.testUserId);
+        this.fetchInitialData();
+      } else {
+        alert('ユーザーIDを入力してください');
       }
     },
   },
@@ -196,7 +297,6 @@ input[type="time"] {
 button {
   display: block;
   width: 100%;
-  padding: 10px 20px;
   background-color: #4CAF50;
   color: white;
   border: none;

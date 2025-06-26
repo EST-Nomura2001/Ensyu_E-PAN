@@ -91,11 +91,18 @@
             </tr>
             <tr>
               <th>現場住所:</th>
-              <td><input type="text" v-model="purchaseOrder.Location"></td>
+              <td>
+                <select v-model="purchaseOrder.Location">
+                  <option disabled value="">選択してください</option>
+                  <option v-for="store in stores" :key="store.id" :value="store.address1 + (store.address2 || '')">
+                    {{ store.address1 }}{{ store.address2 }}
+                  </option>
+                </select>
+              </td>
             </tr>
             <tr>
               <th>工期:</th>
-              <td><input type="text" v-model="purchaseOrder.Period"></td>
+              <td><input type="date" v-model="purchaseOrder.Period"></td>
             </tr>
             <tr>
               <th>支払期日:</th>
@@ -137,8 +144,24 @@
             <!-- (item, index)でitemは商品データ、indexは配列の番号 -->
             <tr v-for="(item, index) in purchaseOrder.OrderItems" :key="index">
               <td>{{ index + 1 }}</td>
-              <td>
-                <input type="text" v-model="item.Item_Cd" list="product-list" placeholder="商品コードまたは商品名">
+              <td style="vertical-align: top;">
+                <input
+                  type="text"
+                  v-model="item.Item_Name"
+                  list="product-list"
+                  placeholder="商品コードまたは商品名"
+                  @change="onItemNameChange(item)"
+                  style="margin-bottom:2px;"
+                >
+                <div v-if="item.Item_Cd === 'その他'" style="margin-top:2px;">
+                  <input
+                    type="text"
+                    v-model="item.Other_ItemName"
+                    placeholder="商品名を入力"
+                    style="width: 95%; font-size: 12px; padding: 3px; border: 1px solid #ccc; border-radius: 3px; margin-top:2px;"
+                  >
+                  <span style="font-size:11px; color:#888;">※「その他」の場合は商品名を入力</span>
+                </div>
               </td>
               <td>
                 <input type="number" v-model.number="item.Amount" placeholder="数量">
@@ -214,9 +237,9 @@ export default {
     const todayStr = `${yyyy}-${mm}-${dd}`;
     return {
       isSaving: false,
-      predefinedProducts: [
-        'めん', 'スープ', '醤油', '味噌', '豚骨', '昆布', 'チャーシュー', 'メンマ', 'のり', 'ネギ', '卵', 'ラード', 'ごま油', 'ニンニク', 'ラー油', 'スパイス', 'お酢'
-      ],
+      predefinedProducts: [],
+      predefinedProductsList: [], // idとitem_Name両方保持
+      stores: [],
       purchaseOrder: {
         Id: null,
         Title: '',
@@ -379,26 +402,55 @@ export default {
       this.isSaving = true;
       try {
         const payload = {
-          Title: this.purchaseOrder.Title,
-          Quotation: Number(this.purchaseOrder.Quotation),
-          Tax: Number(this.purchaseOrder.Tax),
-          Order_Date: this.purchaseOrder.Order_Date,
-          Delivery_Date: this.purchaseOrder.Delivery_Date,
-          Payment_Date: this.purchaseOrder.Payment_Date,
-          Payment_Terms: this.purchaseOrder.Payment_Terms,
-          Confirm_Flg: this.purchaseOrder.Confirm_Flg,
-          Manager: this.purchaseOrder.Manager,
-          Other: this.purchaseOrder.Other,
-          Company: { Id: Number(this.purchaseOrder.Company.Id) },
-          Store: { Id: Number(this.purchaseOrder.Store.Id) },
-          OrderItems: this.purchaseOrder.OrderItems.map(item => ({
-            Id: item.Id || 0,
-            Item_Cd: Number(item.Item_Cd),
-            Item_Name: item.Item_Name || '',
-            Amount: Number(item.Amount),
-            Other_ItemName: item.Other_ItemName || ''
-          }))
+          id: 0,
+          title: this.purchaseOrder.Title,
+          quotation: Number(this.purchaseOrder.Quotation),
+          tax: Number(this.purchaseOrder.Tax),
+          order_Date: this.purchaseOrder.Order_Date ? this.purchaseOrder.Order_Date + 'T00:00:00.000Z' : '',
+          delivery_Date: this.purchaseOrder.Delivery_Date ? this.purchaseOrder.Delivery_Date + 'T00:00:00.000Z' : '',
+          payment_Date: this.purchaseOrder.Payment_Date ? this.purchaseOrder.Payment_Date + 'T00:00:00.000Z' : '',
+          payment_Terms: this.purchaseOrder.Payment_Terms || 'string',
+          confirm_Flg: this.purchaseOrder.Confirm_Flg,
+          manager: this.purchaseOrder.Manager || 'string',
+          other: this.purchaseOrder.Other || 'string',
+          company: {
+            id: Number(this.purchaseOrder.Company.Id),
+            c_Name: this.purchaseOrder.CustomerName || 'string',
+            address1: this.purchaseOrder.Address1 || 'string',
+            address2: this.purchaseOrder.Address2 || 'string',
+            post_Code: this.purchaseOrder.Postal_Code || 'string',
+            mail: this.purchaseOrder.Email || 'string',
+            tel: this.purchaseOrder.Tel || 'string',
+            fax: this.purchaseOrder.Fax || 'string'
+          },
+          store: {
+            id: Number(this.purchaseOrder.Store.Id),
+            c_Name: this.purchaseOrder.Store.c_Name || 'string',
+            address1: this.purchaseOrder.Store.address1 || 'string',
+            address2: this.purchaseOrder.Store.address2 || 'string',
+            post_Code: this.purchaseOrder.Store.post_Code || 'string',
+            mail: this.purchaseOrder.Store.mail || 'string',
+            tel: this.purchaseOrder.Store.tel || 'string',
+            fax: this.purchaseOrder.Store.fax || 'string'
+          },
+          orderItems: this.purchaseOrder.OrderItems
+            .filter(item => item.Item_Cd !== null && item.Item_Cd !== '' && !isNaN(item.Item_Cd))
+            .map(item => ({
+              id: item.Id || 0,
+              item_Cd: Number(item.Item_Cd),
+              item_Name: item.Item_Name || 'string',
+              amount: Number(item.Amount),
+              other_ItemName: item.Other_ItemName || 'string'
+            }))
         };
+        // OrderItemsのバリデーション
+        if (payload.orderItems.length === 0) {
+          alert('商品が1つも入力されていません。');
+          this.isSaving = false;
+          return;
+        }
+        // 送信データをコンソールに出力
+        console.log('送信payload:', JSON.stringify(payload, null, 2));
         const response = await axios.post(`${API_BASE_URL}/api/PurchaseOrders/newOrder`, payload);
         if (response.data && response.data.success) {
           alert('発注書が正常に保存されました。');
@@ -423,27 +475,53 @@ export default {
       this.isSaving = true;
       try {
         const payload = {
-          Id: Number(this.purchaseOrder.Id),
-          Title: this.purchaseOrder.Title,
-          Quotation: Number(this.purchaseOrder.Quotation),
-          Tax: Number(this.purchaseOrder.Tax),
-          Order_Date: this.purchaseOrder.Order_Date,
-          Delivery_Date: this.purchaseOrder.Delivery_Date,
-          Payment_Date: this.purchaseOrder.Payment_Date,
-          Payment_Terms: this.purchaseOrder.Payment_Terms,
-          Confirm_Flg: this.purchaseOrder.Confirm_Flg,
-          Manager: this.purchaseOrder.Manager,
-          Other: this.purchaseOrder.Other,
-          Company: { Id: Number(this.purchaseOrder.Company.Id) },
-          Store: { Id: Number(this.purchaseOrder.Store.Id) },
-          OrderItems: this.purchaseOrder.OrderItems.map(item => ({
-            Id: item.Id || 0,
-            Item_Cd: Number(item.Item_Cd),
-            Item_Name: item.Item_Name || '',
-            Amount: Number(item.Amount),
-            Other_ItemName: item.Other_ItemName || ''
-          }))
+          id: 0,
+          title: this.purchaseOrder.Title,
+          quotation: Number(this.purchaseOrder.Quotation),
+          tax: Number(this.purchaseOrder.Tax),
+          order_Date: this.purchaseOrder.Order_Date ? this.purchaseOrder.Order_Date + 'T00:00:00.000Z' : '',
+          delivery_Date: this.purchaseOrder.Delivery_Date ? this.purchaseOrder.Delivery_Date + 'T00:00:00.000Z' : '',
+          payment_Date: this.purchaseOrder.Payment_Date ? this.purchaseOrder.Payment_Date + 'T00:00:00.000Z' : '',
+          payment_Terms: this.purchaseOrder.Payment_Terms || 'string',
+          confirm_Flg: this.purchaseOrder.Confirm_Flg,
+          manager: this.purchaseOrder.Manager || 'string',
+          other: this.purchaseOrder.Other || 'string',
+          company: {
+            id: Number(this.purchaseOrder.Company.Id),
+            c_Name: this.purchaseOrder.CustomerName || 'string',
+            address1: this.purchaseOrder.Address1 || 'string',
+            address2: this.purchaseOrder.Address2 || 'string',
+            post_Code: this.purchaseOrder.Postal_Code || 'string',
+            mail: this.purchaseOrder.Email || 'string',
+            tel: this.purchaseOrder.Tel || 'string',
+            fax: this.purchaseOrder.Fax || 'string'
+          },
+          store: {
+            id: Number(this.purchaseOrder.Store.Id),
+            c_Name: this.purchaseOrder.Store.c_Name || 'string',
+            address1: this.purchaseOrder.Store.address1 || 'string',
+            address2: this.purchaseOrder.Store.address2 || 'string',
+            post_Code: this.purchaseOrder.Store.post_Code || 'string',
+            mail: this.purchaseOrder.Store.mail || 'string',
+            tel: this.purchaseOrder.Store.tel || 'string',
+            fax: this.purchaseOrder.Store.fax || 'string'
+          },
+          orderItems: this.purchaseOrder.OrderItems
+            .filter(item => item.Item_Cd !== null && item.Item_Cd !== '' && !isNaN(item.Item_Cd))
+            .map(item => ({
+              id: item.Id || 0,
+              item_Cd: Number(item.Item_Cd),
+              item_Name: item.Item_Name || 'string',
+              amount: Number(item.Amount),
+              other_ItemName: item.Other_ItemName || 'string'
+            }))
         };
+        // OrderItemsのバリデーション
+        if (payload.orderItems.length === 0) {
+          alert('商品が1つも入力されていません。');
+          this.isSaving = false;
+          return;
+        }
         const response = await axios.put(`${API_BASE_URL}/api/PurchaseOrders/updateOrder/${this.purchaseOrder.Id}`, payload);
         if (response.data && response.data.success) {
           alert('発注書が正常に更新されました。');
@@ -475,6 +553,43 @@ export default {
         alert('会社情報の取得に失敗しました');
       }
     },
+
+    async fetchProducts() {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/Masters/items`);
+        if (Array.isArray(res.data)) {
+          this.predefinedProducts = res.data.map(item => item.item_Name);
+          this.predefinedProductsList = res.data; // idとitem_Name両方保持
+        }
+      } catch (e) {
+        alert('商品リストの取得に失敗しました');
+      }
+    },
+
+    async fetchStores() {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/Masters/stores`);
+        if (Array.isArray(res.data)) {
+          this.stores = res.data;
+        }
+      } catch (e) {
+        alert('店舗リストの取得に失敗しました');
+      }
+    },
+
+    onItemNameChange(item) {
+      // 商品リストからitem_Nameに一致するidを探してセット
+      const found = this.predefinedProductsList.find(p => p.item_Name === item.Item_Name);
+      if (found) {
+        item.Item_Cd = found.id;
+      } else {
+        item.Item_Cd = null;
+      }
+    },
+  },
+  mounted() {
+    this.fetchProducts();
+    this.fetchStores();
   }
 };
 </script>

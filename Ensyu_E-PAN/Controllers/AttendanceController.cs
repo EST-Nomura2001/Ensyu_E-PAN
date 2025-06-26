@@ -97,7 +97,8 @@ namespace Ensyu_E_PAN.Controllers
                                 T_DayPrice = uds.DateSchedule.T_DayPrice,
                                 UserName = uds.DateSchedule.User?.Name,
                                 WorkRollName = uds.DateSchedule.WorkRoll?.Name,
-                                DayShiftDate = uds.DateSchedule.DayShift?.Date
+                                DayShiftDate = uds.DateSchedule.DayShift?.Date,
+                                U_Confirm_Flg = uds.UserDateShifts?.FirstOrDefault()?.UserShift?.U_Confirm_Flg
                             }
                         }).ToList()
                     };
@@ -173,7 +174,8 @@ namespace Ensyu_E_PAN.Controllers
                             T_DayPrice = uds.DateSchedule.T_DayPrice,
                             UserName = uds.DateSchedule.User?.Name,
                             WorkRollName = uds.DateSchedule.WorkRoll?.Name,
-                            DayShiftDate = uds.DateSchedule.DayShift?.Date
+                            DayShiftDate = uds.DateSchedule.DayShift?.Date,
+                            U_Confirm_Flg = uds.UserDateShifts?.FirstOrDefault()?.UserShift?.U_Confirm_Flg
                         }
                     }).ToList()
                 }).ToList()
@@ -236,7 +238,8 @@ namespace Ensyu_E_PAN.Controllers
                 T_DayPrice = ds.T_DayPrice,
                 UserName = ds.User != null ? ds.User.Name : null,
                 WorkRollName = ds.WorkRoll != null ? ds.WorkRoll.Name : null,
-                DayShiftDate = ds.DayShift != null ? ds.DayShift.Date : null
+                DayShiftDate = ds.DayShift != null ? ds.DayShift.Date : null,
+                U_Confirm_Flg = ds.UserDateShifts?.FirstOrDefault()?.UserShift?.U_Confirm_Flg
             }).ToList();
 
             return Ok(result);

@@ -1,3 +1,5 @@
+<!-- ユーザーID指定のみ、未テスト。田村 -->
+
 <template>
   <CommonHeader />
   <div style="margin: 10px 0; padding: 10px; background: #f9f9f9; border: 1px solid #ccc;">
@@ -22,17 +24,28 @@
               <th>曜日</th>
               <th>出勤時間</th>
               <th>退勤時間</th>
+              <th>取消</th>
+              <th style="width: 260px; min-width: 180px; max-width: 320px; white-space: normal; word-break: break-all;">注意事項</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="day in shifts" :key="day.date">
+            <tr v-for="(day, idx) in shifts" :key="day.date">
               <td>{{ day.date }}</td>
               <td>{{ getDayOfWeek(day.date) }}</td>
               <td>
-                <input type="time" v-model="day.startTime" />
+                <input type="time" v-model="day.startTime" @input="validateShift(idx)" />
               </td>
               <td>
-                <input type="time" v-model="day.endTime" />
+                <input type="time" v-model="day.endTime" @input="validateShift(idx)" />
+              </td>
+              <td>
+                <button type="button" @click="resetShift(day)">取消</button>
+              </td>
+              <td style="width: 260px; min-width: 180px; max-width: 320px; white-space: normal; word-break: break-all;">
+                <span v-if="day.error && (day.error.start || day.error.end)" style="color: red; font-size: 12px;">
+                  <span v-if="day.error.start">{{ day.error.start }}</span>
+                  <span v-else-if="day.error.end">{{ day.error.end }}</span>
+                </span>
               </td>
             </tr>
           </tbody>
@@ -105,13 +118,15 @@ export default {
         this.shifts = shiftArray.map(s => ({
           date: new Date(s.today).getDate(),
           startTime: s.u_Start_WorkTime ? s.u_Start_WorkTime.substring(11, 16) : '',
-          endTime: s.u_End_WorkTime ? s.u_End_WorkTime.substring(11, 16) : ''
+          endTime: s.u_End_WorkTime ? s.u_End_WorkTime.substring(11, 16) : '',
+          error: { start: '', end: '' },
         }));
 
-        // 5. その他の情報（必要に応じて）
-        // this.userName = ...;
-        // this.deadline = ...;
-        // this.status = ...;
+        // U_Confirm_Flgの取得とstatusへの反映
+        // 1件でもtrueがあれば「シフト提出済み」、全てfalseまたはnullなら「シフト未提出」
+        const hasConfirmed = shiftArray.some(s => s.u_Confirm_Flg === true);
+        this.status = hasConfirmed ? 'シフト提出済み' : 'シフト未提出';
+        // ...他の情報（userName, deadline等）は必要に応じて
       } catch (error) {
         console.error('データの取得に失敗しました。', error);
         alert('データの取得に失敗しました。APIサーバーが起動しているか確認してください。');
@@ -128,6 +143,7 @@ export default {
           date: i,
           startTime: existing ? existing.startTime : '',
           endTime: existing ? existing.endTime : '',
+          error: { start: '', end: '' },
         });
       }
     },
@@ -137,7 +153,60 @@ export default {
       const days = ['日', '月', '火', '水', '木', '金', '土'];
       return `(${days[day]})`;
     },
+    resetShift(day) {
+      day.startTime = '';
+      day.endTime = '';
+    },
+    validateShift(idx) {
+      const shift = this.shifts[idx];
+      shift.error = { start: '', end: '' };
+      // 両方未入力はOK
+      if (!shift.startTime && !shift.endTime) return;
+      // 片方だけ入力はNG（start側だけにエラー文セット）
+      if (!shift.startTime || !shift.endTime) {
+        shift.error.start = '出勤・退勤時間は両方入力、または両方未入力にしてください。';
+        shift.error.end = '';
+        return;
+      }
+      // 出勤時間9:00未満はNG
+      if (shift.startTime < '09:00') {
+        shift.error.start = '出勤時間は9:00以降にしてください。';
+      }
+      // 退勤時間24:00超はNG
+      if (shift.endTime > '24:00') {
+        shift.error.end = '退勤時間は24:00までにしてください。';
+      }
+      // 退勤時間が出勤時間以前はNG
+      if (shift.endTime && shift.startTime && shift.endTime <= shift.startTime) {
+        shift.error.end = '退勤時間は出勤時間より後にしてください。';
+      }
+    },
+    validateShifts() {
+      for (const shift of this.shifts) {
+        // 両方未入力はOK
+        if (!shift.startTime && !shift.endTime) continue;
+        // 片方だけ入力はNG
+        if (!shift.startTime || !shift.endTime) {
+          return '出勤・退勤時間は両方入力、または両方未入力にしてください。';
+        }
+        if (shift.startTime < '09:00') {
+          return '出勤時間は9:00以降にしてください。';
+        }
+        if (shift.endTime > '24:00') {
+          return '退勤時間は24:00までにしてください。';
+        }
+        if (shift.endTime <= shift.startTime) {
+          return '退勤時間は出勤時間より後にしてください。';
+        }
+      }
+      return null;
+    },
     async submitShifts() {
+      const error = this.validateShifts();
+      if (error) {
+        alert(error);
+        return;
+      }
       try {
         const userId = this.currentUserId;
         const year = this.year;
@@ -165,7 +234,8 @@ export default {
         }
 
         alert('シフトが提出されました。');
-        this.status = '提出済み';
+        // 提出後は「シフト提出済み」に更新
+        this.status = 'シフト提出済み';
       } catch (error) {
         console.error('シフトの提出に失敗しました。', error);
         alert('シフトの提出に失敗しました。');
@@ -227,7 +297,6 @@ input[type="time"] {
 button {
   display: block;
   width: 100%;
-  padding: 10px 20px;
   background-color: #4CAF50;
   color: white;
   border: none;

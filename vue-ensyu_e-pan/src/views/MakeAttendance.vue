@@ -547,19 +547,14 @@ watch(schedules, (newSchedules) => {
 
 // --- Lifecycle Hooks ---
 onMounted(() => {
-  // クエリから日付取得
-  let dateParam = route.query.date;
-  let initialDate;
-  if (dateParam && typeof dateParam === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
-    // "YYYY-MM-DD" 形式
-    const [yyyy, mm, dd] = dateParam.split('-').map(Number);
-    initialDate = new Date(yyyy, mm - 1, dd);
-  } else {
-    // クエリがなければ本日
-    initialDate = new Date();
+  // クエリパラメータdateがあれば初期化
+  if (route.query.date) {
+    const date = new Date(route.query.date);
+    if (!isNaN(date)) {
+      currentDate.value = date;
+      calendarDate.value = date;
+    }
   }
-  currentDate.value = initialDate;
-  calendarDate.value = new Date(initialDate);
   fetchShifts(currentDate.value);
 });
 </script>

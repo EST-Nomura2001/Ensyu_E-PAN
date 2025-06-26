@@ -12,28 +12,28 @@
         <!-- 発注元の会社情報 -->
         <div class="company-info">
           <!-- v-modelは双方向データバインディング：入力内容がデータと同期される -->
-          <input type="text" v-model="purchaseOrder.Company_Cd" class="issuer-company-name" placeholder="会社CD" @change="onCompanyChange">
+          <input type="text" v-model="purchaseOrder.Company.Id" class="issuer-company-name" placeholder="会社CD" @change="onCompanyChange">
           <div class="issuer-address">
               <span>〒</span>
               <!-- 郵便番号入力欄 -->
-              <input type="text" v-model="purchaseOrder.Postal_Code" class="issuer-postal-code" placeholder="郵便番号">
+              <input type="text" v-model="purchaseOrder.Postal_Code" class="issuer-postal-code" placeholder="郵便番号" readonly>
           </div>
           <!-- 住所入力欄（2行） -->
-          <input type="text" v-model="purchaseOrder.Address1" class="issuer-address-line" placeholder="住所1">
-          <input type="text" v-model="purchaseOrder.Address2" class="issuer-address-line" placeholder="住所2">
+          <input type="text" v-model="purchaseOrder.Address1" class="issuer-address-line" placeholder="住所1" readonly>
+          <input type="text" v-model="purchaseOrder.Address2" class="issuer-address-line" placeholder="住所2" readonly>
           
           <!-- 連絡先情報（電話、FAX、メール、担当者） -->
           <div class="issuer-contact-row">
               <label>TEL:</label>
-              <input type="text" v-model="purchaseOrder.Tel" placeholder="電話番号">
+              <input type="text" v-model="purchaseOrder.Tel" placeholder="電話番号" readonly>
           </div>
           <div class="issuer-contact-row">
               <label>FAX:</label>
-              <input type="text" v-model="purchaseOrder.Fax" placeholder="FAX番号">
+              <input type="text" v-model="purchaseOrder.Fax" placeholder="FAX番号" readonly>
           </div>
           <div class="issuer-contact-row">
               <label>Mail:</label>
-              <input type="email" v-model="purchaseOrder.Email" placeholder="メールアドレス">
+              <input type="email" v-model="purchaseOrder.Email" placeholder="メールアドレス" readonly>
           </div>
           <div class="issuer-contact-row">
               <label>担当者:</label>
@@ -51,7 +51,7 @@
       <section class="po-customer">
         <div class="customer-name-wrapper">
           <!-- 発注先の会社名入力 -->
-          <input type="text" v-model="purchaseOrder.CustomerName" class="customer-name-input" placeholder="宛名を入力">
+          <input type="text" v-model="purchaseOrder.CustomerName" class="customer-name-input" placeholder="宛名を入力" readonly>
           <span class="honorific">御中</span>
         </div>
       </section>
@@ -135,7 +135,7 @@
           <tbody>
             <!-- v-forで商品項目を繰り返し表示 -->
             <!-- (item, index)でitemは商品データ、indexは配列の番号 -->
-            <tr v-for="(item, index) in purchaseOrder.OrderItemLists" :key="index">
+            <tr v-for="(item, index) in purchaseOrder.OrderItems" :key="index">
               <td>{{ index + 1 }}</td>
               <td>
                 <input type="text" v-model="item.Item_Cd" list="product-list" placeholder="商品コードまたは商品名">
@@ -195,6 +195,11 @@ import axios from 'axios';
 // APIサーバーのベースURL
 const API_BASE_URL = 'http://localhost:5011';
 
+// 5桁ランダム番号生成関数
+function generateRandomQuotation() {
+  return Math.floor(10000 + Math.random() * 90000);
+}
+
 // Vue.jsコンポーネントの定義
 export default {
   name: 'PurchaseOrder', // コンポーネントの名前
@@ -215,19 +220,19 @@ export default {
       purchaseOrder: {
         Id: null,
         Title: '',
-        Quotation: '',
+        Quotation: generateRandomQuotation(),
         Tax: 10,
         Order_Date: todayStr,
         Delivery_Date: '',
         Payment_Date: '',
         Payment_Terms: '',
         Confirm_Flg: false,
-        Company_Cd: 1,
+        Company: { Id: '' },
+        Store: { Id: 1 },
         Manager: '',
-        Store_Cd: 1,
         Other: '',
-        OrderItemLists: [
-          { Id: null, P_Order_List_Id: null, Item_Cd: '', Other_ItemName: '', Amount: 1, Item: null, PurchaseOrder: null }
+        OrderItems: [
+          { Id: null, Item_Cd: '', Item_Name: '', Amount: 1, Other_ItemName: '' }
         ],
         Postal_Code: '',
         Address1: '',
@@ -270,19 +275,19 @@ export default {
       this.purchaseOrder = {
         Id: null,
         Title: '',
-        Quotation: '',
+        Quotation: generateRandomQuotation(),
         Tax: 10,
         Order_Date: todayStr,
         Delivery_Date: '',
         Payment_Date: '',
         Payment_Terms: '',
         Confirm_Flg: false,
-        Company_Cd: 1,
+        Company: { Id: '' },
+        Store: { Id: 1 },
         Manager: '',
-        Store_Cd: 1,
         Other: '',
-        OrderItemLists: [
-          { Id: null, P_Order_List_Id: null, Item_Cd: '', Other_ItemName: '', Amount: 1, Item: null, PurchaseOrder: null }
+        OrderItems: [
+          { Id: null, Item_Cd: '', Item_Name: '', Amount: 1, Other_ItemName: '' }
         ],
         Postal_Code: '',
         Address1: '',
@@ -310,18 +315,16 @@ export default {
             Payment_Date: d.payment_Date ? d.payment_Date.substring(0, 10) : '',
             Payment_Terms: d.payment_Terms,
             Confirm_Flg: d.confirm_Flg,
-            Company_Cd: d.company?.id || 1,
+            Company: d.company || { Id: '' },
+            Store: d.store || { Id: 1 },
             Manager: d.manager,
-            Store_Cd: d.store?.id || 1,
             Other: d.other,
-            OrderItemLists: (d.orderItems && d.orderItems.$values) ? d.orderItems.$values.map(item => ({
+            OrderItems: (d.orderItems) ? d.orderItems.map(item => ({
               Id: item.id || null,
-              P_Order_List_Id: item.p_Order_List_Id || null,
               Item_Cd: item.item_Cd,
-              Other_ItemName: item.other_ItemName,
+              Item_Name: item.item_Name,
               Amount: item.amount,
-              Item: null,
-              PurchaseOrder: null
+              Other_ItemName: item.other_ItemName
             })) : [],
             Postal_Code: d.company?.post_Code || '',
             Address1: d.company?.address1 || '',
@@ -344,56 +347,60 @@ export default {
     // 商品行を追加する関数
     addItem() {
       if (this.purchaseOrder.Confirm_Flg) return;
-      this.purchaseOrder.OrderItemLists.push({ Id: null, P_Order_List_Id: null, Item_Cd: '', Other_ItemName: '', Amount: 1 });
+      this.purchaseOrder.OrderItems.push({ Id: null, Item_Cd: '', Item_Name: '', Amount: 1, Other_ItemName: '' });
     },
 
     // 商品行を削除する関数
     removeItem(index) {
       if (this.purchaseOrder.Confirm_Flg) return;
-      if (this.purchaseOrder.OrderItemLists.length > 1) {
-        this.purchaseOrder.OrderItemLists.splice(index, 1);
+      if (this.purchaseOrder.OrderItems.length > 1) {
+        this.purchaseOrder.OrderItems.splice(index, 1);
       } else {
         alert('最低1行は必要です。');
       }
     },
 
     // 保存ボタンが押されたときの処理
-    handleSave(isConfirm) {
+    async handleSave(isConfirm) {
       if (this.purchaseOrder.Confirm_Flg) {
         alert('この発注書は確定済みのため、保存できません。');
         return;
       }
       this.purchaseOrder.Confirm_Flg = isConfirm;
-      this.saveOrder();
+      if (this.purchaseOrder.Id) {
+        await this.updateOrder();
+      } else {
+        await this.saveOrder();
+      }
     },
 
     // 実際の保存処理（非同期処理）
     async saveOrder() {
       this.isSaving = true;
       try {
-        // orderItemsとして送信
         const payload = {
-          id: this.purchaseOrder.Id,
-          title: this.purchaseOrder.Title,
-          quotation: this.purchaseOrder.Quotation,
-          tax: this.purchaseOrder.Tax,
-          order_Date: this.purchaseOrder.Order_Date,
-          delivery_Date: this.purchaseOrder.Delivery_Date,
-          payment_Date: this.purchaseOrder.Payment_Date,
-          payment_Terms: this.purchaseOrder.Payment_Terms,
-          confirm_Flg: this.purchaseOrder.Confirm_Flg,
-          company_Cd: this.purchaseOrder.Company_Cd,
-          manager: this.purchaseOrder.Manager,
-          store_Cd: this.purchaseOrder.Store_Cd,
-          other: this.purchaseOrder.Other,
-          orderItems: this.purchaseOrder.OrderItemLists.map(item => ({
-            item_Cd: item.Item_Cd,
-            amount: item.Amount,
-            other_ItemName: item.Other_ItemName
+          Title: this.purchaseOrder.Title,
+          Quotation: Number(this.purchaseOrder.Quotation),
+          Tax: Number(this.purchaseOrder.Tax),
+          Order_Date: this.purchaseOrder.Order_Date,
+          Delivery_Date: this.purchaseOrder.Delivery_Date,
+          Payment_Date: this.purchaseOrder.Payment_Date,
+          Payment_Terms: this.purchaseOrder.Payment_Terms,
+          Confirm_Flg: this.purchaseOrder.Confirm_Flg,
+          Manager: this.purchaseOrder.Manager,
+          Other: this.purchaseOrder.Other,
+          Company: { Id: Number(this.purchaseOrder.Company.Id) },
+          Store: { Id: Number(this.purchaseOrder.Store.Id) },
+          OrderItems: this.purchaseOrder.OrderItems.map(item => ({
+            Id: item.Id || 0,
+            Item_Cd: Number(item.Item_Cd),
+            Item_Name: item.Item_Name || '',
+            Amount: Number(item.Amount),
+            Other_ItemName: item.Other_ItemName || ''
           }))
         };
-        const response = await axios.post(`${API_BASE_URL}/api/PurchaseOrders`, payload);
-        if (response.data) {
+        const response = await axios.post(`${API_BASE_URL}/api/PurchaseOrders/newOrder`, payload);
+        if (response.data && response.data.success) {
           alert('発注書が正常に保存されました。');
           this.$router.push({ name: 'SavedOrders' });
         } else {
@@ -415,41 +422,32 @@ export default {
     async updateOrder() {
       this.isSaving = true;
       try {
-        // 日付をISO8601形式に変換する関数
-        const toISO8601 = (dateStr) => {
-          if (!dateStr) return new Date().toISOString();
-          if (dateStr.length === 10) return dateStr + 'T00:00:00';
-          return dateStr;
-        };
-        // API仕様に合わせてpayloadを整理
         const payload = {
-          id: Number(this.purchaseOrder.id) || 1, // 更新時はidを必ずセット
-          Order: this.purchaseOrder.Order || 1, // Orderフィールド（大文字）
-          title: this.purchaseOrder.title || 'ダミータイトル',
-          quotation: Number(this.purchaseOrder.quotation) || 99999999,
-          tax: Number(this.purchaseOrder.tax) || 10,
-          order_Date: toISO8601(this.purchaseOrder.order_Date),
-          delivery_Date: toISO8601(this.purchaseOrder.delivery_Date),
-          payment_Date: toISO8601(this.purchaseOrder.payment_Date),
-          payment_Terms: this.purchaseOrder.payment_Terms || '月末締め',
-          confirm_Flg: this.purchaseOrder.confirm_Flg,
-          company_Cd: Number(this.purchaseOrder.company_Cd) || 0,
-          manager: this.purchaseOrder.manager || 'ダミー担当',
-          store_Cd: Number(this.purchaseOrder.store_Cd) || 1,
-          other: this.purchaseOrder.other || '備考なし',
-          orderItemLists: this.purchaseOrder.orderItemLists.map((item, idx) => ({
-            id: Number(item.id) || 0,
-            p_Order_List_Id: Number(item.p_Order_List_Id) || 0,
-            item_Cd: Number(item.item_Cd) || (idx + 1),
-            other_ItemName: item.other_ItemName || 'ダミー商品',
-            amount: Number(item.amount) || 1
+          Id: Number(this.purchaseOrder.Id),
+          Title: this.purchaseOrder.Title,
+          Quotation: Number(this.purchaseOrder.Quotation),
+          Tax: Number(this.purchaseOrder.Tax),
+          Order_Date: this.purchaseOrder.Order_Date,
+          Delivery_Date: this.purchaseOrder.Delivery_Date,
+          Payment_Date: this.purchaseOrder.Payment_Date,
+          Payment_Terms: this.purchaseOrder.Payment_Terms,
+          Confirm_Flg: this.purchaseOrder.Confirm_Flg,
+          Manager: this.purchaseOrder.Manager,
+          Other: this.purchaseOrder.Other,
+          Company: { Id: Number(this.purchaseOrder.Company.Id) },
+          Store: { Id: Number(this.purchaseOrder.Store.Id) },
+          OrderItems: this.purchaseOrder.OrderItems.map(item => ({
+            Id: item.Id || 0,
+            Item_Cd: Number(item.Item_Cd),
+            Item_Name: item.Item_Name || '',
+            Amount: Number(item.Amount),
+            Other_ItemName: item.Other_ItemName || ''
           }))
         };
-        console.log('送信payload', JSON.stringify(payload, null, 2));
-        const response = await axios.put(`http://localhost:5011/api/PurchaseOrders/${this.purchaseOrder.id}`, payload);
+        const response = await axios.put(`${API_BASE_URL}/api/PurchaseOrders/updateOrder/${this.purchaseOrder.Id}`, payload);
         if (response.data && response.data.success) {
           alert('発注書が正常に更新されました。');
-          this.purchaseOrder = response.data.data;
+          this.$router.push({ name: 'SavedOrders' });
         } else {
           alert('更新に失敗しました');
         }
@@ -460,19 +458,11 @@ export default {
       }
     },
 
-    async addOrderItem(item) {
-      const payload = {
-        item_Cd: item.item_Cd,
-        amount: item.amount
-      };
-      await axios.post(`http://localhost:5011/api/PurchaseOrders/${this.purchaseOrder.id}/items`, payload);
-    },
-
     async onCompanyChange() {
-      const id = this.purchaseOrder.Company_Cd;
+      const id = this.purchaseOrder.Company.Id;
       if (!id) return;
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/Companies/${id}`);
+        const res = await axios.get(`${API_BASE_URL}/api/Masters/company/${id}`);
         const c = res.data;
         this.purchaseOrder.Postal_Code = c.post_Code || '';
         this.purchaseOrder.Address1 = c.address1 || '';

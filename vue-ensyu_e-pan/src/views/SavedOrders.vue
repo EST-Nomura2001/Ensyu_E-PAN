@@ -125,12 +125,11 @@ export default {
     async fetchOrders() {
       // 読み込み中フラグをONにする
       this.isLoading = true;
-      
       try {
         // サーバーから発注書一覧のデータを取得
-        const response = await axios.get(`${API_BASE_URL}/api/PurchaseOrders`);
+        const response = await axios.get(`${API_BASE_URL}/api/orders`);
         // 取得したデータをコンポーネントの状態に保存
-        this.savedOrders = response.data;
+        this.savedOrders = response.data.data || [];
         console.log("発注書一覧",response.data)
       } catch (error) {
         // エラーが発生した場合の処理
@@ -141,7 +140,7 @@ export default {
         // 読み込み中フラグをOFFにする
         this.isLoading = false;
         this.savedOrders.forEach(order => {
-          console.log("発注会社", order.company.c_Name);
+          console.log("発注会社", order.Company?.C_Name);
         });
       }
     },

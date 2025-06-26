@@ -27,6 +27,7 @@
               <th>発注日</th>
               <th>保存日時</th>
               <th class="col-confirm">確定</th>
+              <th class="col-confirm">削除</th>
             </tr>
           </thead>
           
@@ -54,13 +55,16 @@
             <!-- 各データを表示 -->
               <td>{{ order.Quotation }}</td>
               <td>{{ order.Title }}</td>
-              <td>{{ order.Company.C_Name }}</td>
+              <td>{{ order.Company?.C_Name }}</td>
               <!-- 日付フォーマット関数を使用 -->
               <td>{{ formatDate(order.Order_Date) }}</td>
               <td>{{ formatDateTime(order.CreatedAt) }}</td>
               <!-- 確定済みの場合のみチェックマークを表示 -->
               <td class="col-confirm">
                 <span v-if="order.Confirm_Flg" class="confirmed-mark">✔</span>
+              </td>
+              <td class="col-confirm">
+                <button @click.stop="deleteOrder(order.Id)">削除</button>
               </td>
             </tr> 
           </tbody>
@@ -124,9 +128,9 @@ export default {
       
       try {
         // サーバーから発注書一覧のデータを取得
-        const response = await axios.get(`${API_BASE_URL}/api/orders`);
+        const response = await axios.get(`${API_BASE_URL}/api/PurchaseOrders`);
         // 取得したデータをコンポーネントの状態に保存
-        this.savedOrders = response.data.value;
+        this.savedOrders = response.data;
         console.log("発注書一覧",response.data)
       } catch (error) {
         // エラーが発生した場合の処理
@@ -168,6 +172,16 @@ export default {
         hour: '2-digit',    // 時を2桁で表示
         minute: '2-digit'   // 分を2桁で表示
       });
+    },
+    
+    async deleteOrder(orderId) {
+      if (!confirm('本当に削除しますか？')) return;
+      try {
+        await axios.delete(`${API_BASE_URL}/api/PurchaseOrders/${orderId}`);
+        this.fetchOrders();
+      } catch (error) {
+        alert('削除に失敗しました');
+      }
     }
   },
   

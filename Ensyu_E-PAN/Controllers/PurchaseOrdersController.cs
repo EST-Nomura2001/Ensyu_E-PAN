@@ -4,6 +4,8 @@ using Ensyu_E_PAN.Data;
 using Ensyu_E_PAN.Models.Order;
 using System.Linq;
 using System.Threading.Tasks;
+using Ensyu_E_PAN.DTOs.Master;
+using Ensyu_E_PAN.DTOs.Order;
 
 namespace Ensyu_E_PAN.Controllers
 {
@@ -28,20 +30,86 @@ namespace Ensyu_E_PAN.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            // 発注書本体＋商品リスト＋会社・事業所情報も含めて取得
             var order = await _context.Purchase_Orders
-                .Include(o => o.OrderItemLists) // 商品リストも一緒に取得
-                .Include(o => o.Company)       // 会社情報も一緒に取得
-                .Include(o => o.Store)         // 事業所情報も一緒に取得
+                .Include(o => o.OrderItemLists)
+                    .ThenInclude(oi => oi.Item)
+                .Include(o => o.Company)
+                .Include(o => o.Store)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
-            // 見つからなければ404を返す
             if (order == null)
+            {
                 return NotFound(new { success = false, message = "Not found" });
+            }
 
-            // 成功時はデータを返す
-            return Ok(new { success = true, data = order });
+            var dto = new PurchaseOrderDto
+            {
+                Id = order.Id,
+                Title = order.Title,
+                Quotation = order.Quotation,
+                Tax = order.Tax,
+                Order_Date = order.Order_Date,
+                Delivery_Date = order.Delivery_Date,
+                Payment_Date = order.Payment_Date,
+                Payment_Terms = order.Payment_Terms,
+                Confirm_Flg = order.Confirm_Flg,
+                Manager = order.Manager,
+                Other = order.Other,
+
+                Company = new CompanyDto
+                {
+                    Id = order.Company.Id,
+                    C_Name = order.Company.C_Name,
+                    Address1 = order.Company.Address1,
+                    Address2 = order.Company.Address2,
+                    Post_Code = order.Company.Post_Code,
+                    Mail = order.Company.Mail,
+                    Tel = order.Company.Tel?.ToString(),
+                    Fax = order.Company.Fax?.ToString()
+                },
+
+                Store = new StoreDto
+                {
+                    Id = order.Store.Id,
+                    C_Name = order.Store.C_Name,
+                    Address1 = order.Store.Address1,
+                    Address2 = order.Store.Address2,
+                    Post_Code = order.Store.Post_Code,
+                    Mail = order.Store.Mail,
+                    Tel = order.Store.Tel?.ToString(),
+                    Fax = order.Store.Fax?.ToString()
+                },
+
+                OrderItems = order.OrderItemLists.Select(item => new OrderItemDto
+                {
+                    Item_Cd = item.Item_Cd,
+                    Item_Name = item.Item?.Item_Name ?? "(未設定)",
+                    Amount = item.Amount,
+                    Other_ItemName = item.Other_ItemName
+                }).ToList()
+            };
+
+            return Ok(new { success = true, data = dto });
         }
+
+
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> Get(int id)
+        //{
+        //    // 発注書本体＋商品リスト＋会社・事業所情報も含めて取得
+        //    var order = await _context.Purchase_Orders
+        //        .Include(o => o.OrderItemLists) // 商品リストも一緒に取得
+        //        .Include(o => o.Company)       // 会社情報も一緒に取得
+        //        .Include(o => o.Store)         // 事業所情報も一緒に取得
+        //        .FirstOrDefaultAsync(o => o.Id == id);
+
+        //    // 見つからなければ404を返す
+        //    if (order == null)
+        //        return NotFound(new { success = false, message = "Not found" });
+
+        //    // 成功時はデータを返す
+        //    return Ok(new { success = true, data = order });
+        //}
 
         // =============================
         // 発注書新規作成・更新API
@@ -118,25 +186,45 @@ namespace Ensyu_E_PAN.Controllers
         [HttpGet("/api/orders")]
         public async Task<IActionResult> GetAll()
         {
-            // 発注書一覧を取得（会社情報も含める）
-            var list = await _context.Purchase_Orders
+            var orders = await _context.Purchase_Orders
                 .Include(o => o.Company)
                 .OrderByDescending(o => o.Id)
-                .Select(o => new
-                {
-                    Id = o.Id,
-                    Quotation = o.Quotation,
-                    Title = o.Title,
-                    Company = o.Company, // 会社情報
-                    Order_Date = o.Order_Date,
-                    CreatedAt = o.Order_Date,
-                    Confirm_Flg = o.Confirm_Flg
-                })
                 .ToListAsync();
 
-            // 一覧を返す
-            return Ok(list);
+            var dtoList = orders.Select(o => new PurchaseOrderDto
+            {
+                Id = o.Id,
+                Title = o.Title,
+                Quotation = o.Quotation,
+                Tax = o.Tax,
+                Order_Date = o.Order_Date,
+                Delivery_Date = o.Delivery_Date,
+                Payment_Date = o.Payment_Date,
+                Payment_Terms = o.Payment_Terms,
+                Confirm_Flg = o.Confirm_Flg,
+                Manager = o.Manager,
+                Other = o.Other,
+
+                Company = new CompanyDto
+                {
+                    Id = o.Company.Id,
+                    C_Name = o.Company.C_Name,
+                    Address1 = o.Company.Address1,
+                    Address2 = o.Company.Address2,
+                    Post_Code = o.Company.Post_Code,
+                    Mail = o.Company.Mail,
+                    Tel = o.Company.Tel?.ToString(),
+                    Fax = o.Company.Fax?.ToString()
+                },
+
+                Store = null,              // 一覧では不要な場合は null または省略
+                OrderItems = null          // 詳細のみ必要なら null でOK
+            }).ToList();
+
+            return Ok(new { success = true, data = dtoList });
         }
+
+
 
         // =============================
         // 商品行追加API

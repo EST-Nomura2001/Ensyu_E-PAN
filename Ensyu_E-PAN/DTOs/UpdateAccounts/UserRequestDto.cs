@@ -2,7 +2,7 @@
 
 namespace Ensyu_E_PAN.DTOs.UpdateAccounts
 {
-    public class CreateUserRequestDto
+    public class UserRequestDto
     {
         [Required]
         public string Login_Id { get; set; }

@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { fetchAllShiftSchedules } from '../services/api';
+import { getAllShiftsForAllMonths } from '../services/api';
 
 //ヘッダー用
 import CommonHeader from '../components/CommonHeader.vue';
@@ -84,62 +84,85 @@ export default {
     };
   },
   async mounted() {
-    // ★初回表示は2025年7月に固定（本実装時は下記2行を有効化）
-    let year = 2025;
-    let month = 7;
-    // const now = new Date();
-    // let year = now.getFullYear();
-    // let month = now.getMonth() + 1;
-    let dateSchedules = [];
-    try {
-      dateSchedules = await fetchAllShiftSchedules(year, month);
-      if (dateSchedules && dateSchedules.$values) {
-        dateSchedules = dateSchedules.$values;
+    let year, month;
+    // クエリパラメータdateがあれば年月を取得
+    if (this.$route.query.date) {
+      const date = new Date(this.$route.query.date);
+      if (!isNaN(date)) {
+        year = date.getFullYear();
+        month = date.getMonth() + 1;
       }
+    }
+    // なければデフォルト
+    if (!year || !month) {
+      year = 2025;
+      month = 7;
+    }
+    const storeId = sessionStorage.getItem('storeId');
+    let allShifts = [];
+    try {
+      allShifts = await getAllShiftsForAllMonths(storeId, year, month);
     } catch (e) {
       console.error('API error:', e);
-      dateSchedules = [];
+      allShifts = [];
     }
-    if (!Array.isArray(dateSchedules)) dateSchedules = [];
-    // --- 合計列合計行（ALL_SHIFTS.SUM_WORKTIME） ---
-    let totalWorkTime = '';
-    if (dateSchedules.length > 0) {
-      const userShifts = dateSchedules[0]?.user?.userShifts?.$values || [];
-      if (userShifts.length > 0 && userShifts[0].allShift) {
-        totalWorkTime = userShifts[0].allShift.sum_WorkTime || '';
-      }
-    }
-    // --- 全日付（DATE_SCHEDULES.TODAY）をユニークかつ昇順で抽出 ---
-    function toDateString(dateStr) {
-      if (!dateStr) return '';
-      return new Date(dateStr).toISOString().split('T')[0];
-    }
-    const allDates = Array.from(
-      new Set(dateSchedules.map(ds => toDateString(ds.today)).filter(Boolean))
-    ).sort();
-    // --- 合計行各日付（DAY_SHIFTS.SUM_WORKTIME） ---
-    const dayShiftMap = {};
-    dateSchedules.forEach(ds => {
-      if (ds.dayShift && ds.dayShift.id) {
-        dayShiftMap[ds.dayShift.id] = ds.dayShift;
-      }
+    if (!Array.isArray(allShifts)) allShifts = [];
+    // --- ネスト構造を展開してusers配列・days配列を生成 ---
+    const userMap = {};
+    const allDatesSet = new Set();
+    (allShifts || []).forEach(monthData => {
+      (monthData.userShifts || []).forEach(userShift => {
+        const userId = userShift.user_Id || userShift.userName;
+        if (!userMap[userId]) {
+          userMap[userId] = {
+            name: userShift.userName,
+            wage: '', // 必要ならuserShiftから取得
+            totalWorkTime: 0,
+            monthPrice: 0,
+            days: []
+          };
+        }
+        (userShift.userDateShifts || []).forEach(dateShift => {
+          const ds = dateShift.dateSchedule || {};
+          allDatesSet.add(ds.today);
+          userMap[userId].days.push({
+            workTime: ds.t_WorkTime_All || '',
+            dayPrice: ds.t_DayPrice || ''
+          });
+          userMap[userId].totalWorkTime += Number(ds.t_WorkTime_All || 0);
+          userMap[userId].monthPrice += Number(ds.t_DayPrice || 0);
+        });
+      });
     });
-    const dayShifts = Object.values(dayShiftMap).sort((a, b) => new Date(a.date) - new Date(b.date));
-    // --- 合計列個人行（USER_SHIFTS.TOTAL_WORKTIME） ---
-    // ユーザーごとの列は一旦空配列にする（別メソッドで取得予定）
-    this.users = [];
-    // 合計行・合計列はusersから算出
+    // 日付配列を昇順で
+    const allDates = Array.from(allDatesSet).filter(Boolean).sort();
+    // users配列を整形
+    const users = Object.values(userMap).map(u => ({
+      ...u,
+      totalWorkTime: u.totalWorkTime ? u.totalWorkTime.toFixed(1) : '',
+      monthPrice: u.monthPrice ? u.monthPrice.toString() : '',
+    }));
+    // 日ごとの合計
+    const dayShifts = allDates.map((date, idx) => {
+      let sumWorkTime = users.reduce((sum, u) => sum + Number(u.days[idx]?.workTime || 0), 0);
+      let sumTotalCost = users.reduce((sum, u) => sum + Number(u.days[idx]?.dayPrice || 0), 0);
+      return {
+        date,
+        sumWorkTime: sumWorkTime ? sumWorkTime.toFixed(1) : '',
+        sumTotalCost: sumTotalCost ? sumTotalCost.toString() : ''
+      };
+    });
+    // 合計
+    const totalWorkTime = users.reduce((sum, u) => sum + Number(u.totalWorkTime || 0), 0).toFixed(1);
+    const totalCost = users.reduce((sum, u) => sum + Number(u.monthPrice || 0), 0).toString();
+    this.users = users;
+    this.days = allDates;
+    this.dayShifts = dayShifts;
+    this.totalWorkTime = totalWorkTime;
+    this.totalCost = totalCost;
     this.status = '';
     this.storeName = '';
     this.yearMonth = `${year}年${month}月`;
-    this.days = allDates;
-    this.totalWorkTime = totalWorkTime;
-    this.totalCost = this.users.reduce((sum, u) => sum + Number(u.monthPrice || 0), 0).toString();
-    this.dayShifts = dayShifts.map(ds => ({
-      date: ds.date,
-      sumWorkTime: ds.sum_WorkTime || '',
-      sumTotalCost: ds.sum_TotalCost || ''
-    }));
   },
   methods: {
     async changeMonth(diff) {
@@ -158,84 +181,71 @@ export default {
       if (m > 12) { y++; m = 1; }
       let year = y;
       let month = m;
-      let dateSchedules = [];
+      const storeId = sessionStorage.getItem('storeId');
+      let allShifts = [];
       try {
-        dateSchedules = await fetchAllShiftSchedules(year, month);
-        if (dateSchedules && dateSchedules.$values) {
-          dateSchedules = dateSchedules.$values;
-        }
+        allShifts = await getAllShiftsForAllMonths(storeId, year, month);
       } catch (e) {
         console.error('API error:', e);
-        dateSchedules = [];
+        allShifts = [];
       }
-      if (!Array.isArray(dateSchedules)) dateSchedules = [];
-      if (dateSchedules.length > 0 && dateSchedules[0].days) {
-        this.users = dateSchedules.map(u => ({
-          name: u.name,
-          wage: u.wage,
-          totalWorkTime: u.days.reduce((sum, d) => sum + Number(d.workTime || 0), 0).toFixed(1),
-          monthPrice: u.days.reduce((sum, d) => sum + Number(d.dayPrice || 0), 0).toString(),
-          days: u.days
-        }));
-      } else {
-        this.users = this.formatUsersFromDateSchedules(dateSchedules);
-      }
-      // 合計行・合計列はusersから算出
-      this.status = '';
-      this.storeName = '';
-      this.yearMonth = `${year}年${month}月`;
-      this.days = this.users[0]?.days.map((d, idx) => {
-        return `${year}-${month.toString().padStart(2, '0')}-${(idx+1).toString().padStart(2, '0')}`;
-      }) || [];
-      this.totalWorkTime = this.users.reduce((sum, u) => sum + Number(u.totalWorkTime || 0), 0).toFixed(1);
-      this.totalCost = this.users.reduce((sum, u) => sum + Number(u.monthPrice || 0), 0).toString();
-      this.dayShifts = this.days.map((date, idx) => {
-        let sumWorkTime = this.users.reduce((sum, u) => sum + Number(u.days[idx]?.workTime || 0), 0);
-        let sumTotalCost = this.users.reduce((sum, u) => sum + Number(u.days[idx]?.dayPrice || 0), 0);
+      if (!Array.isArray(allShifts)) allShifts = [];
+      // --- ネスト構造を展開してusers配列・days配列を生成 ---
+      const userMap = {};
+      const allDatesSet = new Set();
+      (allShifts || []).forEach(monthData => {
+        (monthData.userShifts || []).forEach(userShift => {
+          const userId = userShift.user_Id || userShift.userName;
+          if (!userMap[userId]) {
+            userMap[userId] = {
+              name: userShift.userName,
+              wage: '', // 必要ならuserShiftから取得
+              totalWorkTime: 0,
+              monthPrice: 0,
+              days: []
+            };
+          }
+          (userShift.userDateShifts || []).forEach(dateShift => {
+            const ds = dateShift.dateSchedule || {};
+            allDatesSet.add(ds.today);
+            userMap[userId].days.push({
+              workTime: ds.t_WorkTime_All || '',
+              dayPrice: ds.t_DayPrice || ''
+            });
+            userMap[userId].totalWorkTime += Number(ds.t_WorkTime_All || 0);
+            userMap[userId].monthPrice += Number(ds.t_DayPrice || 0);
+          });
+        });
+      });
+      // 日付配列を昇順で
+      const allDates = Array.from(allDatesSet).filter(Boolean).sort();
+      // users配列を整形
+      const users = Object.values(userMap).map(u => ({
+        ...u,
+        totalWorkTime: u.totalWorkTime ? u.totalWorkTime.toFixed(1) : '',
+        monthPrice: u.monthPrice ? u.monthPrice.toString() : '',
+      }));
+      // 日ごとの合計
+      const dayShifts = allDates.map((date, idx) => {
+        let sumWorkTime = users.reduce((sum, u) => sum + Number(u.days[idx]?.workTime || 0), 0);
+        let sumTotalCost = users.reduce((sum, u) => sum + Number(u.days[idx]?.dayPrice || 0), 0);
         return {
           date,
           sumWorkTime: sumWorkTime ? sumWorkTime.toFixed(1) : '',
           sumTotalCost: sumTotalCost ? sumTotalCost.toString() : ''
         };
       });
-    },
-    /**
-     * @description APIから取得したdateSchedules配列を、テーブル描画用のusers配列に整形する
-     * @param {Array} dateSchedules - APIから取得した日別勤怠データ
-     * @returns {Array} users配列
-     */
-    formatUsersFromDateSchedules(dateSchedules) {
-      // 防御: 配列でなければ空配列を返す
-      if (!Array.isArray(dateSchedules)) return [];
-      // ユーザーごとにグループ化
-      const userMap = {};
-      dateSchedules.forEach(ds => {
-        // ユーザーIDでグループ化（IDがなければ名前で）
-        const userId = ds.userId || ds.user?.id || ds.userName || '不明';
-        const userName = ds.user?.name || ds.userName || '不明';
-        const wage = ds.user?.timePrice_D || ds.user?.wage || ds.wage || '';
-        if (!userMap[userId]) {
-          userMap[userId] = {
-            name: userName,
-            wage: wage,
-            totalWorkTime: 0,
-            monthPrice: 0,
-            days: []
-          };
-        }
-        userMap[userId].days.push({
-          workTime: ds.t_WorkTime_All?.toString() || ds.workTime?.toString() || '',
-          dayPrice: ds.t_Day_Price?.toString() || ds.dayPrice?.toString() || ''
-        });
-        userMap[userId].totalWorkTime += Number(ds.t_WorkTime_All || ds.workTime || 0);
-        userMap[userId].monthPrice += Number(ds.t_Day_Price || ds.dayPrice || 0);
-      });
-      // 合計値を文字列化
-      Object.values(userMap).forEach(u => {
-        u.totalWorkTime = u.totalWorkTime.toFixed(1);
-        u.monthPrice = u.monthPrice.toString();
-      });
-      return Object.values(userMap);
+      // 合計
+      const totalWorkTime = users.reduce((sum, u) => sum + Number(u.totalWorkTime || 0), 0).toFixed(1);
+      const totalCost = users.reduce((sum, u) => sum + Number(u.monthPrice || 0), 0).toString();
+      this.users = users;
+      this.days = allDates;
+      this.dayShifts = dayShifts;
+      this.totalWorkTime = totalWorkTime;
+      this.totalCost = totalCost;
+      this.status = '';
+      this.storeName = '';
+      this.yearMonth = `${year}年${month}月`;
     },
     formatDate(dateStr) {
       // 例: "2025-06-01" → "6/1"

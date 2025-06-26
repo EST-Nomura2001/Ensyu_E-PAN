@@ -323,4 +323,17 @@ export async function getAllShiftsForAllMonths(storeId, year, month) {
     console.error('店舗・年月指定のAllShiftデータ取得失敗:', error);
     throw error;
   }
+}
+
+/**
+ * @description ALL_SHIFTSテーブルのrecFlgを更新します。
+ * @param {number} id ALL_SHIFTSテーブルのID
+ * @param {boolean} recFlg 希望収集フラグ
+ * @returns {Promise<void>} 成功時はNoContent
+ */
+export function updateRecFlag(id, recFlg) {
+  // URL直指定、bodyはプリミティブ型で送信
+  return axios.put(`http://localhost:5011/api/Attendance/allshift/${id}/rec-flag`, recFlg, {
+    headers: { 'Content-Type': 'application/json' }
+  });
 } 

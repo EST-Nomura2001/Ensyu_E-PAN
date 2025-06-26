@@ -50,7 +50,6 @@
           <th>希望収集</th>
           <th>シフト提出期限</th>
           <th>シフト表</th>
-          <th>シフト編集状態</th>
           <th>勤怠画面</th>
           <th>勤怠送付</th>
         </tr>
@@ -73,9 +72,20 @@
               <button @click="editDeadline(shift)">設定</button>
             </div>
           </td>
-          <td>編集 / 閲覧</td>
-          <td>{{ shift.confirmFlg ? '済' : '' }}</td>
-          <td>閲覧</td>
+          <td>
+            <router-link
+              :to="{ name: 'Make-Attendance', query: { date: shift.date.split('T')[0] } }"
+            >編集</router-link>
+            /
+            <router-link
+              :to="{ name: 'Check-Attendance', query: { date: shift.date.split('T')[0] } }"
+            >閲覧</router-link>
+          </td>
+          <td>
+            <router-link
+              :to="{ name: 'Record-Attendance', query: { date: shift.date.split('T')[0] } }"
+            >閲覧</router-link>
+          </td>
           <td>{{ shift.sendingFlg ? '済' : '' }}</td>
         </tr>
       </tbody>
@@ -85,7 +95,7 @@
 </template>
 
 <script>
-import { getAttendanceData, updateAttendanceData, getUserInfo, getStoreInfo, generateMonthly, getAllShiftsForAllMonths } from '@/services/api';
+import { getAttendanceData, updateAttendanceData, getUserInfo, getStoreInfo, generateMonthly, getAllShiftsForAllMonths, updateRecFlag } from '@/services/api';
 import CommonHeader from '../components/CommonHeader.vue';
 
 export default {
@@ -128,8 +138,14 @@ export default {
         );
       }
       const results = await Promise.all(monthPromises);
-      // 12ヶ月分の配列をフラット化
-      this.shifts = results.flat();
+      // 12ヶ月分の配列をフラット化し、rec_Flg→recFlgへ変換
+      this.shifts = results.flat().map(shift => ({
+        ...shift,
+        recFlg: shift.rec_Flg,
+        confirmFlg: shift.confirm_Flg,
+        sendingFlg: shift.sending_Flg,
+        fixedDate: shift.fixed_Date
+      }));
       console.log('APIレスポンス（各月ごと）:', results);
       console.log('shifts:', this.shifts);
       if (this.shifts.length === 0) {
@@ -140,14 +156,11 @@ export default {
     },
     async toggleRecruiting(shift) {
       try {
-        const response = await updateAttendanceData(shift.id, { recFlg: !shift.recFlg });
-        const updatedShift = response.data;
-        const index = this.shifts.findIndex(s => s.id === shift.id);
-        if (index !== -1) {
-          this.shifts[index].recFlg = updatedShift.recFlg;
-        }
+        await updateRecFlag(shift.id, !shift.recFlg);
+        shift.recFlg = !shift.recFlg;
       } catch (error) {
-        console.error('希望収集状態の更新に失敗しました。', error);
+        alert('希望収集状態の更新に失敗しました。');
+        console.error(error);
       }
     },
     editDeadline(shift) {

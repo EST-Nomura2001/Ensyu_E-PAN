@@ -139,9 +139,33 @@ export default {
     },
     async submitShifts() {
       try {
-        await api.submitUserShifts(this.currentUserId, this.shifts);
+        const userId = this.currentUserId;
+        const year = this.year;
+        const month = this.month;
+        const U_Confirm_Flg = true;
+
+        for (const shift of this.shifts) {
+          const yyyy = year;
+          const mm = String(month).padStart(2, '0');
+          const dd = String(shift.date).padStart(2, '0');
+          const dateStr = `${yyyy}-${mm}-${dd}`;
+          const targetDate = `${dateStr}T00:00:00`;
+          const uStart = shift.startTime ? `${dateStr}T${shift.startTime}:00` : null;
+          const uEnd = shift.endTime ? `${dateStr}T${shift.endTime}:00` : null;
+
+          await axios.put(
+            `http://localhost:5011/api/Attendance/user/${userId}/schedule-update`,
+            {
+              TargetDate: targetDate,
+              U_Start_WorkTime: uStart,
+              U_End_WorkTime: uEnd,
+              U_Confirm_Flg: U_Confirm_Flg
+            }
+          );
+        }
+
         alert('シフトが提出されました。');
-        this.status = '提出済み'; // 画面上のステータスを更新
+        this.status = '提出済み';
       } catch (error) {
         console.error('シフトの提出に失敗しました。', error);
         alert('シフトの提出に失敗しました。');

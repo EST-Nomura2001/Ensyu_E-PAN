@@ -98,7 +98,7 @@ namespace Ensyu_E_PAN.Controllers
                                 UserName = uds.DateSchedule.User?.Name,
                                 WorkRollName = uds.DateSchedule.WorkRoll?.Name,
                                 DayShiftDate = uds.DateSchedule.DayShift?.Date,
-                                U_Confirm_Flg = uds.UserDateShifts?.FirstOrDefault()?.UserShift?.U_Confirm_Flg
+                                U_Confirm_Flg = uds.UserShift?.U_Confirm_Flg
                             }
                         }).ToList()
                     };
@@ -175,7 +175,7 @@ namespace Ensyu_E_PAN.Controllers
                             UserName = uds.DateSchedule.User?.Name,
                             WorkRollName = uds.DateSchedule.WorkRoll?.Name,
                             DayShiftDate = uds.DateSchedule.DayShift?.Date,
-                            U_Confirm_Flg = uds.UserDateShifts?.FirstOrDefault()?.UserShift?.U_Confirm_Flg
+                            U_Confirm_Flg = uds.UserShift?.U_Confirm_Flg
                         }
                     }).ToList()
                 }).ToList()

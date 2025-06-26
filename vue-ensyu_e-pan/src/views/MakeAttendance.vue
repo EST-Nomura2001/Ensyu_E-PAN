@@ -373,7 +373,7 @@ const fetchShifts = async (date) => {
     const rawSchedules = Array.isArray(data) ? data : (data.$values || []);
     schedules.value = rawSchedules.map(ds => {
       // userDateShiftsが配列であることを確認
-      const userDateShift = ds.userDateShifts?.$values?.[0];
+      const userDateShift = ds.userDateShifts?.$values?.[0] || (Array.isArray(ds.userDateShifts) ? ds.userDateShifts[0] : undefined);
       const dateSchedule = userDateShift?.dateSchedule || {};
 
       return {
@@ -382,10 +382,26 @@ const fetchShifts = async (date) => {
         userName: ds.userName || '',
         hourlyWage: '', // 必要ならAPIで返すようにする
         workRollName: dateSchedule.workRollName || '',
-        plannedStart: dateSchedule.p_Start_WorkTime ? dateSchedule.p_Start_WorkTime.substring(11, 16) : '',
-        plannedEnd: dateSchedule.p_End_WorkTime ? dateSchedule.p_End_WorkTime.substring(11, 16) : '',
-        hopeStart: dateSchedule.u_Start_WorkTime ? dateSchedule.u_Start_WorkTime.substring(11, 16) : '',
-        hopeEnd: dateSchedule.u_End_WorkTime ? dateSchedule.u_End_WorkTime.substring(11, 16) : ''
+        plannedStart: dateSchedule.p_Start_WorkTime
+          ? (typeof dateSchedule.p_Start_WorkTime === 'string'
+              ? dateSchedule.p_Start_WorkTime.substring(11, 16)
+              : new Date(dateSchedule.p_Start_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
+          : '',
+        plannedEnd: dateSchedule.p_End_WorkTime
+          ? (typeof dateSchedule.p_End_WorkTime === 'string'
+              ? dateSchedule.p_End_WorkTime.substring(11, 16)
+              : new Date(dateSchedule.p_End_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
+          : '',
+        hopeStart: dateSchedule.u_Start_WorkTime
+          ? (typeof dateSchedule.u_Start_WorkTime === 'string'
+              ? dateSchedule.u_Start_WorkTime.substring(11, 16)
+              : new Date(dateSchedule.u_Start_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
+          : '',
+        hopeEnd: dateSchedule.u_End_WorkTime
+          ? (typeof dateSchedule.u_End_WorkTime === 'string'
+              ? dateSchedule.u_End_WorkTime.substring(11, 16)
+              : new Date(dateSchedule.u_End_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
+          : ''
       };
     });
     originalSchedules.value = JSON.parse(JSON.stringify(schedules.value));

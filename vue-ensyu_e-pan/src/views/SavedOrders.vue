@@ -48,10 +48,10 @@
             <!-- @click: 行をクリックした時の処理 -->
             <!-- :class: 条件によってCSSクラスを動的に適用 -->
             <tr v-for="order in savedOrders" :key="order.Id" 
-                @click="navigateToPurchaseOrder(order.Id)" 
-                class="order-row"
-                :class="{ 'order-confirmed': order.Confirm_Flg }">
-              <!-- 各データを表示 -->
+            @click="navigateToPurchaseOrder(order.Id)" 
+            class="order-row"
+            :class="{ 'order-confirmed': order.Confirm_Flg }">
+            <!-- 各データを表示 -->
               <td>{{ order.Quotation }}</td>
               <td>{{ order.Title }}</td>
               <td>{{ order.Company.C_Name }}</td>
@@ -126,7 +126,8 @@ export default {
         // サーバーから発注書一覧のデータを取得
         const response = await axios.get(`${API_BASE_URL}/api/orders`);
         // 取得したデータをコンポーネントの状態に保存
-        this.savedOrders = response.data;
+        this.savedOrders = response.data.value;
+        console.log("発注書一覧",response.data)
       } catch (error) {
         // エラーが発生した場合の処理
         console.error('発注書一覧の取得に失敗しました:', error);
@@ -135,6 +136,9 @@ export default {
         // 成功・失敗に関係なく最後に実行される処理
         // 読み込み中フラグをOFFにする
         this.isLoading = false;
+        this.savedOrders.forEach(order => {
+          console.log("発注会社", order.company.c_Name);
+        });
       }
     },
     

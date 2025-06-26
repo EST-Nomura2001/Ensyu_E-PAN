@@ -288,7 +288,7 @@ export default {
       this.purchaseOrder = {
         Id: null,
         Title: '本日',
-        Quotation: 123456789,
+        Quotation: null,
         Tax: 10,
         Order_Date: '2025-06-23',
         Delivery_Date: '2025-06-25',

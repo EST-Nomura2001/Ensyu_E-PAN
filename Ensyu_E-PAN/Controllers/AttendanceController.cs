@@ -27,23 +27,86 @@ namespace Ensyu_E_PAN.Controllers
         }
         //Get処理↓
         //全体の本日分のスケジュールを渡す
+        //[HttpGet("DateSchedules/{today}")]
+        //public async Task<IActionResult> GetTodayAttendance(DateTime today)
+        //{
+        //    var records = await _context.Date_Schedules
+        //     .Where(ds => ds.Today.Date == today.Date) // ここで日付だけを比較
+        //                                               // DateSchedule 直下の関係
+        //    .Include(ds => ds.User)
+        //    .Include(ds => ds.WorkRoll)
+        //    .Include(ds => ds.DayShift)
+
+        //    // UserDateShifts → UserShift → User
+        //    .Include(ds => ds.UserDateShifts)
+        //        .ThenInclude(uds => uds.UserShift)
+        //            .ThenInclude(us => us.User)
+        //    .ToListAsync();
+        //    return Ok(records);
+        //}
+
         [HttpGet("DateSchedules/{today}")]
         public async Task<IActionResult> GetTodayAttendance(DateTime today)
         {
-            var records = await _context.Date_Schedules
-             .Where(ds => ds.Today.Date == today.Date) // ここで日付だけを比較
-                                                       // DateSchedule 直下の関係
-            .Include(ds => ds.User)
-            .Include(ds => ds.WorkRoll)
-            .Include(ds => ds.DayShift)
+            var dateSchedules = await _context.Date_Schedules
+                .Where(ds => ds.Today.Date == today.Date)
+                .Include(ds => ds.User)
+                .Include(ds => ds.WorkRoll)
+                .Include(ds => ds.DayShift)
+                .Include(ds => ds.UserDateShifts)
+                    .ThenInclude(uds => uds.UserShift)
+                        .ThenInclude(us => us.User)
+                .ToListAsync();
 
-            // UserDateShifts → UserShift → User
-            .Include(ds => ds.UserDateShifts)
-                .ThenInclude(uds => uds.UserShift)
-                    .ThenInclude(us => us.User)
-            .ToListAsync();
-            return Ok(records);
+            var userShiftGroups = dateSchedules
+                .SelectMany(ds => ds.UserDateShifts)
+                .GroupBy(uds => uds.UserShift.Id)
+                .Select(g =>
+                {
+                    var userShift = g.First().UserShift;
+                    return new UserShiftDto
+                    {
+                        Id = userShift.Id,
+                        User_Id = userShift.User_Id,
+                        UserName = userShift.User?.Name,
+                        List_Status = userShift.List_Status,
+                        Total_WorkTime = userShift.Total_WorkTime,
+                        Month_Price = userShift.Month_Price,
+                        U_Confirm_Flg = userShift.U_Confirm_Flg,
+                        UserDateShifts = g.Select(uds => new UserDateShiftDto
+                        {
+                            Id = uds.Id,
+                            Shift_Date = uds.Shift_Date,
+                            DateSchedule = new DateScheduleDto
+                            {
+                                Id = uds.DateSchedule.Id,
+                                Today = uds.DateSchedule.Today,
+                                P_Start_WorkTime = uds.DateSchedule.P_Start_WorkTime,
+                                P_End_WorkTime = uds.DateSchedule.P_End_WorkTime,
+                                U_Start_WorkTime = uds.DateSchedule.U_Start_WorkTime,
+                                U_End_WorkTime = uds.DateSchedule.U_End_WorkTime,
+                                Start_WorkTime = uds.DateSchedule.Start_WorkTime,
+                                End_WorkTime = uds.DateSchedule.End_WorkTime,
+                                Start_BreakTime = uds.DateSchedule.Start_BreakTime,
+                                End_BreakTime = uds.DateSchedule.End_BreakTime,
+                                T_WorkTime_D = uds.DateSchedule.T_WorkTime_D,
+                                T_WorkTime_N = uds.DateSchedule.T_WorkTime_N,
+                                T_WorkTime_All = uds.DateSchedule.T_WorkTime_All,
+                                D_DayPrice = uds.DateSchedule.D_DayPrice,
+                                N_DayPrice = uds.DateSchedule.N_DayPrice,
+                                T_DayPrice = uds.DateSchedule.T_DayPrice,
+                                UserName = uds.DateSchedule.User?.Name,
+                                WorkRollName = uds.DateSchedule.WorkRoll?.Name,
+                                DayShiftDate = uds.DateSchedule.DayShift?.Date
+                            }
+                        }).ToList()
+                    };
+                }).ToList();
+
+            return Ok(userShiftGroups);
         }
+
+
 
         //全体の当月分のスケジュールを渡す
 
@@ -118,39 +181,6 @@ namespace Ensyu_E_PAN.Controllers
 
             return Ok(dtoList);
         }
-
-        //古いデータ
-        /*[HttpGet("AllShiftSchedules/{year}/{month}")]
-        public async Task<IActionResult> GetAllShiftSchedules(int year, int month)
-        {
-            var startDate = new DateTime(year, month, 1);
-            var endDate = startDate.AddMonths(1);
-
-            var allShifts = await _context.All_Shifts
-                .Where(a => a.Date.Year == year && a.Date.Month == month)
-                .Include(a => a.UserShifts)
-                    .ThenInclude(us => us.UserDateShifts)
-                        .ThenInclude(uds => uds.DateSchedule)
-                            .ThenInclude(ds => ds.User)
-                .Include(a => a.UserShifts)
-                    .ThenInclude(us => us.UserDateShifts)
-                        .ThenInclude(uds => uds.DateSchedule)
-                            .ThenInclude(ds => ds.WorkRoll)
-                .Include(a => a.UserShifts)
-                    .ThenInclude(us => us.UserDateShifts)
-                        .ThenInclude(uds => uds.DateSchedule)
-                            .ThenInclude(ds => ds.DayShift)
-                .ToListAsync();
-
-            var dateSchedules = allShifts
-                .SelectMany(a => a.UserShifts)
-                .SelectMany(us => us.UserDateShifts)
-                .Select(uds => uds.DateSchedule)
-                .Distinct() // 重複を防ぐ
-                .ToList();
-
-            return Ok(dateSchedules);
-        }*/
 
         //個人の本日のスケジュール
         [HttpGet("UserSchedule/Day/{userId}/{date}")]

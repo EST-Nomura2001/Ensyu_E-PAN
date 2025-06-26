@@ -67,7 +67,7 @@ namespace Ensyu_E_PAN.Controllers
         }
 
         [HttpPost("users")]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserRequestDto dto)
+        public async Task<IActionResult> CreateUser([FromBody] UserRequestDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -116,6 +116,40 @@ namespace Ensyu_E_PAN.Controllers
 
             return CreatedAtAction(nameof(CreateUser), new { id = user.Id }, response);
         }
+        //アカウント更新
+        [HttpPut("users/{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserRequestDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound("ユーザーが見つかりません");
+
+            // 変更内容を更新
+            user.Name = dto.Name;
+            user.Password = dto.Password; // 実運用では必ずハッシュ化を！
+            user.TimePrice_D = dto.TimePrice_D;
+            user.TimePrice_N = dto.TimePrice_N;
+            user.Roll_Cd = dto.Roll_Cd;
+            user.Stores_Cd = dto.Stores_Cd;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent(); // 204：成功だが返すデータなし
+        }
+        //アカウント削除
+        [HttpDelete("users/{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+                return NotFound("対象のユーザーが見つかりません");
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            return NoContent(); // 204: 削除成功、返却する内容なし
+        }
     }
 }

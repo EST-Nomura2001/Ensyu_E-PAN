@@ -2,6 +2,7 @@
 {
     public class OrderItemDto
     {
+        public int Id { get; set; }
         public int Item_Cd { get; set; }
         public string Item_Name { get; set; }
         public int Amount { get; set; }

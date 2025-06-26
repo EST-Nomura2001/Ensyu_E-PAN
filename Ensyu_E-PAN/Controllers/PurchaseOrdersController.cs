@@ -92,91 +92,125 @@ namespace Ensyu_E_PAN.Controllers
             return Ok(new { success = true, data = dto });
         }
 
-
-        //[HttpGet("{id}")]
-        //public async Task<IActionResult> Get(int id)
-        //{
-        //    // 発注書本体＋商品リスト＋会社・事業所情報も含めて取得
-        //    var order = await _context.Purchase_Orders
-        //        .Include(o => o.OrderItemLists) // 商品リストも一緒に取得
-        //        .Include(o => o.Company)       // 会社情報も一緒に取得
-        //        .Include(o => o.Store)         // 事業所情報も一緒に取得
-        //        .FirstOrDefaultAsync(o => o.Id == id);
-
-        //    // 見つからなければ404を返す
-        //    if (order == null)
-        //        return NotFound(new { success = false, message = "Not found" });
-
-        //    // 成功時はデータを返す
-        //    return Ok(new { success = true, data = order });
-        //}
-
         // =============================
-        // 発注書新規作成・更新API
+        // 発注書新規作成API
         // POST: api/PurchaseOrders
         // =============================
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] PurchaseOrder order)
+        [HttpPost("newOrder")]
+        public async Task<IActionResult> PostNewOrder([FromBody] PurchaseOrderDto dto)
         {
-            // Idが0なら新規作成、0以外なら更新
-            if (order.Id == 0)
+            if (!ModelState.IsValid)
+                return BadRequest(new { success = false, message = "不正なデータです。" });
+
+            // PurchaseOrderエンティティにマッピング
+            var newOrder = new PurchaseOrder
             {
-                // 新規作成
-                _context.Purchase_Orders.Add(order);
-            }
-            else
+                Title = dto.Title,
+                Quotation = dto.Quotation,
+                Tax = dto.Tax,
+                Order_Date = dto.Order_Date,
+                Delivery_Date = dto.Delivery_Date,
+                Payment_Date = dto.Payment_Date,
+                Payment_Terms = dto.Payment_Terms,
+                Confirm_Flg = dto.Confirm_Flg,
+                Manager = dto.Manager,
+                Other = dto.Other,
+                Company_Cd = dto.Company.Id,
+                Store_Cd = dto.Store.Id,
+                OrderItemLists = new List<OrderItemList>() // 明細があればここで生成
+            };
+
+            // 明細（OrderItemList）も追加
+            if (dto.OrderItems != null && dto.OrderItems.Count > 0)
             {
-                // 更新処理
-                var existing = await _context.Purchase_Orders
-                    .Include(o => o.OrderItemLists)
-                    .FirstOrDefaultAsync(o => o.Id == order.Id);
-
-                if (existing == null)
-                    return NotFound(new { success = false, message = "Not found" });
-
-                // 発注書本体のプロパティを更新
-                _context.Entry(existing).CurrentValues.SetValues(order);
-
-                // 商品リストを一度クリアしてから再登録
-                existing.OrderItemLists.Clear();
-                foreach (var item in order.OrderItemLists)
+                foreach (var itemDto in dto.OrderItems)
                 {
-                    existing.OrderItemLists.Add(item);
+                    var item = new OrderItemList
+                    {
+                        Item_Cd = itemDto.Item_Cd,
+                        Amount = itemDto.Amount,
+                        Other_ItemName = itemDto.Other_ItemName
+                    };
+                    newOrder.OrderItemLists.Add(item);
                 }
             }
-            // DBに保存
+
+            _context.Purchase_Orders.Add(newOrder);
             await _context.SaveChangesAsync();
-            return Ok(new { success = true, data = order });
+
+            return Ok(new { success = true, message = "発注書を登録しました", id = newOrder.Id });
         }
 
         // =============================
         // 発注書更新API
         // PUT: api/PurchaseOrders/{id}
         // =============================
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] PurchaseOrder order)
+        [HttpPut("updateOrder/{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] PurchaseOrderDto dto)
         {
-            // 既存データを取得
+            if (!ModelState.IsValid)
+                return BadRequest(new { success = false, message = "無効なデータです。" });
+
             var existing = await _context.Purchase_Orders
-                .Include(o => o.OrderItemLists)
-                .FirstOrDefaultAsync(o => o.Id == id);
+                .Include(po => po.OrderItemLists)
+                .FirstOrDefaultAsync(po => po.Id == id);
 
             if (existing == null)
-                return NotFound(new { success = false, message = "Not found" });
+                return NotFound(new { success = false, message = "発注書が見つかりません。" });
 
-            // 発注書本体のプロパティを更新
-            _context.Entry(existing).CurrentValues.SetValues(order);
+            // 発注書本体を更新
+            existing.Title = dto.Title;
+            existing.Quotation = dto.Quotation;
+            existing.Tax = dto.Tax;
+            existing.Order_Date = dto.Order_Date;
+            existing.Delivery_Date = dto.Delivery_Date;
+            existing.Payment_Date = dto.Payment_Date;
+            existing.Payment_Terms = dto.Payment_Terms;
+            existing.Confirm_Flg = dto.Confirm_Flg;
+            existing.Manager = dto.Manager;
+            existing.Other = dto.Other;
+            existing.Company_Cd = dto.Company.Id;
+            existing.Store_Cd = dto.Store.Id;
 
-            // 商品リストを一度クリアしてから再登録
-            existing.OrderItemLists.Clear();
-            foreach (var item in order.OrderItemLists)
+            // ========== 差分明細処理 ==========
+
+            var dtoItems = dto.OrderItems ?? new List<OrderItemDto>();
+            var dbItems = existing.OrderItemLists.ToList();
+
+            // 削除：DTOに存在しないID
+            var toRemove = dbItems
+                .Where(dbItem => !dtoItems.Any(d => d.Id == dbItem.Id))
+                .ToList();
+            _context.Order_Item_Lists.RemoveRange(toRemove);
+
+            // 更新または追加
+            foreach (var itemDto in dtoItems)
             {
-                existing.OrderItemLists.Add(item);
+                var target = dbItems.FirstOrDefault(d => d.Id == itemDto.Id);
+                if (target != null)
+                {
+                    // 更新
+                    target.Item_Cd = itemDto.Item_Cd;
+                    target.Amount = itemDto.Amount;
+                    target.Other_ItemName = itemDto.Other_ItemName;
+                }
+                else
+                {
+                    // 追加
+                    var newItem = new OrderItemList
+                    {
+                        P_Order_List_Id = existing.Id,
+                        Item_Cd = itemDto.Item_Cd,
+                        Amount = itemDto.Amount,
+                        Other_ItemName = itemDto.Other_ItemName
+                    };
+                    existing.OrderItemLists.Add(newItem);
+                }
             }
 
-            // DBに保存
             await _context.SaveChangesAsync();
-            return Ok(new { success = true, data = existing });
+
+            return Ok(new { success = true, message = "発注書と明細を更新しました。" });
         }
 
         // =============================
@@ -223,8 +257,6 @@ namespace Ensyu_E_PAN.Controllers
 
             return Ok(new { success = true, data = dtoList });
         }
-
-
 
         // =============================
         // 商品行追加API

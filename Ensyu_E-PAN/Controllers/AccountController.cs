@@ -5,6 +5,7 @@ using Ensyu_E_PAN.Data;
 using Ensyu_E_PAN.Models.Masters;
 using Ensyu_E_PAN.DTOs.Accounts;
 using Microsoft.AspNetCore.Identity.Data;
+using Ensyu_E_PAN.DTOs.UpdateAccounts;
 
 
 namespace Ensyu_E_PAN.Controllers
@@ -63,6 +64,57 @@ namespace Ensyu_E_PAN.Controllers
         {
             var users = _context.Users.ToList();
             return Ok(users);
+        }
+
+        [HttpPost("users")]
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserRequestDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            // Roll・Storeの存在チェック
+            var role = await _context.Roll_Lists.FindAsync(dto.Roll_Cd);
+            var store = await _context.Stores.FindAsync(dto.Stores_Cd);
+
+            if (role == null || store == null)
+                return NotFound("指定されたロールまたは店舗が存在しません");
+
+            var user = new User
+            {
+                Login_Id = dto.Login_Id,
+                Name = dto.Name,
+                Roll_Cd = dto.Roll_Cd,
+                Password = dto.Password, // 本番ならハッシュ推奨！
+                Stores_Cd = dto.Stores_Cd,
+                TimePrice_D = dto.TimePrice_D,
+                TimePrice_N = dto.TimePrice_N
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            var response = new UserWithFullRoleLoginResponseDto
+            {
+                Id = user.Id,
+                Login_Id = user.Login_Id,
+                Name = user.Name,
+                Role = new RoleDto
+                {
+                    Id = role.Id,
+                    Name = role.Name,
+                    IsAdmin = role.IsAdmin
+                },
+                StoreName = store.C_Name,
+                StoreAddress1 = store.Address1,
+                StoreAddress2 = store.Address2,
+                StorePostCode = store.Post_Code,
+                StoreTel = store.Tel,
+                StoreFax = store.Fax,
+                StoreMail = store.Mail,
+                TimePrice_D = user.TimePrice_D,
+                TimePrice_N = user.TimePrice_N
+            };
+
+            return CreatedAtAction(nameof(CreateUser), new { id = user.Id }, response);
         }
 
     }

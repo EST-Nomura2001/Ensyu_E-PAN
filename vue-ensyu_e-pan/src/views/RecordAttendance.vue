@@ -84,8 +84,20 @@ export default {
     };
   },
   async mounted() {
-    let year = 2025;
-    let month = 7;
+    let year, month;
+    // クエリパラメータdateがあれば年月を取得
+    if (this.$route.query.date) {
+      const date = new Date(this.$route.query.date);
+      if (!isNaN(date)) {
+        year = date.getFullYear();
+        month = date.getMonth() + 1;
+      }
+    }
+    // なければデフォルト
+    if (!year || !month) {
+      year = 2025;
+      month = 7;
+    }
     const storeId = sessionStorage.getItem('storeId');
     let allShifts = [];
     try {
@@ -95,7 +107,6 @@ export default {
       allShifts = [];
     }
     if (!Array.isArray(allShifts)) allShifts = [];
-
     // --- ネスト構造を展開してusers配列・days配列を生成 ---
     const userMap = {};
     const allDatesSet = new Set();

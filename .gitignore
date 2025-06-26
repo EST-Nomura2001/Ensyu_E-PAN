@@ -10,7 +10,7 @@ Ensyu_E-PAN/obj/
 *.log
 Ensyu_E-PAN/*.db
 
-Ensyu_E-PAN/*.db-shm
-Ensyu_E-PAN/*.db-wal
+##Ensyu_E-PAN/*.db-shm
+##Ensyu_E-PAN/*.db-wal
 
-Ensyu_E-PAN/app.db
+##Ensyu_E-PAN/app.db

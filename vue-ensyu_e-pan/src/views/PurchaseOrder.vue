@@ -12,7 +12,7 @@
         <!-- 発注元の会社情報 -->
         <div class="company-info">
           <!-- v-modelは双方向データバインディング：入力内容がデータと同期される -->
-          <input type="text" v-model="purchaseOrder.Company_Cd" class="issuer-company-name" placeholder="会社CD">
+          <input type="text" v-model="purchaseOrder.Company_Cd" class="issuer-company-name" placeholder="会社CD" @change="onCompanyChange">
           <div class="issuer-address">
               <span>〒</span>
               <!-- 郵便番号入力欄 -->
@@ -433,7 +433,7 @@ export default {
           payment_Date: toISO8601(this.purchaseOrder.payment_Date),
           payment_Terms: this.purchaseOrder.payment_Terms || '月末締め',
           confirm_Flg: this.purchaseOrder.confirm_Flg,
-          company_Cd: Number(this.purchaseOrder.company_Cd) || 1,
+          company_Cd: Number(this.purchaseOrder.company_Cd) || 0,
           manager: this.purchaseOrder.manager || 'ダミー担当',
           store_Cd: Number(this.purchaseOrder.store_Cd) || 1,
           other: this.purchaseOrder.other || '備考なし',
@@ -466,6 +466,24 @@ export default {
         amount: item.amount
       };
       await axios.post(`http://localhost:5011/api/PurchaseOrders/${this.purchaseOrder.id}/items`, payload);
+    },
+
+    async onCompanyChange() {
+      const id = this.purchaseOrder.Company_Cd;
+      if (!id) return;
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/Companies/${id}`);
+        const c = res.data;
+        this.purchaseOrder.Postal_Code = c.post_Code || '';
+        this.purchaseOrder.Address1 = c.address1 || '';
+        this.purchaseOrder.Address2 = c.address2 || '';
+        this.purchaseOrder.Tel = c.tel || '';
+        this.purchaseOrder.Fax = c.fax || '';
+        this.purchaseOrder.Email = c.mail || '';
+        this.purchaseOrder.CustomerName = c.c_Name || '';
+      } catch (e) {
+        alert('会社情報の取得に失敗しました');
+      }
     },
   }
 };

@@ -308,18 +308,19 @@ export async function getDateSchedulesByDate(today) {
 }
 
 /**
- * 指定した年の1～12月分のAllShiftSchedulesを一括取得します。
- * @param {number} year - 取得したい年
- * @returns {Promise<Array>} - 12ヶ月分のデータをまとめた配列
+ * 指定店舗・年月のAllShiftデータを取得します。
+ * @param {number|string} storeId - 店舗ID
+ * @param {number} year - 年
+ * @param {number} month - 月
+ * @returns {Promise<Array>} - その月のAllShiftDto配列
  */
-export async function getAllShiftsForAllMonths(year) {
-  // 1月～12月分をまとめて取得
+export async function getAllShiftsForAllMonths(storeId, year, month) {
   const API_BASE_URL = 'http://localhost:5011/api';
-  const requests = Array.from({ length: 12 }, (_, i) =>
-    axios.get(`${API_BASE_URL}/Attendance/AllShiftSchedules/${year}/${i + 1}`)
-      .then(res => res.data)
-      .catch(() => []) // 1ヶ月分の取得失敗時は空配列
-  );
-  const results = await Promise.all(requests);
-  return results.flat();
+  try {
+    const response = await axios.get(`${API_BASE_URL}/Attendance/store/${storeId}/allshifts/${year}/${month}`);
+    return response.data;
+  } catch (error) {
+    console.error('店舗・年月指定のAllShiftデータ取得失敗:', error);
+    throw error;
+  }
 } 

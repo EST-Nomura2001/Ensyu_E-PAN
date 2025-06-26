@@ -116,11 +116,19 @@ export default {
         const url = `http://localhost:5011/api/Attendance/UserSchedule/Month/${userId}/${year}/${month}`;
         const response = await axios.get(url);
         const schedules = response.data;
-        const shiftArray = schedules && Array.isArray(schedules.$values) ? schedules.$values : [];
+        const shiftArray = Array.isArray(schedules) ? schedules : [];
         this.shifts = shiftArray.map(s => ({
           date: new Date(s.today).getDate(),
-          startTime: s.u_Start_WorkTime ? s.u_Start_WorkTime.substring(11, 16) : '',
-          endTime: s.u_End_WorkTime ? s.u_End_WorkTime.substring(11, 16) : '',
+          startTime: s.u_Start_WorkTime
+            ? (typeof s.u_Start_WorkTime === 'string'
+                ? s.u_Start_WorkTime.substring(11, 16)
+                : new Date(s.u_Start_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
+            : '',
+          endTime: s.u_End_WorkTime
+            ? (typeof s.u_End_WorkTime === 'string'
+                ? s.u_End_WorkTime.substring(11, 16)
+                : new Date(s.u_End_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
+            : '',
           error: { start: '', end: '' },
         }));
 

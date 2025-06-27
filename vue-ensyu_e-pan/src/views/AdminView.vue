@@ -23,6 +23,7 @@ const registerMsgIsSuccess = ref(false);
 const userList = ref([]);
 const rolls = ref([]);
 
+//登録処理
 async function registerUser() {
   if (!newUserId.value || !newUserPw.value) {
     registerMsg.value = 'IDとパスワードを入力してください。';

@@ -70,8 +70,7 @@ const userListForDisplay = computed(() => {
 });
 
 function logout() {
-  sessionStorage.removeItem('userRole');
-  sessionStorage.removeItem('userName');
+  sessionStorage.clear(); // すべてのsessionStorageデータをクリア
   router.push('/login');
 }
 

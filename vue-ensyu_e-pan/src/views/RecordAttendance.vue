@@ -84,6 +84,11 @@ export default {
     };
   },
   async mounted() {
+    // sessionStorageの内容をコンソールに出力
+    console.log('userId:', sessionStorage.getItem('userId'));
+    console.log('userName:', sessionStorage.getItem('userName'));
+    console.log('isAdmin:', sessionStorage.getItem('isAdmin'));
+    console.log('storeId:', sessionStorage.getItem('storeId'));
     let year, month;
     // クエリパラメータdateがあれば年月を取得
     if (this.$route.query.date) {

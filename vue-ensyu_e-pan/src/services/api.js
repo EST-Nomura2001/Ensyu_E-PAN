@@ -236,4 +236,9 @@ function getMockShiftData(date) {
             },
         ]
     }
+}
+
+export function fetchDateSchedules(today) {
+  // baseURLは使わず、URLを直指定
+  return axios.get(`http://localhost:5011/api/Attendance/DateSchedules/${today}`);
 } 

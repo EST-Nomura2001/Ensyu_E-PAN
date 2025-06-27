@@ -1,37 +1,43 @@
 <template>
   <div class="attendance-management">
     <h1>勤怠管理</h1>
+    <div>
+      <label>日付選択：</label>
+      <input type="date" v-model="selectedDate" @change="fetchData" />
+    </div>
     <table>
       <thead>
         <tr>
           <th>名前</th>
+          <th>担当業務</th>
           <th>予定出勤</th>
           <th>予定退勤</th>
-          <th>担当業務</th>
-          <th>出勤時刻</th>
-          <th>退勤時刻</th>
+          <th>実出勤</th>
+          <th>実退勤</th>
           <th>休憩開始</th>
           <th>休憩終了</th>
           <th v-if="canOperate">操作</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in attendanceData" :key="item.userId">
-          <td>{{ item.userName }}</td>
-          <td>{{ item.p_start_worktime }}</td>
-          <td>{{ item.p_end_worktime }}</td>
-          <td>{{ item.taskName }}</td>
-          <td>{{ item.start_worktime }}</td>
-          <td>{{ item.end_worktime }}</td>
-          <td>{{ item.start_break_time }}</td>
-          <td>{{ item.end_break_time }}</td>
-          <td v-if="canOperate">
-            <button @click="clockIn(item.userId)">出勤</button>
-            <button @click="clockOut(item.userId)">退勤</button>
-            <button @click="startBreak(item.userId)">休憩入</button>
-            <button @click="endBreak(item.userId)">休憩戻</button>
-          </td>
-        </tr>
+        <template v-for="item in attendanceData" :key="item.id">
+          <tr v-for="shift in item.userDateShifts" :key="shift.id">
+            <td>{{ item.userName }}</td>
+            <td>{{ shift.dateSchedule.workRollName }}</td>
+            <td>{{ formatDateTime(shift.dateSchedule.p_Start_WorkTime, 'time') }}</td>
+            <td>{{ formatDateTime(shift.dateSchedule.p_End_WorkTime, 'time') }}</td>
+            <td>{{ formatDateTime(shift.dateSchedule.start_WorkTime, 'time') }}</td>
+            <td>{{ formatDateTime(shift.dateSchedule.end_WorkTime, 'time') }}</td>
+            <td>{{ formatDateTime(shift.dateSchedule.start_BreakTime, 'time') }}</td>
+            <td>{{ formatDateTime(shift.dateSchedule.end_BreakTime, 'time') }}</td>
+            <td v-if="canOperate">
+              <button @click="clockIn(item.user_Id)">出勤</button>
+              <button @click="clockOut(item.user_Id)">退勤</button>
+              <button @click="startBreak(item.user_Id)">休憩入</button>
+              <button @click="endBreak(item.user_Id)">休憩戻</button>
+            </td>
+          </tr>
+        </template>
       </tbody>
     </table>
   </div>
@@ -39,7 +45,7 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue';
-import axios from 'axios';
+import { fetchDateSchedules } from '../services/api';
 
 export default {
   name: 'AttendanceManagement',
@@ -47,10 +53,12 @@ export default {
     const userRole = ref(sessionStorage.getItem('userRole') || 'partTime');
     const loggedInUserId = ref(parseInt(sessionStorage.getItem('userId')) || 1);
     const allAttendanceData = ref([]);
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const selectedDate = ref(todayStr);
 
     const attendanceData = computed(() => {
       if (userRole.value === 'partTime') {
-        return allAttendanceData.value.filter(item => item.userId === loggedInUserId.value);
+        return allAttendanceData.value.filter(item => item.user_Id === loggedInUserId.value);
       }
       return allAttendanceData.value;
     });
@@ -58,19 +66,26 @@ export default {
     const canOperate = computed(() => {
       return userRole.value === 'admin' || userRole.value === 'employee';
     });
-    
-    const apiClient = axios.create({ baseURL: 'https://localhost:5011/api' });
 
     const fetchData = async () => {
       try {
-        const response = await apiClient.get('/attendance/today');
+        const response = await fetchDateSchedules(selectedDate.value);
         allAttendanceData.value = response.data;
       } catch (error) {
         console.error('Failed to fetch attendance data:', error);
-        // エラー発生時は空のままにするか、何らかのエラー表示を検討
       }
     };
-    
+
+    // 日付・時刻フォーマット用
+    const formatDateTime = (value, type = 'datetime') => {
+      if (!value) return '';
+      const date = new Date(value);
+      if (type === 'time') {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+      return date.toLocaleString();
+    };
+
     const clockIn = (userId) => console.log(`Clock in for user ${userId}`);
     const clockOut = (userId) => console.log(`Clock out for user ${userId}`);
     const startBreak = (userId) => console.log(`Start break for user ${userId}`);
@@ -78,6 +93,11 @@ export default {
 
     onMounted(() => {
       fetchData();
+      // sessionStorageの内容をコンソールに出力
+      console.log('userId:', sessionStorage.getItem('userId'));
+      console.log('userName:', sessionStorage.getItem('userName'));
+      console.log('isAdmin:', sessionStorage.getItem('isAdmin'));
+      console.log('storeId:', sessionStorage.getItem('storeId'));
     });
 
     return {
@@ -87,6 +107,9 @@ export default {
       clockOut,
       startBreak,
       endBreak,
+      selectedDate,
+      fetchData,
+      formatDateTime,
     };
   },
 };

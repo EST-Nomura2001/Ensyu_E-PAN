@@ -32,6 +32,12 @@ async function login() {
     sessionStorage.setItem('isAdmin', data.role?.isAdmin);
     sessionStorage.setItem('storeId', data.storeId ?? '');
 
+    // sessionStorageの内容をコンソールに出力
+    console.log('userId:', sessionStorage.getItem('userId'));
+    console.log('userName:', sessionStorage.getItem('userName'));
+    console.log('isAdmin:', sessionStorage.getItem('isAdmin'));
+    console.log('storeId:', sessionStorage.getItem('storeId'));
+
     // 権限に応じてリダイレクト
     if (data.role?.isAdmin) {
       router.push('/admin');

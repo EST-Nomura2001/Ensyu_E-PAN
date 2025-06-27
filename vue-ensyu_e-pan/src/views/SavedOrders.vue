@@ -25,7 +25,7 @@
               <th>件名</th>
               <th>宛名</th>
               <th>発注日</th>
-              <th>保存日時</th>
+              <th>支払日</th>
               <th class="col-confirm">確定</th>
               <th class="col-confirm">削除</th>
             </tr>
@@ -35,12 +35,12 @@
           <tbody>
             <!-- データ読み込み中の表示 -->
             <tr v-if="isLoading">
-              <td colspan="6">読み込み中...</td>
+              <td colspan="7">読み込み中...</td>
             </tr>
             
             <!-- 保存された発注書が0件の場合の表示 -->
             <tr v-else-if="savedOrders.length === 0">
-              <td colspan="6">保存された発注書はありません。</td>
+              <td colspan="7">保存された発注書はありません。</td>
             </tr>
             
             <!-- 保存された発注書を1行ずつ表示 -->
@@ -48,23 +48,23 @@
             <!-- :key: Vue.jsがリストの各要素を識別するための一意なキー -->
             <!-- @click: 行をクリックした時の処理 -->
             <!-- :class: 条件によってCSSクラスを動的に適用 -->
-            <tr v-for="order in savedOrders" :key="order.Id" 
-            @click="navigateToPurchaseOrder(order.Id)" 
+            <tr v-for="order in savedOrders" :key="order.id" 
+            @click="navigateToPurchaseOrder(order.id)" 
             class="order-row"
-            :class="{ 'order-confirmed': order.Confirm_Flg }">
+            :class="{ 'order-confirmed': order.confirm_Flg }">
             <!-- 各データを表示 -->
-              <td>{{ order.Quotation }}</td>
-              <td>{{ order.Title }}</td>
-              <td>{{ order.Company?.C_Name }}</td>
+              <td>{{ order.quotation }}</td>
+              <td>{{ order.title }}</td>
+              <td>{{ order.company?.c_Name }}</td>
               <!-- 日付フォーマット関数を使用 -->
-              <td>{{ formatDate(order.Order_Date) }}</td>
-              <td>{{ formatDateTime(order.CreatedAt) }}</td>
+              <td>{{ formatDate(order.order_Date) }}</td>
+              <td>{{ formatDate(order.payment_Date) }}</td>
               <!-- 確定済みの場合のみチェックマークを表示 -->
               <td class="col-confirm">
-                <span v-if="order.Confirm_Flg" class="confirmed-mark">✔</span>
+                <span v-if="order.confirm_Flg" class="confirmed-mark">✔</span>
               </td>
               <td class="col-confirm">
-                <button @click.stop="deleteOrder(order.Id)">削除</button>
+                <button @click.stop="deleteOrder(order.id)">削除</button>
               </td>
             </tr> 
           </tbody>
@@ -140,7 +140,7 @@ export default {
         // 読み込み中フラグをOFFにする
         this.isLoading = false;
         this.savedOrders.forEach(order => {
-          console.log("発注会社", order.Company?.C_Name);
+          console.log("発注会社", order.company?.c_Name);
         });
       }
     },

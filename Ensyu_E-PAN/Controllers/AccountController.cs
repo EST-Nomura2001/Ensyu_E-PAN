@@ -6,6 +6,7 @@ using Ensyu_E_PAN.Models.Masters;
 using Ensyu_E_PAN.DTOs.Accounts;
 using Microsoft.AspNetCore.Identity.Data;
 using Ensyu_E_PAN.DTOs.UpdateAccounts;
+using Ensyu_E_PAN.DTOs.Accounts.Ensyu_E_PAN.DTOs.Masters;
 
 
 namespace Ensyu_E_PAN.Controllers
@@ -59,11 +60,28 @@ namespace Ensyu_E_PAN.Controllers
 
             return Ok(dto);
         }
-
+        //アカウント全件取得
         [HttpGet("users/all")]
         public IActionResult Get()
         {
-            var users = _context.Users.ToList();
+            var users = _context.Users
+                .Include(u => u.Roll)
+                .Include(u => u.Store)
+                .Select(u => new UserDto
+                {
+                    Id = u.Id,
+                    Login_Id = u.Login_Id,
+                    Name = u.Name,
+                    Roll_Cd = u.Roll_Cd,
+                    RollName = u.Roll != null ? u.Roll.Name : null,
+                    IsAdmin = u.Roll != null && u.Roll.IsAdmin,
+                    Stores_Cd = u.Stores_Cd,
+                    StoreName = u.Store != null ? u.Store.C_Name : null,
+                    TimePrice_D = u.TimePrice_D,
+                    TimePrice_N = u.TimePrice_N
+                })
+                .ToList();
+
             return Ok(users);
         }
 

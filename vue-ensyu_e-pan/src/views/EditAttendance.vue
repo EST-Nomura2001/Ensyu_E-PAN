@@ -87,7 +87,6 @@ import CommonHeader from '../components/CommonHeader.vue';
   name: 'EditAttendance',
   props: {
     date: { type: String, required: true }, // 'YYYY-MM-DD'
-    storeId: { type: Number, required: true }
   },
   data() {
     return {
@@ -104,12 +103,18 @@ import CommonHeader from '../components/CommonHeader.vue';
     };
   },
   async mounted() {
+    // sessionStorageの内容をコンソールに出力
+    console.log('userId:', sessionStorage.getItem('userId'));
+    console.log('userName:', sessionStorage.getItem('userName'));
+    console.log('isAdmin:', sessionStorage.getItem('isAdmin'));
+    console.log('storeId:', sessionStorage.getItem('storeId'));
     await this.fetchAttendance();
   },
   methods: {
     async fetchAttendance() {
       try {
-        const res = await getAttendanceByDateStore(this.date, this.storeId);
+        const storeId = sessionStorage.getItem('storeId');
+        const res = await getAttendanceByDateStore(this.date, storeId);
         this.tableData = res.users || [];
         this.totalLaborCost = res.totalLaborCost || '';
         this.totalWorkTime = res.totalWorkTime || '';
@@ -145,7 +150,8 @@ import CommonHeader from '../components/CommonHeader.vue';
         return;
       }
       try {
-        await updateAttendanceByDateStore(this.date, this.storeId, this.editRows);
+        const storeId = sessionStorage.getItem('storeId');
+        await updateAttendanceByDateStore(this.date, storeId, this.editRows);
         await this.fetchAttendance();
         this.isEditing = false;
         alert('保存しました');

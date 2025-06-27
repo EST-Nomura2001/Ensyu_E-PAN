@@ -433,6 +433,12 @@ onMounted(() => {
     }
   }
   fetchShifts(currentDate.value);
+
+  // sessionStorageの内容をコンソールに出力
+  console.log('userId:', sessionStorage.getItem('userId'));
+  console.log('userName:', sessionStorage.getItem('userName'));
+  console.log('isAdmin:', sessionStorage.getItem('isAdmin'));
+  console.log('storeId:', sessionStorage.getItem('storeId'));
 });
 </script>
 

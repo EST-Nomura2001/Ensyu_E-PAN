@@ -22,76 +22,79 @@
  -->
 <template>
   <CommonHeader />
-  <div class="attendance-home">
-    <div class="header">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <label>店舗ID:</label>
-        <input type="text" v-model="storeId" style="width: 80px;" />
-        <button @click="setStoreId">店舗ID設定</button>
+  <div v-if="isAdmin">
+    <div class="attendance-home">
+      <div class="header">
+        <!--<div style="display: flex; align-items: center; gap: 8px;">
+          <label>店舗ID:</label>
+          <input type="text" v-model="storeId" style="width: 80px;" />
+          <button @click="setStoreId">店舗ID設定</button>
+        </div>-->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <input
+            type="number"
+            v-model.number="selectedYear"
+            min="2000"
+            max="2100"
+            @input="validateYear"
+            style="width: 90px;"
+          />
+          <button @click="fetchShiftsByYear">指定年のシフト取得</button>
+          <button @click="handleGenerateMonthly">翌月の新規作成</button>
+        </div>
       </div>
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <input
-          type="number"
-          v-model.number="selectedYear"
-          min="2000"
-          max="2100"
-          @input="validateYear"
-          style="width: 90px;"
-        />
-        <button @click="fetchShiftsByYear">指定年のシフト取得</button>
-        <button @click="handleGenerateMonthly">翌月の新規作成</button>
-      </div>
+      <div v-if="noDataMessage" style="color: red; margin-bottom: 10px;">{{ noDataMessage }}</div>
+      <table v-if="shifts.length > 0">
+        <thead>
+          <tr>
+            <th>月</th>
+            <th>希望収集</th>
+            <th>シフト提出期限</th>
+            <th>シフト表</th>
+            <th>勤怠画面</th>
+            <th>勤怠送付</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="shift in shifts" :key="shift.id">
+            <td>{{ formatYearMonth(shift.date) }}</td>
+            <td>
+              {{ shift.recFlg ? '集計中' : '非収集中' }}
+              <button @click="toggleRecruiting(shift)">切り替え</button>
+            </td>
+            <td>
+              <div v-if="shift.isEditingDeadline">
+                <input type="date" v-model="shift.editableDeadline" />
+                <button @click="saveDeadline(shift)">保存</button>
+                <button @click="cancelEditDeadline(shift)">キャンセル</button>
+              </div>
+              <div v-else>
+                {{ formatDeadline(shift.fixedDate) }}
+                <button @click="editDeadline(shift)">設定</button>
+              </div>
+            </td>
+            <td>
+              <router-link
+                :to="{ name: 'Make-Attendance', query: { date: shift.date.split('T')[0] } }"
+              >編集</router-link>
+              /
+              <router-link
+                :to="{ name: 'Check-Attendance', query: { date: shift.date.split('T')[0] } }"
+              >閲覧</router-link>
+            </td>
+            <td>
+              <router-link
+                :to="{ name: 'Record-Attendance', query: { date: shift.date.split('T')[0] } }"
+              >閲覧</router-link>
+            </td>
+            <td>{{ shift.sendingFlg ? '済' : '' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div v-else style="margin-top: 20px; color: #666;">データがありません</div>
     </div>
-    <div v-if="noDataMessage" style="color: red; margin-bottom: 10px;">{{ noDataMessage }}</div>
-    <table v-if="shifts.length > 0">
-      <thead>
-        <tr>
-          <th>月</th>
-          <th>希望収集</th>
-          <th>シフト提出期限</th>
-          <th>シフト表</th>
-          <th>勤怠画面</th>
-          <th>勤怠送付</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="shift in shifts" :key="shift.id">
-          <td>{{ formatYearMonth(shift.date) }}</td>
-          <td>
-            {{ shift.recFlg ? '集計中' : '非収集中' }}
-            <button @click="toggleRecruiting(shift)">切り替え</button>
-          </td>
-          <td>
-            <div v-if="shift.isEditingDeadline">
-              <input type="date" v-model="shift.editableDeadline" />
-              <button @click="saveDeadline(shift)">保存</button>
-              <button @click="cancelEditDeadline(shift)">キャンセル</button>
-            </div>
-            <div v-else>
-              {{ formatDeadline(shift.fixedDate) }}
-              <button @click="editDeadline(shift)">設定</button>
-            </div>
-          </td>
-          <td>
-            <router-link
-              :to="{ name: 'Make-Attendance', query: { date: shift.date.split('T')[0] } }"
-            >編集</router-link>
-            /
-            <router-link
-              :to="{ name: 'Check-Attendance', query: { date: shift.date.split('T')[0] } }"
-            >閲覧</router-link>
-          </td>
-          <td>
-            <router-link
-              :to="{ name: 'Record-Attendance', query: { date: shift.date.split('T')[0] } }"
-            >閲覧</router-link>
-          </td>
-          <td>{{ shift.sendingFlg ? '済' : '' }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <div v-else style="margin-top: 20px; color: #666;">データがありません</div>
   </div>
+  <div v-else style="text-align:center; margin-top:40px; font-size:1.3em; color:red;">権限がありません</div>
 </template>
 
 <script>
@@ -108,6 +111,7 @@ export default {
       selectedYear: new Date().getFullYear(),
       noDataMessage: '',
       storeId: sessionStorage.getItem('storeId') || '', // テスト用inputのバインド用
+      isAdmin: sessionStorage.getItem('isAdmin') === 'true', // 追加: 管理者判定
     };
   },
   methods: {
@@ -212,12 +216,14 @@ export default {
       }
     },
     async setStoreId() {
+      /*
       if (!this.storeId) {
         alert('店舗IDを入力してください');
         return;
       }
       sessionStorage.setItem('storeId', this.storeId);
       await this.fetchShiftsByYear();
+      */
     },
   },
   created() {
@@ -225,6 +231,13 @@ export default {
     if (sessionStorage.getItem('storeId')) {
       this.fetchShiftsByYear();
     }
+  },
+  mounted() {
+    // sessionStorageの内容をコンソールに出力
+    console.log('userId:', sessionStorage.getItem('userId'));
+    console.log('userName:', sessionStorage.getItem('userName'));
+    console.log('isAdmin:', sessionStorage.getItem('isAdmin'));
+    console.log('storeId:', sessionStorage.getItem('storeId'));
   }
 };
 </script>

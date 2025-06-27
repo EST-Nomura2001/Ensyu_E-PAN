@@ -236,4 +236,22 @@ function getMockShiftData(date) {
             },
         ]
     }
+}
+
+export function fetchDateSchedules(today) {
+  // baseURLは使わず、URLを直指定
+  return axios.get(`http://localhost:5011/api/Attendance/DateSchedules/${today}`);
+}
+
+/**
+ * 勤怠操作（出勤・退勤・休憩入・休憩戻）用API
+ * @param {number} userId
+ * @param {number} scheduleId
+ * @param {string} action - 'clockIn' | 'clockOut' | 'startBreak' | 'endBreak'
+ * @returns {Promise}
+ */
+export function operateAttendance(userId, scheduleId, action) {
+  // actionごとにエンドポイントやbodyを変えたい場合はここで分岐
+  // 今回はURLのみ指定、bodyは空
+  return axios.put(`http://localhost:5011/api/Attendance/users/${userId}/schedules/${scheduleId}/${action}`, {});
 } 

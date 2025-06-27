@@ -149,6 +149,9 @@ onMounted(() => {
     <router-link to="/attendance-management" custom v-slot="{ navigate }">
       <button @click="navigate" role="link" class="nav-button">勤怠管理ページへ</button>
     </router-link>
+    <router-link to="/adminEdit" custom v-slot="{ navigate }">
+      <button @click="navigate" role="link" class="nav-button">ユーザー管理ページへ</button>
+    </router-link>
 
     <h3>登録済みユーザー一覧</h3>
     <div class="user-list">

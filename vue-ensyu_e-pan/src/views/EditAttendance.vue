@@ -113,8 +113,7 @@ import CommonHeader from '../components/CommonHeader.vue';
   methods: {
     async fetchAttendance() {
       try {
-        const storeId = sessionStorage.getItem('storeId');
-        const res = await getAttendanceByDateStore(this.date, storeId);
+        const res = await getAttendanceByDateStore(this.date);
         this.tableData = res.users || [];
         this.totalLaborCost = res.totalLaborCost || '';
         this.totalWorkTime = res.totalWorkTime || '';
@@ -150,8 +149,7 @@ import CommonHeader from '../components/CommonHeader.vue';
         return;
       }
       try {
-        const storeId = sessionStorage.getItem('storeId');
-        await updateAttendanceByDateStore(this.date, storeId, this.editRows);
+        await updateAttendanceByDateStore(this.date, this.editRows);
         await this.fetchAttendance();
         this.isEditing = false;
         alert('保存しました');

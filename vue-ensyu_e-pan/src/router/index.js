@@ -110,6 +110,7 @@ const router = createRouter({
       path: '/Edit-Attendance',
       name: 'Edit-Attendance',
       component: () => import('../views/EditAttendance.vue'),
+      props: route => ({ date: route.query.date })
     },
   ],
 })

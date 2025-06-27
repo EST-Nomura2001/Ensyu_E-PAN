@@ -2,115 +2,120 @@
  担当業務の変更なし -->
 <template>
   <CommonHeader />
-  <div class="edit-attendance">
-    <h1>勤怠編集</h1>
-    <h2>{{ formattedDayShiftDate }}の勤怠情報</h2>
-    <router-link :to="{ name: 'Record-Attendance', query: { date: recordAttendanceMonthQuery } }">
-      {{ formattedMonth }}の勤怠一覧に戻る
-    </router-link>
-    <div v-if="fetchError" class="fetch-error-message">データを取得できませんでした</div>
-    <div>
-      <div class="edit-controls">
-        <button v-if="!isEditing" @click="startEdit">編集</button>
-        <button v-else @click="saveEdit">保存</button>
-        <button v-if="isEditing" @click="cancelEdit">キャンセル</button>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>名前</th>
-            <th>時給(円)</th>
-            <th>人件費(円)</th>
-            <th>勤務時間(h)</th>
-            <th>うち深夜勤務時間(h)</th> <!--要相談-->
-            <th>出勤時間</th>
-            <th>退勤時間</th>
-            <th>休憩入り時間</th>
-            <th>休憩戻り時間</th>
-            <th>担当業務</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="total-row">
-            <td>合計</td>
-            <td class="slash-cell"></td>
-            <td>{{ totalLaborCost }}</td>
-            <td>{{ totalWorkTime }}</td>
-            <td class="slash-cell"></td>
-            <td class="slash-cell"></td>
-            <td class="slash-cell"></td>
-            <td class="slash-cell"></td>
-            <td class="slash-cell"></td>
-            <td class="slash-cell"></td>
-          </tr>
-          <tr v-for="(row, idx) in tableData" :key="idx">
-            <td>{{ row.name }}</td>
-            <td>{{ row.wage }}</td>
-            <td>{{ row.laborCost }}</td>
-            <td>{{ row.workTime }}</td>
-            <td>{{ row.nightWorkTime }}</td>
-            <td v-if="isEditing">
-              <input type="time" v-model="editRows[idx].startTime" style="width: 90px;" />
-              <div v-if="errors[idx] && errors[idx].start" class="error-message">{{ errors[idx].start }}</div>
-            </td>
-            <td v-else>{{ row.startTime }}</td>
-            <td v-if="isEditing">
-              <input type="time" v-model="editRows[idx].endTime" style="width: 90px;" />
-              <div v-if="errors[idx] && errors[idx].end" class="error-message">{{ errors[idx].end }}</div>
-            </td>
-            <td v-else>{{ row.endTime }}</td>
-            <td v-if="isEditing">
-              <input type="time" v-model="editRows[idx].breakInTime" style="width: 90px;" />
-              <div v-if="errors[idx] && errors[idx].breakIn" class="error-message">{{ errors[idx].breakIn }}</div>
-            </td>
-            <td v-else>{{ row.breakInTime }}</td>
-            <td v-if="isEditing">
-              <input type="time" v-model="editRows[idx].breakOutTime" style="width: 90px;" />
-              <div v-if="errors[idx] && errors[idx].breakOut" class="error-message">{{ errors[idx].breakOut }}</div>
-            </td>
-            <td v-else>{{ row.breakOutTime }}</td>
-            <td v-if="isEditing">
-              <input type="text" v-model="editRows[idx].task" style="width: 80px;" />
-            </td>
-            <td v-else>{{ row.task }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <!-- カレンダーを表の下中央に配置 -->
-      <div style="display: flex; justify-content: center; margin-top: 1rem;">
-        <div>
-          <span class="calendar-navi">ジャンプしたい日付をクリックしてください。</span>
-          <div class="calendar-container">
-            <div class="calendar-header">
-              <button @click="changeMonth(-1)">&lt; 前の月</button>
-              <h2>{{ calendarYear }}年 {{ calendarMonth }}月</h2>
-              <button @click="changeMonth(1)">次の月 &gt;</button>
+  <template v-if="!checkedAuth">
+    <div>認証確認中...</div>
+  </template>
+  <template v-else-if="!isAdmin">
+    <div style="color: red; font-size: 1.2em; margin: 2em;">権限がありません</div>
+  </template>
+  <template v-else>
+    <div class="edit-attendance">
+      <h1>勤怠編集</h1>
+      <h2>{{ formattedDayShiftDate }}の勤怠情報</h2>
+      <router-link :to="{ name: 'Record-Attendance', query: { date: recordAttendanceMonthQuery } }">
+        {{ formattedMonth }}の勤怠一覧に戻る
+      </router-link>
+      <div v-if="fetchError" class="fetch-error-message">データを取得できませんでした</div>
+      <div>
+        <div class="edit-controls">
+          <button v-if="!isEditing" @click="startEdit">編集</button>
+          <button v-else @click="saveEdit">保存</button>
+          <button v-if="isEditing" @click="cancelEdit">キャンセル</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>名前</th>
+              <th>時給(円)</th>
+              <th>人件費(円)</th>
+              <th>勤務時間(h)</th>
+              <th>うち深夜勤務時間(h)</th> <!--要相談-->
+              <th>出勤時間</th>
+              <th>退勤時間</th>
+              <th>休憩入り時間</th>
+              <th>休憩戻り時間</th>
+              <th>担当業務</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="total-row">
+              <td>合計</td>
+              <td class="slash-cell"></td>
+              <td>{{ totalLaborCost }}</td>
+              <td>{{ totalWorkTime }}</td>
+              <td class="slash-cell"></td>
+              <td class="slash-cell"></td>
+              <td class="slash-cell"></td>
+              <td class="slash-cell"></td>
+              <td class="slash-cell"></td>
+              <td class="slash-cell"></td>
+            </tr>
+            <tr v-for="(row, idx) in tableData" :key="idx">
+              <td>{{ row.name }}</td>
+              <td>{{ row.wage }}</td>
+              <td>{{ row.laborCost }}</td>
+              <td>{{ row.workTime }}</td>
+              <td>{{ row.nightWorkTime }}</td>
+              <td v-if="isEditing">
+                <input type="time" v-model="editRows[idx].startTime" style="width: 90px;" />
+                <div v-if="errors[idx] && errors[idx].start" class="error-message">{{ errors[idx].start }}</div>
+              </td>
+              <td v-else>{{ row.startTime }}</td>
+              <td v-if="isEditing">
+                <input type="time" v-model="editRows[idx].endTime" style="width: 90px;" />
+                <div v-if="errors[idx] && errors[idx].end" class="error-message">{{ errors[idx].end }}</div>
+              </td>
+              <td v-else>{{ row.endTime }}</td>
+              <td v-if="isEditing">
+                <input type="time" v-model="editRows[idx].breakInTime" style="width: 90px;" />
+                <div v-if="errors[idx] && errors[idx].breakIn" class="error-message">{{ errors[idx].breakIn }}</div>
+              </td>
+              <td v-else>{{ row.breakInTime }}</td>
+              <td v-if="isEditing">
+                <input type="time" v-model="editRows[idx].breakOutTime" style="width: 90px;" />
+                <div v-if="errors[idx] && errors[idx].breakOut" class="error-message">{{ errors[idx].breakOut }}</div>
+              </td>
+              <td v-else>{{ row.breakOutTime }}</td>
+              <td>{{ row.task }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- カレンダーを表の下中央に配置 -->
+        <div style="display: flex; justify-content: center; margin-top: 1rem;">
+          <div>
+            <span class="calendar-navi">ジャンプしたい日付をクリックしてください。</span>
+            <div class="calendar-container">
+              <div class="calendar-header">
+                <button @click="changeMonth(-1)">&lt; 前の月</button>
+                <h2>{{ calendarYear }}年 {{ calendarMonth }}月</h2>
+                <button @click="changeMonth(1)">次の月 &gt;</button>
+              </div>
+              <table class="calendar-table">
+                <thead>
+                  <tr>
+                    <th v-for="(day, index) in weekDays" :key="index" :class="{ 'sunday': index === 0, 'saturday': index === 6 }">{{ day }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(week, weekIndex) in calendarGrid" :key="weekIndex">
+                    <td v-for="day in week" :key="day.date.getTime()" @click="selectDate(day)"
+                        :class="{ 
+                          'not-current-month': !day.isCurrentMonth, 
+                          'selected-day': isSelected(day), 
+                          'sunday': day.date.getDay() === 0, 
+                          'saturday': day.date.getDay() === 6 
+                        }">
+                      {{ day.day }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <table class="calendar-table">
-              <thead>
-                <tr>
-                  <th v-for="(day, index) in weekDays" :key="index" :class="{ 'sunday': index === 0, 'saturday': index === 6 }">{{ day }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(week, weekIndex) in calendarGrid" :key="weekIndex">
-                  <td v-for="day in week" :key="day.date.getTime()" @click="selectDate(day)"
-                      :class="{ 
-                        'not-current-month': !day.isCurrentMonth, 
-                        'selected-day': isSelected(day), 
-                        'sunday': day.date.getDay() === 0, 
-                        'saturday': day.date.getDay() === 6 
-                      }">
-                    {{ day.day }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </template>
 </template>
 
 <script>
@@ -136,13 +141,18 @@ import CommonHeader from '../components/CommonHeader.vue';
       fetchError: false,
       dayShiftDate: '',
       calendarDate: new Date(),
+      isAdmin: false,
+      checkedAuth: false,
     };
   },
   async mounted() {
+    // 権限チェック
+    this.isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+    this.checkedAuth = true;
+    if (!this.isAdmin) return;
     // sessionStorageの内容をコンソールに出力
     console.log('userId:', sessionStorage.getItem('userId'));
     console.log('userName:', sessionStorage.getItem('userName'));
-    console.log('isAdmin:', sessionStorage.getItem('isAdmin'));
     console.log('storeId:', sessionStorage.getItem('storeId'));
     await this.fetchAttendance();
   },

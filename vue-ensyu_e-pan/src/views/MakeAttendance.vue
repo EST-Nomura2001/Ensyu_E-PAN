@@ -134,111 +134,119 @@
 
 <template>
   <CommonHeader />
-  <h1>シフト調整</h1>
-  <div v-if="loading">データを読み込み中...</div>
-  <div v-if="apiError">{{ apiError }}</div>
+  <template v-if="!checkedAuth">
+    <div>認証確認中...</div>
+  </template>
+  <template v-else-if="!isAdmin">
+    <div style="color: red; font-size: 1.2em; margin: 2em;">権限がありません</div>
+  </template>
+  <template v-else>
+    <h1>シフト調整</h1>
+    <div v-if="loading">データを読み込み中...</div>
+    <div v-if="apiError">{{ apiError }}</div>
 
-  <div v-if="!loading && !apiError">
-   
-    <div class="date-navigation">
-      <button @click="changeDay(-1)">前の日へ</button>
-      <h2>{{ formattedDate }}</h2>
-      <button @click="changeDay(1)">次の日へ</button>
-    </div>
-    <p>{{ storeName }}</p>
+    <div v-if="!loading && !apiError">
+     
+      <div class="date-navigation">
+        <button @click="changeDay(-1)">前の日へ</button>
+        <h2>{{ formattedDate }}</h2>
+        <button @click="changeDay(1)">次の日へ</button>
+      </div>
+      <p>{{ storeName }}</p>
 
-    <table id="timeTable">
-      <thead>
-        <tr>
-          <th>名前</th>
-          <th>時給</th>
-          <th>担当業務</th>
-          <th>出勤時間</th>
-          <th>退勤時間</th>
-          <th>取消</th>
-          <th v-for="h in (endHour - startHour)" :key="h" class="time-header" :colspan="6">{{ String(startHour + h - 1).padStart(2, '0') }}:00</th>
-        </tr>
-      </thead>
-      <tbody>
-        <template v-for="(schedule, index) in schedules" :key="schedule.scheduleId">
-          <tr><!--上段: 希望シフト-->
-            <th class="event-col" rowspan="2">
-              {{ schedule.userName }}
-            </th>
-            <td rowspan="2">¥{{ schedule.hourlyWage }}</td>
-            <td rowspan="2">
-              <select v-model="schedule.workRollId">
-                <option :value="0">フリー</option>
-                <option :value="1">ホール</option>
-                <option :value="2">キッチン</option>
-              </select>
-            </td>
-            <td>{{ schedule.hopeStart }}</td>
-            <td>{{ schedule.hopeEnd }}</td>
-            <td></td>
-            <template v-for="(cell, cellIndex) in calculateRow(schedule.hopeStart, schedule.hopeEnd)" :key="cellIndex">
-              <td v-if="cell.type === 'event'" :colspan="cell.colspan" class="event-block">希望</td>
-              <td v-if="cell.type === 'empty'" class="empty">&nbsp;</td>
-            </template>
+      <table id="timeTable">
+        <thead>
+          <tr>
+            <th>名前</th>
+            <th>時給</th>
+            <th>担当業務</th>
+            <th>出勤時間</th>
+            <th>退勤時間</th>
+            <th>取消</th>
+            <th v-for="h in (endHour - startHour)" :key="h" class="time-header" :colspan="6">{{ String(startHour + h - 1).padStart(2, '0') }}:00</th>
           </tr>
-          <tr><!--下段: 予定シフト-->
-            <td>
-              <input type="time" v-model="schedule.plannedStart" @input="validatePlannedShift(index)" step="600">
-              <div v-if="errors[index]?.start" class="error-message">{{ errors[index].start }}</div>
-            </td>
-            <td>
-              <input type="time" v-model="schedule.plannedEnd" @input="validatePlannedShift(index)" step="600">
-              <div v-if="errors[index]?.end" class="error-message">{{ errors[index].end }}</div>
-            </td>
-            <td>
-              <button type="button" @click="resetPlannedShift(index)">取消</button>
-            </td>
-            <template v-for="(cell, cellIndex) in calculateRow(schedule.plannedStart, schedule.plannedEnd)" :key="cellIndex">
-              <td v-if="cell.type === 'event'" :colspan="cell.colspan" class="event-block-dark">予定</td>
-              <td v-if="cell.type === 'empty'" class="empty">&nbsp;</td>
-            </template>
-          </tr>
-        </template>
-      </tbody>
-    </table>
-    <div style="text-align: left; margin-top: 1rem;">
-      <button @click="saveChanges" :disabled="!isDirty">保存</button>
-    </div>
+        </thead>
+        <tbody>
+          <template v-for="(schedule, index) in schedules" :key="schedule.scheduleId">
+            <tr><!--上段: 希望シフト-->
+              <th class="event-col" rowspan="2">
+                {{ schedule.userName }}
+              </th>
+              <td rowspan="2">¥{{ schedule.hourlyWage }}</td>
+              <td rowspan="2">
+                <select v-model="schedule.workRollId">
+                  <option :value="0">フリー</option>
+                  <option :value="1">ホール</option>
+                  <option :value="2">キッチン</option>
+                </select>
+              </td>
+              <td>{{ schedule.hopeStart }}</td>
+              <td>{{ schedule.hopeEnd }}</td>
+              <td></td>
+              <template v-for="(cell, cellIndex) in calculateRow(schedule.hopeStart, schedule.hopeEnd)" :key="cellIndex">
+                <td v-if="cell.type === 'event'" :colspan="cell.colspan" class="event-block">希望</td>
+                <td v-if="cell.type === 'empty'" class="empty">&nbsp;</td>
+              </template>
+            </tr>
+            <tr><!--下段: 予定シフト-->
+              <td>
+                <input type="time" v-model="schedule.plannedStart" @input="validatePlannedShift(index)" step="600">
+                <div v-if="errors[index]?.start" class="error-message">{{ errors[index].start }}</div>
+              </td>
+              <td>
+                <input type="time" v-model="schedule.plannedEnd" @input="validatePlannedShift(index)" step="600">
+                <div v-if="errors[index]?.end" class="error-message">{{ errors[index].end }}</div>
+              </td>
+              <td>
+                <button type="button" @click="resetPlannedShift(index)">取消</button>
+              </td>
+              <template v-for="(cell, cellIndex) in calculateRow(schedule.plannedStart, schedule.plannedEnd)" :key="cellIndex">
+                <td v-if="cell.type === 'event'" :colspan="cell.colspan" class="event-block-dark">予定</td>
+                <td v-if="cell.type === 'empty'" class="empty">&nbsp;</td>
+              </template>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+      <div style="text-align: left; margin-top: 1rem;">
+        <button @click="saveChanges" :disabled="!isDirty">保存</button>
+      </div>
 
-    <!-- カレンダーを表の下中央に配置 -->
-    <div style="display: flex; justify-content: center; margin-top: 1rem;">
-      <div>
-        <span class="calendar-navi">ジャンプしたい日付をクリックしてください。</span>
-        <div class="calendar-container">
-          <div class="calendar-header">
-            <button @click="changeMonth(-1)">&lt; 前の月</button>
-            <h2>{{ calendarYear }}年 {{ calendarMonth }}月</h2>
-            <button @click="changeMonth(1)">次の月 &gt;</button>
-          </div>
-          <table class="calendar-table">
-            <thead>
-              <tr>
-                <th v-for="(day, index) in weekDays" :key="index" :class="{ 'sunday': index === 0, 'saturday': index === 6 }">{{ day }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(week, weekIndex) in calendarGrid" :key="weekIndex">
-                <td v-for="day in week" :key="day.date.getTime()" @click="selectDate(day)"
-                    :class="{ 
-                      'not-current-month': !day.isCurrentMonth, 
-                      'selected-day': isSelected(day), 
-                      'sunday': day.date.getDay() === 0, 
-                      'saturday': day.date.getDay() === 6 
-                    }">
-                  {{ day.day }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- カレンダーを表の下中央に配置 -->
+      <div style="display: flex; justify-content: center; margin-top: 1rem;">
+        <div>
+          <span class="calendar-navi">ジャンプしたい日付をクリックしてください。</span>
+            <div class="calendar-container">
+              <div class="calendar-header">
+                <button @click="changeMonth(-1)">&lt; 前の月</button>
+                <h2>{{ calendarYear }}年 {{ calendarMonth }}月</h2>
+                <button @click="changeMonth(1)">次の月 &gt;</button>
+              </div>
+              <table class="calendar-table">
+                <thead>
+                  <tr>
+                    <th v-for="(day, index) in weekDays" :key="index" :class="{ 'sunday': index === 0, 'saturday': index === 6 }">{{ day }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(week, weekIndex) in calendarGrid" :key="weekIndex">
+                    <td v-for="day in week" :key="day.date.getTime()" @click="selectDate(day)"
+                        :class="{ 
+                          'not-current-month': !day.isCurrentMonth, 
+                          'selected-day': isSelected(day), 
+                          'sunday': day.date.getDay() === 0, 
+                          'saturday': day.date.getDay() === 6 
+                        }">
+                      {{ day.day }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
         </div>
       </div>
     </div>
-  </div>
+  </template>
 </template>
 
 <script setup>
@@ -250,6 +258,10 @@ import axios from 'axios';
 
 //ヘッダー用
 import CommonHeader from '../components/CommonHeader.vue';
+
+// --- 追加: 権限ガード用 ---
+const isAdmin = ref(false);
+const checkedAuth = ref(false);
 
 const route = useRoute();
 const router = useRouter();
@@ -547,6 +559,10 @@ watch(schedules, (newSchedules) => {
 
 // --- Lifecycle Hooks ---
 onMounted(() => {
+  // 権限チェック
+  isAdmin.value = sessionStorage.getItem('isAdmin') === 'true';
+  checkedAuth.value = true;
+
   // クエリパラメータdateがあれば初期化
   if (route.query.date) {
     const date = new Date(route.query.date);
@@ -555,7 +571,9 @@ onMounted(() => {
       calendarDate.value = date;
     }
   }
-  fetchShifts(currentDate.value);
+  if (isAdmin.value) {
+    fetchShifts(currentDate.value);
+  }
 
   // sessionStorageの内容をコンソールに出力
   console.log('userId:', sessionStorage.getItem('userId'));

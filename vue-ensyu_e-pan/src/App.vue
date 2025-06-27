@@ -11,6 +11,7 @@ import { RouterLink, RouterView } from 'vue-router'
       <RouterLink to="/part-time">アルバイトページ</RouterLink>
       <RouterLink to="/attendance-management">勤怠登録</RouterLink>
       <RouterLink to="/purchase-order">発注書作成</RouterLink>
+      <RouterLink to="/saved-order">保存された発注書</RouterLink>
       <RouterLink to="/admin">管理者ページ</RouterLink>
       <RouterLink to="/kibou-form">希望フォーム</RouterLink>
       <RouterLink to="/Attendance-home">勤怠ホーム</RouterLink>

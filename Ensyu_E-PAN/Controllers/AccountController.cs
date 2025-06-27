@@ -45,6 +45,7 @@ namespace Ensyu_E_PAN.Controllers
                     Name = user.Roll.Name,
                     IsAdmin = user.Roll.IsAdmin
                 },
+                StoreId = user.Stores_Cd,
                 StoreName = user.Store?.C_Name,
                 StoreAddress1 = user.Store?.Address1,
                 StoreAddress2 = user.Store?.Address2,

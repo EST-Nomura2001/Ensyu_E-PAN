@@ -104,7 +104,7 @@
             </tr>
             <tr>
               <th>工期:</th>
-              <td><input type="date" v-model="purchaseOrder.Period"></td>
+              <td><input type="date" v-model="purchaseOrder.Delivery_Date"></td>
             </tr>
             <tr>
               <th>支払期日:</th>
@@ -155,14 +155,8 @@
                   @change="onItemNameChange(item)"
                   style="margin-bottom:2px;"
                 >
-                <div v-if="item.Item_Cd === 'その他'" style="margin-top:2px;">
-                  <input
-                    type="text"
-                    v-model="item.Other_ItemName"
-                    placeholder="商品名を入力"
-                    style="width: 95%; font-size: 12px; padding: 3px; border: 1px solid #ccc; border-radius: 3px; margin-top:2px;"
-                  >
-                  <span style="font-size:11px; color:#888;">※「その他」の場合は商品名を入力</span>
+                <div v-if="item.Item_Cd === 0 && item.Item_Name === 'その他' && item.Other_ItemName && item.Other_ItemName.trim() !== ''" style="margin-top:2px; font-size:15px;">
+                  {{ item.Other_ItemName }}
                 </div>
               </td>
               <td>
@@ -391,10 +385,10 @@ export default {
             fax: this.purchaseOrder.Store.fax || 'string'
           },
           orderItems: this.purchaseOrder.OrderItems
-            .filter(item => item.Item_Cd !== null && item.Item_Cd !== '' && !isNaN(item.Item_Cd))
+            .filter(item => item.Item_Name && item.Item_Name.trim() !== '')
             .map(item => ({
-              item_Cd: Number(item.Item_Cd),
-              item_Name: item.Item_Name || 'string',
+              item_Cd: Number(item.Item_Cd) || 0,
+              item_Name: item.Item_Name,
               amount: Number(item.Amount),
               other_ItemName: item.Other_ItemName || 'string'
             }))
@@ -475,8 +469,15 @@ export default {
       const found = this.predefinedProductsList.find(p => p.item_Name === item.Item_Name);
       if (found) {
         item.Item_Cd = found.id;
+        item.Other_ItemName = '';
+      } else if (item.Item_Name === 'その他') {
+        item.Item_Cd = 0;
+        // 入力値はother_ItemNameに記録する（item_Nameは'その他'のまま）
+        // 入力欄でother_ItemNameを編集できるようにする
       } else {
-        item.Item_Cd = null;
+        item.Item_Cd = 0;
+        item.Other_ItemName = item.Item_Name;
+        item.Item_Name = 'その他';
       }
     },
   },

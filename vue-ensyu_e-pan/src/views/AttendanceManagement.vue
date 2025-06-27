@@ -1,4 +1,5 @@
 <template>
+  <CommonHeader />
   <div class="attendance-management">
     <h1>勤怠管理</h1>
     <div>
@@ -31,10 +32,10 @@
             <td>{{ formatDateTime(shift.dateSchedule.start_BreakTime, 'time') }}</td>
             <td>{{ formatDateTime(shift.dateSchedule.end_BreakTime, 'time') }}</td>
             <td v-if="canOperate">
-              <button @click="clockIn(item.user_Id)">出勤</button>
-              <button @click="clockOut(item.user_Id)">退勤</button>
-              <button @click="startBreak(item.user_Id)">休憩入</button>
-              <button @click="endBreak(item.user_Id)">休憩戻</button>
+              <button @click="clockIn(item.user_Id, shift.dateSchedule.id)">出勤</button>
+              <button @click="clockOut(item.user_Id, shift.dateSchedule.id)">退勤</button>
+              <button @click="startBreak(item.user_Id, shift.dateSchedule.id)">休憩入</button>
+              <button @click="endBreak(item.user_Id, shift.dateSchedule.id)">休憩戻</button>
             </td>
           </tr>
         </template>
@@ -45,7 +46,10 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue';
-import { fetchDateSchedules } from '../services/api';
+import { fetchDateSchedules, operateAttendance } from '../services/api';
+
+//ヘッダー用
+import CommonHeader from '../components/CommonHeader.vue';
 
 export default {
   name: 'AttendanceManagement',
@@ -64,7 +68,7 @@ export default {
     });
 
     const canOperate = computed(() => {
-      return userRole.value === 'admin' || userRole.value === 'employee';
+      return sessionStorage.getItem('isAdmin') === 'true';
     });
 
     const fetchData = async () => {
@@ -86,10 +90,39 @@ export default {
       return date.toLocaleString();
     };
 
-    const clockIn = (userId) => console.log(`Clock in for user ${userId}`);
-    const clockOut = (userId) => console.log(`Clock out for user ${userId}`);
-    const startBreak = (userId) => console.log(`Start break for user ${userId}`);
-    const endBreak = (userId) => console.log(`End break for user ${userId}`);
+    // 勤怠操作ボタン用
+    const clockIn = async (userId, scheduleId) => {
+      try {
+        await operateAttendance(userId, scheduleId, 'clockIn');
+        await fetchData();
+      } catch (e) {
+        alert('出勤処理に失敗しました');
+      }
+    };
+    const clockOut = async (userId, scheduleId) => {
+      try {
+        await operateAttendance(userId, scheduleId, 'clockOut');
+        await fetchData();
+      } catch (e) {
+        alert('退勤処理に失敗しました');
+      }
+    };
+    const startBreak = async (userId, scheduleId) => {
+      try {
+        await operateAttendance(userId, scheduleId, 'startBreak');
+        await fetchData();
+      } catch (e) {
+        alert('休憩入処理に失敗しました');
+      }
+    };
+    const endBreak = async (userId, scheduleId) => {
+      try {
+        await operateAttendance(userId, scheduleId, 'endBreak');
+        await fetchData();
+      } catch (e) {
+        alert('休憩戻処理に失敗しました');
+      }
+    };
 
     onMounted(() => {
       fetchData();
@@ -111,6 +144,11 @@ export default {
       fetchData,
       formatDateTime,
     };
+  },
+
+  //ヘッダー用
+  components: {
+    CommonHeader
   },
 };
 </script>

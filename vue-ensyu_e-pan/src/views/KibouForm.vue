@@ -2,12 +2,11 @@
  田村 -->
 
 <template>
-  <CommonHeader />
-  <div style="margin: 10px 0; padding: 10px; background: #f9f9f9; border: 1px solid #ccc;">
+  <!--<div style="margin: 10px 0; padding: 10px; background: #f9f9f9; border: 1px solid #ccc;">
     <label>テスト用ユーザーID: <input type="number" v-model.number="testUserId" style="width: 60px;" /></label>
     <button @click="setTestUserId">設定</button>
     <span style="margin-left: 10px;">現在のuserId: {{ currentUserId }}</span>
-  </div>
+  </div>-->
   <div class="shift-submission-form">
     <h1>希望シフト提出</h1>
     <div v-if="!isLoading && year && month">
@@ -64,8 +63,6 @@
 import axios from 'axios';
 import * as api from '@/services/api';
 
-//ヘッダー用
-import CommonHeader from '../components/CommonHeader.vue';
 
 export default {
   props: {
@@ -84,7 +81,7 @@ export default {
       userName: '',
       status: '未提出', // APIから取得する想定
       shifts: [],
-      currentUserId: null,
+      currentUserId: Number(sessionStorage.getItem('userId')) || null, // sessionStorageからuserId取得
       testUserId: '', // テスト用userId入力欄
     };
   },
@@ -251,10 +248,6 @@ export default {
         alert('ユーザーIDを入力してください');
       }
     },
-  },
-  //ヘッダー用
-  components: {
-    CommonHeader
   },
 };
 </script>

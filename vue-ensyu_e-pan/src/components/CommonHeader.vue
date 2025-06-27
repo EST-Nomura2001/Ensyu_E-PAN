@@ -10,7 +10,7 @@ import { RouterLink } from 'vue-router'
         <li><RouterLink to="/attendance-home">勤怠ホーム</RouterLink></li>
         <li><RouterLink to="/kibou-form">シフト希望フォーム</RouterLink></li>
         <li><RouterLink to="/purchase-order">発注管理</RouterLink></li>
-        <li><RouterLink to="/account">アカウント管理</RouterLink></li>
+        <li><RouterLink to="/admin">アカウント管理</RouterLink></li>
       </ul>
     </nav>
   </header>

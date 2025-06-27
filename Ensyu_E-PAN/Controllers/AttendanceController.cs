@@ -39,56 +39,51 @@ namespace Ensyu_E_PAN.Controllers
                         .ThenInclude(us => us.User)
                 .ToListAsync();
 
-            var userShiftGroups = dateSchedules
-                .SelectMany(ds => ds.UserDateShifts)
-                .GroupBy(uds => uds.UserShift.Id)
+            // DayShift単位でグループ化
+            var grouped = dateSchedules
+                .Where(ds => ds.DayShift != null)
+                .GroupBy(ds => ds.DayShift.Id)
                 .Select(g =>
                 {
-                    var userShift = g.First().UserShift;
-                    return new UserShiftDto
+                    var dayShift = g.First().DayShift;
+
+                    return new DayShiftDto
                     {
-                        Id = userShift.Id,
-                        User_Id = userShift.User_Id,
-                        UserName = userShift.User?.Name,
-                        List_Status = userShift.List_Status,
-                        Total_WorkTime = userShift.Total_WorkTime,
-                        Month_Price = userShift.Month_Price,
-                        U_Confirm_Flg = userShift.U_Confirm_Flg,
-                        UserDateShifts = g.Select(uds => new UserDateShiftDto
+                        Id = dayShift.Id,
+                        Date = dayShift.Date,
+                        Sum_WorkTime = dayShift.Sum_WorkTime,
+                        Sum_TotalCost = dayShift.Sum_TotalCost,
+                        DateSchedules = g.Select(ds => new DateScheduleDto
                         {
-                            Id = uds.Id,
-                            Shift_Date = uds.Shift_Date,
-                            DateSchedule = new DateScheduleDto
-                            {
-                                Id = uds.DateSchedule.Id,
-                                Today = uds.DateSchedule.Today,
-                                P_Start_WorkTime = uds.DateSchedule.P_Start_WorkTime,
-                                P_End_WorkTime = uds.DateSchedule.P_End_WorkTime,
-                                U_Start_WorkTime = uds.DateSchedule.U_Start_WorkTime,
-                                U_End_WorkTime = uds.DateSchedule.U_End_WorkTime,
-                                Start_WorkTime = uds.DateSchedule.Start_WorkTime,
-                                End_WorkTime = uds.DateSchedule.End_WorkTime,
-                                Start_BreakTime = uds.DateSchedule.Start_BreakTime,
-                                End_BreakTime = uds.DateSchedule.End_BreakTime,
-                                T_WorkTime_D = uds.DateSchedule.T_WorkTime_D,
-                                T_WorkTime_N = uds.DateSchedule.T_WorkTime_N,
-                                T_WorkTime_All = uds.DateSchedule.T_WorkTime_All,
-                                D_DayPrice = uds.DateSchedule.D_DayPrice,
-                                N_DayPrice = uds.DateSchedule.N_DayPrice,
-                                T_DayPrice = uds.DateSchedule.T_DayPrice,
-                                UserName = uds.DateSchedule.User?.Name,
-                                WorkRollName = uds.DateSchedule.WorkRoll?.Name,
-                                DayShiftDate = uds.DateSchedule.DayShift?.Date,
-                                U_Confirm_Flg = uds.UserShift?.U_Confirm_Flg
-                            }
+                            Id = ds.Id,
+                            Today = ds.Today,
+                            P_Start_WorkTime = ds.P_Start_WorkTime,
+                            P_End_WorkTime = ds.P_End_WorkTime,
+                            U_Start_WorkTime = ds.U_Start_WorkTime,
+                            U_End_WorkTime = ds.U_End_WorkTime,
+                            Start_WorkTime = ds.Start_WorkTime,
+                            End_WorkTime = ds.End_WorkTime,
+                            Start_BreakTime = ds.Start_BreakTime,
+                            End_BreakTime = ds.End_BreakTime,
+                            T_WorkTime_D = ds.T_WorkTime_D,
+                            T_WorkTime_N = ds.T_WorkTime_N,
+                            T_WorkTime_All = ds.T_WorkTime_All,
+                            D_DayPrice = ds.D_DayPrice,
+                            N_DayPrice = ds.N_DayPrice,
+                            T_DayPrice = ds.T_DayPrice,
+                            UserName = ds.User?.Name,
+                            WorkRollId = ds.Work_Roll_Id,
+                            WorkRollName = ds.WorkRoll?.Name,
+                            DayShiftId = ds.Day_Shift_Id,
+                            U_Confirm_Flg = ds.UserDateShifts
+                                .FirstOrDefault()?.UserShift?.U_Confirm_Flg
                         }).ToList()
                     };
-                }).ToList();
+                })
+                .ToList();
 
-            return Ok(userShiftGroups);
+            return Ok(grouped);
         }
-
-
 
         //全体の当月分のスケジュールを渡す
 
@@ -97,6 +92,8 @@ namespace Ensyu_E_PAN.Controllers
         {
             var allShifts = await _context.All_Shifts
                 .Where(a => a.Store_ID == storeId && a.Date.Year == year && a.Date.Month == month)
+                .Include(a => a.UserShifts)
+                    .ThenInclude(us => us.User)
                 .Include(a => a.UserShifts)
                     .ThenInclude(us => us.UserDateShifts)
                         .ThenInclude(uds => uds.DateSchedule)
@@ -154,8 +151,9 @@ namespace Ensyu_E_PAN.Controllers
                             N_DayPrice = uds.DateSchedule.N_DayPrice,
                             T_DayPrice = uds.DateSchedule.T_DayPrice,
                             UserName = uds.DateSchedule.User?.Name,
+                            WorkRollId = uds.DateSchedule.Work_Roll_Id,
                             WorkRollName = uds.DateSchedule.WorkRoll?.Name,
-                            DayShiftDate = uds.DateSchedule.DayShift?.Date,
+                            DayShiftId = uds.DateSchedule.Day_Shift_Id,
                             U_Confirm_Flg = uds.UserShift?.U_Confirm_Flg
                         }
                     }).ToList()
@@ -164,6 +162,7 @@ namespace Ensyu_E_PAN.Controllers
 
             return Ok(dtoList);
         }
+
 
         [HttpGet("UserSchedule/Day/{userId}/{date}")]
         public async Task<IActionResult> GetUserDailySchedule(int userId, DateTime date)
@@ -181,15 +180,8 @@ namespace Ensyu_E_PAN.Controllers
             if (schedule == null)
                 return NotFound();
 
-            // AllShift 関連情報取得
-            var allShift = schedule.UserDateShifts?
-                .FirstOrDefault()?
-                .UserShift?
-                .AllShift;
-
             var userShift = schedule.UserDateShifts?
-                .FirstOrDefault()?
-                .UserShift;
+                .FirstOrDefault()?.UserShift;
 
             var dto = new DateScheduleDto
             {
@@ -209,18 +201,18 @@ namespace Ensyu_E_PAN.Controllers
                 D_DayPrice = schedule.D_DayPrice,
                 N_DayPrice = schedule.N_DayPrice,
                 T_DayPrice = schedule.T_DayPrice,
-
                 UserName = schedule.User?.Name,
+                WorkRollId = schedule.Work_Roll_Id,                         // ✅ 追加済み
                 WorkRollName = schedule.WorkRoll?.Name,
-                DayShiftDate = schedule.DayShift?.Date,
-                U_Confirm_Flg = userShift?.U_Confirm_Flg,
+                DayShiftId = schedule.Day_Shift_Id,
+                U_Confirm_Flg = userShift?.U_Confirm_Flg                  // 確認フラグ
             };
 
             return Ok(dto);
         }
 
 
-        //個人の当月のスケジュール
+
         [HttpGet("UserSchedule/Month/{userId}/{year}/{month}")]
         public async Task<IActionResult> GetUserMonthlySchedules(int userId, int year, int month)
         {
@@ -230,40 +222,59 @@ namespace Ensyu_E_PAN.Controllers
             var schedules = await _context.Date_Schedules
                 .Where(ds => ds.User_Id == userId && ds.Today >= startDate && ds.Today < endDate)
                 .Include(ds => ds.WorkRoll)
+                .Include(ds => ds.User)
                 .Include(ds => ds.DayShift)
                 .Include(ds => ds.UserDateShifts)
                     .ThenInclude(uds => uds.UserShift)
                         .ThenInclude(us => us.AllShift)
                 .ToListAsync();
 
-            // DTOに変換。田村編集
-            var result = schedules.Select(ds => new Ensyu_E_PAN.DTOs.AttendanceDTO.DateScheduleDto
-            {
-                Id = ds.Id,
-                Today = ds.Today,
-                P_Start_WorkTime = ds.P_Start_WorkTime,
-                P_End_WorkTime = ds.P_End_WorkTime,
-                U_Start_WorkTime = ds.U_Start_WorkTime,
-                U_End_WorkTime = ds.U_End_WorkTime,
-                Start_WorkTime = ds.Start_WorkTime,
-                End_WorkTime = ds.End_WorkTime,
-                Start_BreakTime = ds.Start_BreakTime,
-                End_BreakTime = ds.End_BreakTime,
-                T_WorkTime_D = ds.T_WorkTime_D,
-                T_WorkTime_N = ds.T_WorkTime_N,
-                T_WorkTime_All = ds.T_WorkTime_All,
-                D_DayPrice = ds.D_DayPrice,
-                N_DayPrice = ds.N_DayPrice,
-                T_DayPrice = ds.T_DayPrice,
-                UserName = ds.User != null ? ds.User.Name : null,
-                WorkRollName = ds.WorkRoll != null ? ds.WorkRoll.Name : null,
-                DayShiftDate = ds.DayShift != null ? ds.DayShift.Date : null,
-                U_Confirm_Flg = ds.UserDateShifts?.FirstOrDefault()?.UserShift?.U_Confirm_Flg
-            }).ToList();
+            // Dayごとにグループ化
+            var dayShiftGroupedDtos = schedules
+                .GroupBy(ds => ds.DayShift?.Id ?? 0)
+                .Select(g =>
+                {
+                    var anyDay = g.FirstOrDefault()?.DayShift;
 
-            return Ok(result);
+                    return new DayShiftDto
+                    {
+                        Id = anyDay?.Id ?? 0,
+                        Date = anyDay?.Date ?? DateTime.MinValue,
+                        Sum_WorkTime = anyDay?.Sum_WorkTime ?? TimeSpan.Zero,
+                        Sum_TotalCost = anyDay?.Sum_TotalCost ?? 0,
+                        DateSchedules = g.Select(ds => new DateScheduleDto
+                        {
+                            Id = ds.Id,
+                            Today = ds.Today,
+                            P_Start_WorkTime = ds.P_Start_WorkTime,
+                            P_End_WorkTime = ds.P_End_WorkTime,
+                            U_Start_WorkTime = ds.U_Start_WorkTime,
+                            U_End_WorkTime = ds.U_End_WorkTime,
+                            Start_WorkTime = ds.Start_WorkTime,
+                            End_WorkTime = ds.End_WorkTime,
+                            Start_BreakTime = ds.Start_BreakTime,
+                            End_BreakTime = ds.End_BreakTime,
+                            T_WorkTime_D = ds.T_WorkTime_D,
+                            T_WorkTime_N = ds.T_WorkTime_N,
+                            T_WorkTime_All = ds.T_WorkTime_All,
+                            D_DayPrice = ds.D_DayPrice,
+                            N_DayPrice = ds.N_DayPrice,
+                            T_DayPrice = ds.T_DayPrice,
+                            UserName = ds.User?.Name,
+                            WorkRollId = ds.Work_Roll_Id,
+                            WorkRollName = ds.WorkRoll?.Name,
+                            DayShiftId = ds.Day_Shift_Id,
+                            U_Confirm_Flg = ds.UserDateShifts?.FirstOrDefault()?.UserShift?.U_Confirm_Flg
+                        }).ToList()
+                    };
+                })
+                .OrderBy(ds => ds.Date)
+                .ToList();
+
+            return Ok(dayShiftGroupedDtos);
         }
         //Get処理↑
+
 
         //Post処理↓
         //シフト表作成

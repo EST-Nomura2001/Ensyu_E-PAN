@@ -15,13 +15,19 @@ const router = useRouter();
 const loggedInUserName = ref(sessionStorage.getItem('userName') || '');
 
 const newUserId = ref('');
+const newUserName = ref('');
 const newUserPw = ref('');
-const newUserRole = ref('');
+const newUserRole = ref(1);
+const newUserStore = ref(1);
+const dayTimePrace = ref(0);
+const nightTimePrace = ref(0);
+
 const registerMsg = ref('');
 const registerMsgIsSuccess = ref(false);
 
 const userList = ref([]);
-const rolls = ref([]);
+const rolls = ref([]);//役職一覧
+const stores = ref([]);//店舗一覧
 
 //登録処理
 async function registerUser() {
@@ -30,8 +36,23 @@ async function registerUser() {
     registerMsgIsSuccess.value = false;
     return;
   }
+  if(newUserRole.value == null){
+    registerMsg.value = '役職を選択してください';
+    registerMsgIsSuccess.value = false;
+    return;
+  }
+  if(!newUserName.value){
+    registerMsg.value = '名前を入力してください';
+    registerMsgIsSuccess.value = false;
+    return;
+  }
+  if(dayTimePrace.value <= 0 || nightTimePrace <= 0){
+    registerMsg.value = '給料は払いましょうよ……';
+    registerMsgIsSuccess.value = false;
+    return;
+  }
   try {
-    await apiClient.post('/users/register', {
+    await apiClient.post('http://localhost:5011/api/Account/users/register', {
       loginId: newUserId.value,
       password: newUserPw.value,
       role: newUserRole.value,
@@ -82,9 +103,17 @@ const getRolls = async()=>{
   rolls.value = rollResponse.data;
 };
 
+//店舗一覧作成
+const getStores = async()=>{
+  const storeResponse = await axios.get('http://localhost:5011/api/Masters/stores');
+  console.log("役職一覧",storeResponse.data);
+  stores.value = storeResponse.data;
+};
+
 onMounted(() => {
   fetchUsers();
   getRolls();
+  getStores();
 });
 
 </script>
@@ -97,10 +126,18 @@ onMounted(() => {
     <p>新しいユーザーを登録できます。</p>
 
     <input type="text" v-model="newUserId" placeholder="新規ユーザーID">
+    <input type="text" placeholder="新規ユーザー名" v-model = "newUserName">
     <input type="password" v-model="newUserPw" placeholder="パスワード">
     <select v-model="newUserRole">
       <option v-for="roll in rolls" :key="roll.id" :value="roll.id">{{ roll.name }}</option>
     </select>
+    <select v-model="newUserStore">
+      <option v-for="store in stores" :value="store.id">{{store.c_Name}}</option>
+    </select>
+    <div>
+      <p>日中時給<input type="number" min="0" v-model="dayTimePrace"></p>
+      <p>深夜時給<input type="number" min="0" v-model="nightTimePrace"></p>
+    </div>
     <button @click="registerUser">登録</button>
     <p v-if="registerMsg" class="message" :class="{ success: registerMsgIsSuccess }">{{ registerMsg }}</p>
 

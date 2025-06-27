@@ -81,7 +81,7 @@ const router = createRouter({
     },
     { //
       path: '/saved-order',
-      name: 'SavedOrder',
+      name: 'SavedOrders',
       component:SavedOrders,
       // meta: { requiresAuth: true }, ログイン機能
     },

@@ -3,65 +3,72 @@
 
 <template>
   <CommonHeader />
-  <div>
-    <h1>勤怠実績確認</h1>
-    <div class="attendance-table-controls" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center;">
-      <button @click="changeMonth(-1)">前の月へ</button>
-      <h2>{{ yearMonth }}</h2>
-      <button @click="changeMonth(1)">次の月へ</button>
+  <template v-if="!checkedAuth">
+    <div>認証確認中...</div>
+  </template>
+  <template v-else-if="!isAdmin">
+    <div style="color: red; font-size: 1.2em; margin: 2em;">権限がありません</div>
+  </template>
+  <template v-else>
+    <div>
+      <h1>勤怠実績確認</h1>
+      <div class="attendance-table-controls" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center;">
+        <button @click="changeMonth(-1)">前の月へ</button>
+        <h2>{{ yearMonth }}</h2>
+        <button @click="changeMonth(1)">次の月へ</button>
+      </div>
+      <p>{{ storeName }}</p>
+      <p>ステータス：{{ status === true ? '送付済み' : '未提出' }}</p>
+      <p>日付をクリックすると、詳細の確認・修正が可能です。</p>
     </div>
-    <p>{{ storeName }}</p>
-    <p>ステータス：{{ status === true ? '送付済み' : '未提出' }}</p>
-    <p>日付をクリックすると、詳細の確認・修正が可能です。</p>
-  </div>
-  <div class="attendance-table-wrapper">
-    <table class="attendance-table">
-      <thead>
-        <tr>
-          <th class="sticky sticky-1">名前</th>
-          <th class="sticky sticky-2">時給</th>
-          <th class="sticky sticky-3">項目</th>
-          <th class="sticky sticky-4">合計</th>
-          <th v-for="ds in dayShifts" :key="'header-'+ds.date">
-            <router-link :to="{ name: 'Edit-Attendance', query: { date: ds.date, storeName: storeName } }">
-              {{ formatDate(ds.date) }}
-            </router-link>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="total-row">
-          <td class="sticky sticky-1" colspan="2" rowspan="2">合計</td>
-          <td class="sticky sticky-3">労働時間(h)</td>
-          <td class="sticky sticky-4">{{ totalWorkTime }}</td>
-          <td v-for="ds in dayShifts" :key="'total-worktime'+ds.date">{{ ds.sumWorkTime }}</td>
-        </tr>
-        <tr class="total-row">
-          <td class="sticky sticky-3">人件費</td>
-          <td class="sticky sticky-4">{{ totalCost }}</td>
-          <td v-for="ds in dayShifts" :key="'total-cost'+ds.date">{{ ds.sumTotalCost }}</td>
-        </tr>
-        <template v-for="user in users" :key="user.name">
+    <div class="attendance-table-wrapper">
+      <table class="attendance-table">
+        <thead>
           <tr>
-            <td class="sticky sticky-1" :rowspan="2">{{ user.name }}</td>
-            <td class="sticky sticky-2" :rowspan="2">{{ user.wage }}</td>
+            <th class="sticky sticky-1">名前</th>
+            <th class="sticky sticky-2">時給</th>
+            <th class="sticky sticky-3">項目</th>
+            <th class="sticky sticky-4">合計</th>
+            <th v-for="ds in dayShifts" :key="'header-'+ds.date">
+              <router-link :to="{ name: 'Edit-Attendance', params: { date: ds.date } }">
+                {{ formatDate(ds.date) }}
+              </router-link>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="total-row">
+            <td class="sticky sticky-1" colspan="2" rowspan="2">合計</td>
             <td class="sticky sticky-3">労働時間(h)</td>
-            <td class="sticky sticky-4">{{ user.totalWorkTime }}</td>
-            <td v-for="(d, idx) in user.days" :key="'worktime'+user.name+idx">{{ d.workTime }}</td>
+            <td class="sticky sticky-4">{{ totalWorkTime }}</td>
+            <td v-for="ds in dayShifts" :key="'total-worktime'+ds.date">{{ ds.sumWorkTime }}</td>
           </tr>
-          <tr>
+          <tr class="total-row">
             <td class="sticky sticky-3">人件費</td>
-            <td class="sticky sticky-4">{{ user.monthPrice }}</td>
-            <td v-for="(d, idx) in user.days" :key="'cost'+user.name+idx">{{ d.dayPrice }}</td>
+            <td class="sticky sticky-4">{{ totalCost }}</td>
+            <td v-for="ds in dayShifts" :key="'total-cost'+ds.date">{{ ds.sumTotalCost }}</td>
           </tr>
-        </template>
-      </tbody>
-    </table>
-  </div>
-  <div class="table-footer">
-    <button class="export-btn" @click="printTable">出力</button>
-  </div>
-</template>
+          <template v-for="user in users" :key="user.name">
+            <tr>
+              <td class="sticky sticky-1" :rowspan="2">{{ user.name }}</td>
+              <td class="sticky sticky-2" :rowspan="2">{{ user.wage }}</td>
+              <td class="sticky sticky-3">労働時間(h)</td>
+              <td class="sticky sticky-4">{{ user.totalWorkTime }}</td>
+              <td v-for="(d, idx) in user.days" :key="'worktime'+user.name+idx">{{ d.workTime }}</td>
+            </tr>
+            <tr>
+              <td class="sticky sticky-3">人件費</td>
+              <td class="sticky sticky-4">{{ user.monthPrice }}</td>
+              <td v-for="(d, idx) in user.days" :key="'cost'+user.name+idx">{{ d.dayPrice }}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-footer">
+      <button class="export-btn" disabled>出力</button>
+    </div>
+  </template>
 
 <script>
 import { getAllShiftsForAllMonths } from '../services/api';
@@ -81,13 +88,18 @@ export default {
       totalWorkTime: 0, // 合計労働時間
       totalCost: 0,     // 合計人件費
       dayShifts: [],    // 日別合計
+      isAdmin: false,
+      checkedAuth: false,
     };
   },
   async mounted() {
+    // 権限チェック
+    this.isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+    this.checkedAuth = true;
+    if (!this.isAdmin) return;
     // sessionStorageの内容をコンソールに出力
     console.log('userId:', sessionStorage.getItem('userId'));
     console.log('userName:', sessionStorage.getItem('userName'));
-    console.log('isAdmin:', sessionStorage.getItem('isAdmin'));
     console.log('storeId:', sessionStorage.getItem('storeId'));
     let year, month;
     // クエリパラメータdateがあれば年月を取得

@@ -12,6 +12,19 @@
     <h1>希望シフト提出</h1>
     <div v-if="!isLoading && year && month">
       <h2>{{ year }}年{{ month }}月</h2>
+      <div style="margin-bottom: 10px;">
+        <label>選択してください：
+          <select v-model="year" @change="onYearMonthChange">
+            <option v-for="y in yearOptions" :key="y" :value="y">{{ y }}</option>
+          </select> 年
+        </label>
+        <label style="margin-left: 10px;">
+          <select v-model="month" @change="onYearMonthChange">
+            <option v-for="m in monthOptions" :key="m" :value="m">{{ m }}</option>
+          </select> 月
+        </label>
+      </div>
+      
       <div>
         <p>{{ userName }}さん</p>
         <p>ステータス：<span>{{ status }}</span></p>
@@ -80,6 +93,8 @@ export default {
       isLoading: true,
       year: null,
       month: null,
+      yearOptions: [],
+      monthOptions: [1,2,3,4,5,6,7,8,9,10,11,12],
       deadline: '',
       userName: '',
       status: '未提出', // APIから取得する想定
@@ -89,12 +104,20 @@ export default {
     };
   },
   async created() {
+    // 年の選択肢（今年と来年）
+    const thisYear = new Date().getFullYear();
+    this.yearOptions = [thisYear, thisYear + 1];
+    // 初期値は来月
+    const today = new Date();
+    let nextMonth = today.getMonth() + 2; // 1月=0なので+2
+    let year = today.getFullYear();
+    if (nextMonth > 12) {
+      year += 1;
+      nextMonth = 1;
+    }
+    this.year = year;
+    this.month = nextMonth;
     await this.fetchInitialData();
-    // sessionStorageの内容をコンソールに出力
-    console.log('userId:', sessionStorage.getItem('userId'));
-    console.log('userName:', sessionStorage.getItem('userName'));
-    console.log('isAdmin:', sessionStorage.getItem('isAdmin'));
-    console.log('storeId:', sessionStorage.getItem('storeId'));
   },
   methods: {
     async fetchInitialData() {
@@ -105,37 +128,40 @@ export default {
         this.currentUserId = userId;
         this.userName = sessionStorage.getItem('userName') || '';
 
-        // 2. 年月は「来月」
-        const today = new Date();
-        let nextMonth = today.getMonth() + 2; // 1月=0なので+2
-        let year = today.getFullYear();
-        if (nextMonth > 12) {
-          year += 1;
-          nextMonth = 1;
-        }
-        const month = nextMonth;
-        this.year = year;
-        this.month = month;
+        // 2. 年月は this.year, this.month を使う
+        const year = this.year;
+        const month = this.month;
 
         // 3. API呼び出し
         const url = `http://localhost:5011/api/Attendance/UserSchedule/Month/${userId}/${year}/${month}`;
         const response = await axios.get(url);
         const schedules = response.data;
         const shiftArray = Array.isArray(schedules) ? schedules : [];
-        this.shifts = shiftArray.map(s => ({
-          date: new Date(s.today).getDate(),
-          startTime: s.u_Start_WorkTime
-            ? (typeof s.u_Start_WorkTime === 'string'
-                ? s.u_Start_WorkTime.substring(11, 16)
-                : new Date(s.u_Start_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
-            : '',
-          endTime: s.u_End_WorkTime
-            ? (typeof s.u_End_WorkTime === 'string'
-                ? s.u_End_WorkTime.substring(11, 16)
-                : new Date(s.u_End_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
-            : '',
-          error: { start: '', end: '' },
-        }));
+        this.shifts = shiftArray.map(s => {
+          const schedule = (s.dateSchedules && s.dateSchedules[0]) ? s.dateSchedules[0] : {};
+          // 日付は s.date または schedule.today どちらでもOK
+          let dateValue = null;
+          if (s.date) {
+            const d = new Date(s.date);
+            if (!isNaN(d)) {
+              dateValue = d.getDate();
+            }
+          }
+          return {
+            date: dateValue,
+            startTime: schedule.u_Start_WorkTime
+              ? (typeof schedule.u_Start_WorkTime === 'string'
+                  ? schedule.u_Start_WorkTime.substring(11, 16)
+                  : new Date(schedule.u_Start_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
+              : '',
+            endTime: schedule.u_End_WorkTime
+              ? (typeof schedule.u_End_WorkTime === 'string'
+                  ? schedule.u_End_WorkTime.substring(11, 16)
+                  : new Date(schedule.u_End_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
+              : '',
+            error: { start: '', end: '' },
+          };
+        });
 
         // U_Confirm_Flgの取得とstatusへの反映
         // 1件でもtrueがあれば「シフト提出済み」、全てfalseまたはnullなら「シフト未提出」
@@ -250,6 +276,9 @@ export default {
       } else {
         alert('ユーザーIDを入力してください');
       }
+    },
+    onYearMonthChange() {
+      this.fetchInitialData();
     },
   },
   components: {

@@ -356,48 +356,31 @@ const fetchShifts = async (date) => {
     const data = await getDateSchedulesByDate(dateString);
     console.log('APIレスポンス', data);
 
-    // UserShiftDto配列からDateScheduleDto配列に変換
-    const dateSchedules = [];
-    (data || []).forEach(us => {
-      (us.userDateShifts || []).forEach(uds => {
-        if (uds.dateSchedule) {
-          dateSchedules.push({
-            ...uds.dateSchedule,
-            userName: us.userName,
-            hourlyWage: us.hourlyWage, // 必要なら
-            workRollName: uds.dateSchedule.workRollName,
-          });
-        }
-      });
+    // dateSchedules配列から展開してschedulesに格納
+    const rawSchedules = Array.isArray(data) ? data : (data.$values || []);
+    schedules.value = rawSchedules.flatMap(ds => {
+      const dateSchedules = Array.isArray(ds.dateSchedules) ? ds.dateSchedules : [];
+      return dateSchedules.map(dateSchedule => ({
+        scheduleId: dateSchedule.id,
+        userName: dateSchedule.userName || '',
+        hourlyWage: '', // 必要ならAPIで返すようにする
+        workRollName: dateSchedule.workRollName || '',
+        plannedStart: dateSchedule.p_Start_WorkTime
+          ? dateSchedule.p_Start_WorkTime.substring(11, 16)
+          : '',
+        plannedEnd: dateSchedule.p_End_WorkTime
+          ? dateSchedule.p_End_WorkTime.substring(11, 16)
+          : '',
+        hopeStart: dateSchedule.u_Start_WorkTime
+          ? dateSchedule.u_Start_WorkTime.substring(11, 16)
+          : '',
+        hopeEnd: dateSchedule.u_End_WorkTime
+          ? dateSchedule.u_End_WorkTime.substring(11, 16)
+          : ''
+      }));
     });
-    schedules.value = dateSchedules.map(ds => ({
-      scheduleId: ds.id,
-      userName: ds.userName || '',
-      hourlyWage: ds.hourlyWage || '',
-      workRollName: ds.workRollName || '',
-      plannedStart: ds.p_Start_WorkTime
-        ? (typeof ds.p_Start_WorkTime === 'string'
-            ? ds.p_Start_WorkTime.substring(11, 16)
-            : new Date(ds.p_Start_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
-        : '',
-      plannedEnd: ds.p_End_WorkTime
-        ? (typeof ds.p_End_WorkTime === 'string'
-            ? ds.p_End_WorkTime.substring(11, 16)
-            : new Date(ds.p_End_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
-        : '',
-      hopeStart: ds.u_Start_WorkTime
-        ? (typeof ds.u_Start_WorkTime === 'string'
-            ? ds.u_Start_WorkTime.substring(11, 16)
-            : new Date(ds.u_Start_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
-        : '',
-      hopeEnd: ds.u_End_WorkTime
-        ? (typeof ds.u_End_WorkTime === 'string'
-            ? ds.u_End_WorkTime.substring(11, 16)
-            : new Date(ds.u_End_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
-        : ''
-    }));
     // 店舗名は必要に応じてセット（APIで取得できる場合のみ）
-    storeName.value = data.length > 0 && data[0].storeName ? data[0].storeName : '';
+    storeName.value = rawSchedules.length > 0 && rawSchedules[0].storeName ? rawSchedules[0].storeName : '';
   } catch (error) {
     apiError.value = 'シフトデータの読み込みに失敗しました。';
     console.error(error);

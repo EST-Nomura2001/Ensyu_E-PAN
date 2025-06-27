@@ -46,7 +46,7 @@ async function login() {
 
     // 権限に応じてリダイレクト
     if (data.role?.isAdmin) {
-      router.push('/admin');
+      router.push('/attendance-management');
     } else {
       router.push('/part-time');
     }

@@ -2,23 +2,12 @@
 
 import axios from 'axios';
 
-// このURLはASP.NET Web APIのプロジェクトの実行URLに合わせて適宜変更してください。
-// 例: https://localhost:7123/api
-const apiClient = axios.create({
-  baseURL: '/api', // Viteのプロキシ設定を利用することを想定
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-const API_BASE_URL = 'http://localhost:5011/api'; // ASP.NET Web API or Node.js server address
-
 /**
  * @description 月次シフトの一覧を取得します。
  * @returns {Promise<Array>} 月次シフト情報の配列
  */
 export const getAttendanceData = () => {
-    return apiClient.get('/AttendanceHome');
+    return axios.get('http://localhost:5011/api/AttendanceHome');
 };
 
 /**
@@ -28,7 +17,7 @@ export const getAttendanceData = () => {
  * @returns {Promise<Object>} 更新後の月次シフト情報
  */
 export const updateAttendanceData = (id, data) => {
-    return apiClient.patch(`/AttendanceHome/${id}`, data);
+    return axios.patch(`http://localhost:5011/api/AttendanceHome/${id}`, data);
 };
 
 /**
@@ -48,7 +37,7 @@ export const getStoreInfo = (storeId) => {
 export async function getShiftsByDate(date) {
   const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD
   try {
-    const response = await fetch(`${API_BASE_URL}/shifts/${dateString}`);
+    const response = await fetch(`http://localhost:5011/api/shifts/${dateString}`);
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
@@ -64,7 +53,7 @@ export async function getShiftsByDate(date) {
 // 勤怠実績データ取得
 export async function fetchAttendanceData({ storeId, yearMonth }) {
   // 例: /api/attendance?storeId=1&date=2025-06
-  const res = await axios.get('/api/attendance', {
+  const res = await axios.get('http://localhost:5011/api/attendance', {
     params: { storeId, date: yearMonth }
   });
   return res.data;
@@ -73,41 +62,44 @@ export async function fetchAttendanceData({ storeId, yearMonth }) {
 // 勤怠実績データ更新（関数名を競合回避のため変更）
 export async function updateAttendanceRecord(payload) {
   // payloadは編集内容
-  const res = await axios.put('/api/attendance', payload);
+  const res = await axios.put('http://localhost:5011/api/attendance', payload);
   return res.data;
 }
 
 // 店舗一覧取得
 export async function fetchStores() {
-  const res = await axios.get('/api/stores');
+  const res = await axios.get('http://localhost:5011/api/stores');
   return res.data;
 }
 
 // ユーザー一覧取得
 export async function fetchUsers({ storeId }) {
-  const res = await axios.get('/api/users', { params: { storeId } });
+  const res = await axios.get('http://localhost:5011/api/users', { params: { storeId } });
   return res.data;
 }
 
 /**
- * 勤怠編集画面用：指定日付・店舗の勤怠データ取得
+ * 勤怠編集画面用：指定日付の勤怠データ取得
  * @param {string} date - 'YYYY-MM-DD' 形式
- * @param {number} storeId
  * @returns {Promise<Object>} 勤怠データ
  */
-export function getAttendanceByDateStore(date, storeId) {
-  return apiClient.get(`/attendance`, { params: { date, storeId } });
+export async function getAttendanceByDateStore(date) {
+  // /api/Attendance/DateSchedules/{today} を直接叩く
+  const response = await fetch(`http://localhost:5011/api/Attendance/DateSchedules/${date}`);
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  return await response.json();
 }
 
 /**
- * 勤怠編集画面用：指定日付・店舗の勤怠データ保存
+ * 勤怠編集画面用：指定日付の勤怠データ保存
  * @param {string} date - 'YYYY-MM-DD' 形式
- * @param {number} storeId
  * @param {Array<Object>} users - 編集後のユーザーデータ配列
  * @returns {Promise<Object>} 保存結果
  */
-export function updateAttendanceByDateStore(date, storeId, users) {
-  return apiClient.put(`/attendance/${date}/${storeId}`, { users });
+export function updateAttendanceByDateStore(date, users) {
+  return axios.put(`http://localhost:5011/api/attendance/${date}`, { users });
 }
 
 /**勤怠ホーム画面、新規作成ボタンに対応。
@@ -250,8 +242,6 @@ export function fetchDateSchedules(today) {
  * @param {string} action - 'clockIn' | 'clockOut' | 'startBreak' | 'endBreak'
  * @returns {Promise}
  */
-export function operateAttendance(userId, scheduleId, action) {
-  // actionごとにエンドポイントやbodyを変えたい場合はここで分岐
-  // 今回はURLのみ指定、bodyは空
-  return axios.put(`http://localhost:5011/api/Attendance/users/${userId}/schedules/${scheduleId}/${action}`, {});
+export function operateAttendance(userId, scheduleId, updateDto) {
+  return axios.put(`http://localhost:5011/api/Attendance/users/${userId}/schedules/${scheduleId}`, updateDto);
 } 

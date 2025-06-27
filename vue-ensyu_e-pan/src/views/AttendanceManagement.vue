@@ -3,8 +3,11 @@
   <div class="attendance-management">
     <h1>勤怠管理</h1>
     <div>
-      <label>日付選択：</label>
-      <input type="date" v-model="selectedDate" @change="fetchData" />
+      <label>表示中の日付：</label>
+      <span>{{ formatDateJp(selectedDate) }}</span>
+    </div>
+    <div style="margin-bottom: 16px;">
+      <button @click="goToEditAttendance">編集画面へ</button>
     </div>
     <table>
       <thead>
@@ -47,6 +50,7 @@
 <script>
 import { ref, onMounted, computed } from 'vue';
 import { fetchDateSchedules, operateAttendance } from '../services/api';
+import { useRouter } from 'vue-router';
 
 //ヘッダー用
 import CommonHeader from '../components/CommonHeader.vue';
@@ -59,6 +63,7 @@ export default {
     const allAttendanceData = ref([]);
     const todayStr = new Date().toISOString().slice(0, 10);
     const selectedDate = ref(todayStr);
+    const router = useRouter();
 
     const attendanceData = computed(() => {
       if (userRole.value === 'partTime') {
@@ -74,8 +79,21 @@ export default {
     const fetchData = async () => {
       try {
         const response = await fetchDateSchedules(selectedDate.value);
-        allAttendanceData.value = response.data;
-        console.log('APIレスポンス:', response.data);
+        // データ整形処理を追加
+        const formatted = response.data.flatMap(day =>
+          day.dateSchedules.map(ds => ({
+            user_Id: ds.userId,
+            userName: ds.userName,
+            userDateShifts: [
+              {
+                id: ds.id,
+                dateSchedule: ds
+              }
+            ]
+          }))
+        );
+        allAttendanceData.value = formatted;
+        console.log('整形後:', formatted);
       } catch (error) {
         console.error('Failed to fetch attendance data:', error);
       }
@@ -91,10 +109,43 @@ export default {
       return date.toLocaleString();
     };
 
+    // 日付を「2025年6月27日」形式で返す関数
+    const formatDateJp = (dateStr) => {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      return `${year}年${month}月${day}日`;
+    };
+
+    // JSTのISO文字列を返す関数
+    const toJstISOString = (date) => {
+      const jst = new Date(date.getTime() + (9 * 60 * 60 * 1000));
+      return jst.toISOString().replace('Z', '+09:00');
+    };
+
     // 勤怠操作ボタン用
     const clockIn = async (userId, scheduleId) => {
       try {
-        await operateAttendance(userId, scheduleId, 'clockIn');
+        // 対象のシフト情報を取得
+        const item = allAttendanceData.value.find(i => i.user_Id === userId);
+        const shift = item?.userDateShifts.find(s => s.id === scheduleId);
+        const ds = shift?.dateSchedule;
+        if (!ds) throw new Error('シフト情報が見つかりません');
+        // UpdateDateScheduleDtoを作成
+        const now = new Date();
+        const updateDto = {
+          Id: ds.id,
+          User_Id: userId,
+          Work_Roll_Id: ds.workRollId,
+          Day_Shift_Id: ds.dayShiftId,
+          Start_WorkTime: toJstISOString(now),
+          End_WorkTime: ds.end_WorkTime,
+          Start_BreakTime: ds.start_BreakTime,
+          End_BreakTime: ds.end_BreakTime
+        };
+        await operateAttendance(userId, scheduleId, updateDto);
         await fetchData();
       } catch (e) {
         alert('出勤処理に失敗しました');
@@ -102,7 +153,22 @@ export default {
     };
     const clockOut = async (userId, scheduleId) => {
       try {
-        await operateAttendance(userId, scheduleId, 'clockOut');
+        const item = allAttendanceData.value.find(i => i.user_Id === userId);
+        const shift = item?.userDateShifts.find(s => s.id === scheduleId);
+        const ds = shift?.dateSchedule;
+        if (!ds) throw new Error('シフト情報が見つかりません');
+        const now = new Date();
+        const updateDto = {
+          Id: ds.id,
+          User_Id: userId,
+          Work_Roll_Id: ds.workRollId,
+          Day_Shift_Id: ds.dayShiftId,
+          Start_WorkTime: ds.start_WorkTime,
+          End_WorkTime: toJstISOString(now),
+          Start_BreakTime: ds.start_BreakTime,
+          End_BreakTime: ds.end_BreakTime
+        };
+        await operateAttendance(userId, scheduleId, updateDto);
         await fetchData();
       } catch (e) {
         alert('退勤処理に失敗しました');
@@ -110,7 +176,22 @@ export default {
     };
     const startBreak = async (userId, scheduleId) => {
       try {
-        await operateAttendance(userId, scheduleId, 'startBreak');
+        const item = allAttendanceData.value.find(i => i.user_Id === userId);
+        const shift = item?.userDateShifts.find(s => s.id === scheduleId);
+        const ds = shift?.dateSchedule;
+        if (!ds) throw new Error('シフト情報が見つかりません');
+        const now = new Date();
+        const updateDto = {
+          Id: ds.id,
+          User_Id: userId,
+          Work_Roll_Id: ds.workRollId,
+          Day_Shift_Id: ds.dayShiftId,
+          Start_WorkTime: ds.start_WorkTime,
+          End_WorkTime: ds.end_WorkTime,
+          Start_BreakTime: toJstISOString(now),
+          End_BreakTime: ds.end_BreakTime
+        };
+        await operateAttendance(userId, scheduleId, updateDto);
         await fetchData();
       } catch (e) {
         alert('休憩入処理に失敗しました');
@@ -118,11 +199,31 @@ export default {
     };
     const endBreak = async (userId, scheduleId) => {
       try {
-        await operateAttendance(userId, scheduleId, 'endBreak');
+        const item = allAttendanceData.value.find(i => i.user_Id === userId);
+        const shift = item?.userDateShifts.find(s => s.id === scheduleId);
+        const ds = shift?.dateSchedule;
+        if (!ds) throw new Error('シフト情報が見つかりません');
+        const now = new Date();
+        const updateDto = {
+          Id: ds.id,
+          User_Id: userId,
+          Work_Roll_Id: ds.workRollId,
+          Day_Shift_Id: ds.dayShiftId,
+          Start_WorkTime: ds.start_WorkTime,
+          End_WorkTime: ds.end_WorkTime,
+          Start_BreakTime: ds.start_BreakTime,
+          End_BreakTime: toJstISOString(now)
+        };
+        await operateAttendance(userId, scheduleId, updateDto);
         await fetchData();
       } catch (e) {
         alert('休憩戻処理に失敗しました');
       }
+    };
+
+    // 編集画面へ遷移
+    const goToEditAttendance = () => {
+      router.push({ name: 'Edit-Attendance' });
     };
 
     onMounted(() => {
@@ -144,6 +245,8 @@ export default {
       selectedDate,
       fetchData,
       formatDateTime,
+      formatDateJp,
+      goToEditAttendance
     };
   },
 

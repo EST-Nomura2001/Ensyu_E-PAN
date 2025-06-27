@@ -107,9 +107,10 @@ const router = createRouter({
       component: () => import('../views/RecordAttendance.vue'),
     },
     {//勤怠編集画面（後日）
-      path: '/Edit-Attendance',
+      path: '/Edit-Attendance/:date?',
       name: 'Edit-Attendance',
       component: () => import('../views/EditAttendance.vue'),
+      props: route => ({ date: route.query.date })
     },
   ],
 })

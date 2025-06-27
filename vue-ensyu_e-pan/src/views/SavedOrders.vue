@@ -1,3 +1,4 @@
+
 <template>
   <CommonHeader />
   <!-- 保存済み発注書一覧のメインコンテナ -->
@@ -9,7 +10,7 @@
       <!-- アクションボタンエリア（新規作成ボタンと更新ボタン） -->
       <div class="actions">
         <!-- 新規発注書作成ページへのリンク -->
-        <router-link to="/" class="action-btn new-order-btn">＋ 新規発注書を作成</router-link>
+        <router-link :to="{ name: 'PurchaseOrder' }" class="action-btn new-order-btn">＋ 新規発注書を作成</router-link>
         <!-- 一覧を再読み込みするボタン -->
         <button @click="fetchOrders" class="refresh-btn">一覧を更新</button>
       </div>
@@ -27,7 +28,6 @@
               <th>発注日</th>
               <th>支払日</th>
               <th class="col-confirm">確定</th>
-              <th class="col-confirm">削除</th>
             </tr>
           </thead>
           
@@ -35,12 +35,12 @@
           <tbody>
             <!-- データ読み込み中の表示 -->
             <tr v-if="isLoading">
-              <td colspan="7">読み込み中...</td>
+              <td colspan="6">読み込み中...</td>
             </tr>
             
             <!-- 保存された発注書が0件の場合の表示 -->
             <tr v-else-if="savedOrders.length === 0">
-              <td colspan="7">保存された発注書はありません。</td>
+              <td colspan="6">保存された発注書はありません。</td>
             </tr>
             
             <!-- 保存された発注書を1行ずつ表示 -->
@@ -62,9 +62,6 @@
               <!-- 確定済みの場合のみチェックマークを表示 -->
               <td class="col-confirm">
                 <span v-if="order.confirm_Flg" class="confirmed-mark">✔</span>
-              </td>
-              <td class="col-confirm">
-                <button @click.stop="deleteOrder(order.id)">削除</button>
               </td>
             </tr> 
           </tbody>
@@ -97,8 +94,8 @@ export default {
     // 発注書詳細ページに遷移する関数
     const navigateToPurchaseOrder = (orderId) => {
       // クエリパラメータとしてIDを渡して発注書ページに遷移
-      // 例: /purchase-order?id=123 のようなURLになる
-      router.push({ name: 'PurchaseOrder', query: { id: orderId } });
+      // 例: /edit-order?id=123 のようなURLになる
+      router.push({ name: 'PurchaseEditOrder', query: { id: orderId } });
     };
 
     // setup関数で定義した関数をコンポーネントで使えるように返す

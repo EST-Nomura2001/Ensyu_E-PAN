@@ -15,7 +15,7 @@ function logout() {
         <li><RouterLink to="/attendance-management">本日のシフト勤怠登録</RouterLink></li>
         <li><RouterLink to="/attendance-home">勤怠ホーム</RouterLink></li>
         <li><RouterLink to="/kibou-form">シフト希望フォーム</RouterLink></li>
-        <li><RouterLink to="/purchase-order">発注管理</RouterLink></li>
+        <li><RouterLink to="/saved-order">発注管理</RouterLink></li>
         <li><RouterLink to="/admin">アカウント管理</RouterLink></li>
         <li>
           <button class="logout-btn" @click="logout">ログアウト</button>

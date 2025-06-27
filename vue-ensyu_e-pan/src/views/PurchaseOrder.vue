@@ -3,6 +3,8 @@
   このコンポーネントは発注書を作成・編集・印刷する機能を持っています
 -->
 <template>
+    <CommonHeader />
+
   <div id="purchase-order-page">
     <div id="purchase-order-container">
       <!-- 発注書ヘッダー部分 -->
@@ -214,6 +216,8 @@
 <script>
 // Axiosライブラリをインポート（HTTP通信を行うためのライブラリ）
 import axios from 'axios';
+import CommonHeader from '../components/CommonHeader.vue';
+
 
 // APIサーバーのベースURL
 const API_BASE_URL = 'http://localhost:5011';
@@ -225,6 +229,10 @@ function generateRandomQuotation() {
 
 // Vue.jsコンポーネントの定義
 export default {
+  components:{
+  CommonHeader
+},
+
   name: 'PurchaseOrder', // コンポーネントの名前
   props: ['id'], // 親コンポーネントから受け取るプロパティ（発注書のID）
   
@@ -270,27 +278,24 @@ export default {
   },
   
   // watchは特定の値の変化を監視する機能
-  watch: {
-    // URLのクエリパラメータ（?id=xxx）が変更されたときの処理
-    '$route.query.id': {
-      immediate: true, // コンポーネント作成時にも実行
-      handler(newId) {
-        if (newId) {
-          // IDがある場合は既存データを読み込み
-          this.loadOrder(newId);
-        } else {
-          // IDがない場合は新規作成フォームを表示
-          this.resetForm();
-        }
-      }
-    }
-  },
+  // '$route.query.id': {
+  //   immediate: true, // コンポーネント作成時にも実行
+  //   handler(newId) {
+  //     if (newId) {
+  //       // IDがある場合は既存データを読み込み
+  //       this.loadOrder(newId);
+  //     } else {
+  //       // IDがない場合は新規作成フォームを表示
+  //       this.resetForm();
+  //     }
+  //   }
+  // },
   
   // メソッド定義：このコンポーネントで使用する関数
   methods: {
     // 新規作成用のフォーム初期化
     resetForm() {
-      this.$router.push({ name: 'PurchaseOrder' });
+      // this.$router.push({ name: 'PurchaseOrder' }); // ルーター遷移は不要
       const today = new Date();
       const yyyy = today.getFullYear();
       const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -323,51 +328,6 @@ export default {
       };
     },
     
-    // 既存データの読み込み（非同期処理）
-    async loadOrder(orderId) {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/api/PurchaseOrders/${orderId}`);
-        if (response.data && response.data.success) {
-          const d = response.data.data;
-          this.purchaseOrder = {
-            Id: d.id,
-            Title: d.title,
-            Quotation: d.quotation,
-            Tax: d.tax,
-            Order_Date: d.order_Date ? d.order_Date.substring(0, 10) : '',
-            Delivery_Date: d.delivery_Date ? d.delivery_Date.substring(0, 10) : '',
-            Payment_Date: d.payment_Date ? d.payment_Date.substring(0, 10) : '',
-            Payment_Terms: d.payment_Terms,
-            Confirm_Flg: d.confirm_Flg,
-            Company: d.company || { Id: '' },
-            Store: d.store || { Id: 1 },
-            Manager: d.manager,
-            Other: d.other,
-            OrderItems: (d.orderItems) ? d.orderItems.map(item => ({
-              Id: item.id || null,
-              Item_Cd: item.item_Cd,
-              Item_Name: item.item_Name,
-              Amount: item.amount,
-              Other_ItemName: item.other_ItemName
-            })) : [],
-            Postal_Code: d.company?.post_Code || '',
-            Address1: d.company?.address1 || '',
-            Address2: d.company?.address2 || '',
-            Tel: d.company?.tel || '',
-            Fax: d.company?.fax || '',
-            Email: d.company?.mail || '',
-            CustomerName: d.company?.c_Name || ''
-          };
-        } else {
-          alert('発注書が見つかりません');
-          this.resetForm();
-        }
-      } catch (error) {
-        alert('発注書の取得に失敗しました');
-        this.resetForm();
-      }
-    },
-
     // 商品行を追加する関数
     addItem() {
       if (this.purchaseOrder.Confirm_Flg) return;
@@ -391,11 +351,8 @@ export default {
         return;
       }
       this.purchaseOrder.Confirm_Flg = isConfirm;
-      if (this.purchaseOrder.Id) {
-        await this.updateOrder();
-      } else {
-        await this.saveOrder();
-      }
+      // 編集分岐を削除し、常に新規作成APIのみ呼ぶ
+      await this.saveOrder();
     },
 
     // 実際の保存処理（非同期処理）
@@ -470,72 +427,6 @@ export default {
     printPage() {
       // ブラウザの印刷機能を呼び出し
       window.print();
-    },
-
-    async updateOrder() {
-      this.isSaving = true;
-      try {
-        const payload = {
-          title: this.purchaseOrder.Title,
-          quotation: Number(this.purchaseOrder.Quotation),
-          tax: Number(this.purchaseOrder.Tax),
-          order_Date: this.purchaseOrder.Order_Date ? this.purchaseOrder.Order_Date + 'T00:00:00.000Z' : null,
-          delivery_Date: this.purchaseOrder.Delivery_Date ? this.purchaseOrder.Delivery_Date + 'T00:00:00.000Z' : null,
-          payment_Date: this.purchaseOrder.Payment_Date ? this.purchaseOrder.Payment_Date + 'T00:00:00.000Z' : null,
-          payment_Terms: this.purchaseOrder.Payment_Terms || 'string',
-          confirm_Flg: this.purchaseOrder.Confirm_Flg,
-          manager: this.purchaseOrder.Manager || 'string',
-          other: this.purchaseOrder.Other || 'string',
-          company: {
-            id: Number(this.purchaseOrder.Company.Id),
-            c_Name: this.purchaseOrder.CustomerName || 'string',
-            address1: this.purchaseOrder.Address1 || 'string',
-            address2: this.purchaseOrder.Address2 || 'string',
-            post_Code: this.purchaseOrder.Postal_Code || 'string',
-            mail: this.purchaseOrder.Email || 'string',
-            tel: this.purchaseOrder.Tel || 'string',
-            fax: this.purchaseOrder.Fax || 'string'
-          },
-          store: {
-            id: Number(this.purchaseOrder.Store.Id),
-            c_Name: this.purchaseOrder.Store.c_Name || 'string',
-            address1: this.purchaseOrder.Store.address1 || 'string',
-            address2: this.purchaseOrder.Store.address2 || 'string',
-            post_Code: this.purchaseOrder.Store.post_Code || 'string',
-            mail: this.purchaseOrder.Store.mail || 'string',
-            tel: this.purchaseOrder.Store.tel || 'string',
-            fax: this.purchaseOrder.Store.fax || 'string'
-          },
-          orderItems: this.purchaseOrder.OrderItems
-            .filter(item => item.Item_Cd !== null && item.Item_Cd !== '' && !isNaN(item.Item_Cd))
-            .map(item => ({
-              id: item.Id || 0,
-              item_Cd: Number(item.Item_Cd),
-              item_Name: item.Item_Name || 'string',
-              amount: Number(item.Amount),
-              other_ItemName: item.Other_ItemName || 'string'
-            }))
-        };
-        // OrderItemsのバリデーション
-        if (payload.orderItems.length === 0) {
-          alert('商品が1つも入力されていません。');
-          this.isSaving = false;
-          return;
-        }
-        const response = await axios.put(`${API_BASE_URL}/api/PurchaseOrders/updateOrder/${this.purchaseOrder.Id}`, payload);
-        if (response.data && response.data.success) {
-          alert('発注書が正常に更新されました。');
-          this.$router.push({ name: 'SavedOrders' });
-          throw '__ROUTER_PUSH__';
-        } else {
-          alert('更新に失敗しました');
-        }
-      } catch (error) {
-        if (error === '__ROUTER_PUSH__') return;
-        if (!this.isUnmounted) alert('更新時にエラーが発生しました');
-      } finally {
-        this.isSaving = false;
-      }
     },
 
     async onCompanyChange() {

@@ -1,6 +1,8 @@
 <script setup>
 import axios from 'axios'
 import { ref, reactive, onMounted } from 'vue'
+import CommonHeader from '@/components/CommonHeader.vue';
+
 
 const users = ref([]);
 const rolls = ref([]);//役職一覧
@@ -143,6 +145,7 @@ onMounted(()=>{
 </script>
 
 <template>
+    <CommonHeader/>
   <div>
     <h2>アカウント一覧</h2>
     <table>

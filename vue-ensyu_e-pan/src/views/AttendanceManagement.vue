@@ -11,7 +11,7 @@
     </div>
 
     <!-- 追加: データがない場合のメッセージ表示 -->
-    <div v-if="attendanceData.length === 0" style="margin-bottom: 16px; color: red;">
+    <div v-if="isNoWorkToday" style="margin-bottom: 16px; color: red;">
       本日の業務はありません
     </div>
 
@@ -81,6 +81,16 @@ export default {
 
     const canOperate = computed(() => {
       return sessionStorage.getItem('isAdmin') === 'true';
+    });
+
+    // 追加: 本日の業務がないか判定
+    const isNoWorkToday = computed(() => {
+      if (attendanceData.value.length === 0) return true;
+      return attendanceData.value.every(item =>
+        item.userDateShifts.every(shift =>
+          !shift.dateSchedule.p_Start_WorkTime
+        )
+      );
     });
 
     const fetchData = async () => {
@@ -253,7 +263,8 @@ export default {
       fetchData,
       formatDateTime,
       formatDateJp,
-      goToEditAttendance
+      goToEditAttendance,
+      isNoWorkToday
     };
   },
 

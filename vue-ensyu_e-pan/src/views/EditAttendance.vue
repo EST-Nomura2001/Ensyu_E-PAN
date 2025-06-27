@@ -19,10 +19,10 @@
         <thead>
           <tr>
             <th>名前</th>
-            <th>時給</th>
-            <th>人件費</th>
-            <th>勤務時間</th>
-            <th>うち深夜勤務時間</th> <!--要相談-->
+            <th>時給(円)</th>
+            <th>人件費(円)</th>
+            <th>勤務時間(h)</th>
+            <th>うち深夜勤務時間(h)</th> <!--要相談-->
             <th>出勤時間</th>
             <th>退勤時間</th>
             <th>休憩入り時間</th>
@@ -123,9 +123,6 @@ import CommonHeader from '../components/CommonHeader.vue';
 
   export default {
   name: 'EditAttendance',
-  props: {
-    date: { type: String, required: true }, // 'YYYY-MM-DD'
-  },
   data() {
     return {
       tableData: [],
@@ -153,7 +150,7 @@ import CommonHeader from '../components/CommonHeader.vue';
     async fetchAttendance() {
       try {
         // today（日付）を決定
-        let today = this.date;
+        let today = this.$route.params.date || this.$route.query.date;
         if (!today) {
           const now = new Date();
           today = now.toISOString().slice(0, 10); // 'YYYY-MM-DD'
@@ -227,7 +224,7 @@ import CommonHeader from '../components/CommonHeader.vue';
       }
       try {
         // 編集日付
-        const date = this.date || this.dayShiftDate;
+        const date = this.dayShiftDate;
         // 全行PUT
         for (let i = 0; i < this.editRows.length; i++) {
           const edit = this.editRows[i];
@@ -368,14 +365,22 @@ import CommonHeader from '../components/CommonHeader.vue';
       },
       deep: true
     },
-    date: {
-      immediate: false,
+    '$route.params.date': {
+      immediate: true,
       handler(newVal, oldVal) {
         if (newVal !== oldVal) {
           this.fetchAttendance();
         }
       }
-    }
+    },
+    '$route.query.date': {
+      immediate: true,
+      handler(newVal, oldVal) {
+        if (newVal !== oldVal) {
+          this.fetchAttendance();
+        }
+      }
+    },
   },
 
   //ヘッダー表示

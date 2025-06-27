@@ -25,25 +25,6 @@ namespace Ensyu_E_PAN.Controllers
             _context = context;
             _calcService = new AttendanceCalculationService();
         }
-        //Get処理↓
-        //全体の本日分のスケジュールを渡す
-        //[HttpGet("DateSchedules/{today}")]
-        //public async Task<IActionResult> GetTodayAttendance(DateTime today)
-        //{
-        //    var records = await _context.Date_Schedules
-        //     .Where(ds => ds.Today.Date == today.Date) // ここで日付だけを比較
-        //                                               // DateSchedule 直下の関係
-        //    .Include(ds => ds.User)
-        //    .Include(ds => ds.WorkRoll)
-        //    .Include(ds => ds.DayShift)
-
-        //    // UserDateShifts → UserShift → User
-        //    .Include(ds => ds.UserDateShifts)
-        //        .ThenInclude(uds => uds.UserShift)
-        //            .ThenInclude(us => us.User)
-        //    .ToListAsync();
-        //    return Ok(records);
-        //}
 
         [HttpGet("DateSchedules/{today}")]
         public async Task<IActionResult> GetTodayAttendance(DateTime today)
@@ -184,7 +165,6 @@ namespace Ensyu_E_PAN.Controllers
             return Ok(dtoList);
         }
 
-        //個人の本日のスケジュール
         [HttpGet("UserSchedule/Day/{userId}/{date}")]
         public async Task<IActionResult> GetUserDailySchedule(int userId, DateTime date)
         {
@@ -192,12 +172,51 @@ namespace Ensyu_E_PAN.Controllers
                 .Where(ds => ds.User_Id == userId && ds.Today.Date == date.Date)
                 .Include(ds => ds.WorkRoll)
                 .Include(ds => ds.DayShift)
+                .Include(ds => ds.User)
                 .Include(ds => ds.UserDateShifts)
                     .ThenInclude(uds => uds.UserShift)
                         .ThenInclude(us => us.AllShift)
                 .FirstOrDefaultAsync();
 
-            return schedule != null ? Ok(schedule) : NotFound();
+            if (schedule == null)
+                return NotFound();
+
+            // AllShift 関連情報取得
+            var allShift = schedule.UserDateShifts?
+                .FirstOrDefault()?
+                .UserShift?
+                .AllShift;
+
+            var userShift = schedule.UserDateShifts?
+                .FirstOrDefault()?
+                .UserShift;
+
+            var dto = new DateScheduleDto
+            {
+                Id = schedule.Id,
+                Today = schedule.Today,
+                P_Start_WorkTime = schedule.P_Start_WorkTime,
+                P_End_WorkTime = schedule.P_End_WorkTime,
+                U_Start_WorkTime = schedule.U_Start_WorkTime,
+                U_End_WorkTime = schedule.U_End_WorkTime,
+                Start_WorkTime = schedule.Start_WorkTime,
+                End_WorkTime = schedule.End_WorkTime,
+                Start_BreakTime = schedule.Start_BreakTime,
+                End_BreakTime = schedule.End_BreakTime,
+                T_WorkTime_D = schedule.T_WorkTime_D,
+                T_WorkTime_N = schedule.T_WorkTime_N,
+                T_WorkTime_All = schedule.T_WorkTime_All,
+                D_DayPrice = schedule.D_DayPrice,
+                N_DayPrice = schedule.N_DayPrice,
+                T_DayPrice = schedule.T_DayPrice,
+
+                UserName = schedule.User?.Name,
+                WorkRollName = schedule.WorkRoll?.Name,
+                DayShiftDate = schedule.DayShift?.Date,
+                U_Confirm_Flg = userShift?.U_Confirm_Flg,
+            };
+
+            return Ok(dto);
         }
 
 
@@ -323,7 +342,7 @@ namespace Ensyu_E_PAN.Controllers
                         {
                             Today = dayShift.Date,
                             User_Id = user.Id,
-                            Work_Roll_Id = workRoll.Id,
+                            Work_Roll_Id = 0,//初期値は0で固定
                             Day_Shift_Id = dayShift.Id
                         };
                         _context.Date_Schedules.Add(schedule);
@@ -461,6 +480,7 @@ namespace Ensyu_E_PAN.Controllers
                 return NotFound("DateSchedule not found.");
             }
 
+            dateSchedule.Work_Roll_Id = request.Work_Roll_Id;
             dateSchedule.P_Start_WorkTime = request.P_Start_WorkTime;
             dateSchedule.P_End_WorkTime = request.P_End_WorkTime;
 

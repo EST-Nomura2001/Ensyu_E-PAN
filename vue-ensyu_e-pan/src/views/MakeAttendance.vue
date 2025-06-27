@@ -233,7 +233,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
-import { getDateSchedulesByDate, updateSchedulesBulk } from '../services/api.js';
+import { getDateSchedulesByDate } from '../services/api.js';
 import { isEqual } from 'lodash-es';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';

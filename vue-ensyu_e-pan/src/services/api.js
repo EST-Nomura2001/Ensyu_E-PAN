@@ -14,56 +14,6 @@ const apiClient = axios.create({
 const API_BASE_URL = 'http://localhost:5011/api'; // ASP.NET Web API or Node.js server address
 
 /**
- * @description シフト希望を募集中の年月と提出期限を取得します。
- * @returns {Promise<Object>} { year, month, deadline } を含むPromiseオブジェクト
- */
-export const getRecruitingShiftInfo = () => {
-  // バックエンド側で、ALL_SHIFTSテーブルからREC_FLGがTRUEのレコードを検索し、
-  // 該当する年月と提出期限などを返却することを想定しています。
-  // GET /api/shifts/recruiting
-  return apiClient.get('/shifts/recruiting');
-};
-
-/**
- * @description 特定ユーザーの、指定年月の希望シフト情報を取得します。
- * @param {number} userId ユーザーID
- * @param {number} year 年
- * @param {number} month 月
- * @returns {Promise<Array>} 希望シフトの配列を返すPromiseオブジェクト
- */
-export const getUserShifts = (userId, year, month) => {
-  // バックエンド側で、DATE_SCHEDULESテーブルなどから該当ユーザーのデータを検索し、
-  // 日付、開始時間、終了時間の一覧を返却することを想定しています。
-  // GET /api/users/{userId}/shifts?year={year}&month={month}
-  return apiClient.get(`/users/${userId}/shifts`, { params: { year, month } });
-};
-
-/**
- * @description 希望シフトをサーバーに提出（保存）します。
- * @param {number} userId ユーザーID
- * @param {Array<Object>} shifts 希望シフトのデータ配列
- * @returns {Promise<Object>} 成功レスポンスを返すPromiseオブジェクト
- */
-export const submitUserShifts = (userId, shifts) => {
-  // バックエンド側で、受け取ったデータをDATE_SCHEDULESテーブルなどに保存します。
-  // POST /api/users/{userId}/shifts
-  const payload = {
-    shifts: shifts.filter(day => day.startTime && day.endTime) // 入力があるものだけ送信
-  };
-  return apiClient.post(`/users/${userId}/shifts`, payload);
-};
-
-/**
- * @description ユーザー情報を取得します。
- * @param {number} userId ユーザーID
- * @returns {Promise<Object>} { name } を含むユーザー情報のPromiseオブジェクト
- */
-export const getUserInfo = (userId) => {
-    // GET /api/users/{userId}
-    return axios.get(`http://localhost:5011/api/users/${userId}`);
-};
-
-/**
  * @description 月次シフトの一覧を取得します。
  * @returns {Promise<Array>} 月次シフト情報の配列
  */
@@ -109,99 +59,6 @@ export async function getShiftsByDate(date) {
     // For now, returning mock data to allow UI development
     return getMockShiftData(date);
   }
-}
-
-/**
- * スケジュールを更新します。
- * @param {number} scheduleId - 更新するスケジュールのID (DATE_SCHEDULES.ID)
- * @param {Object} data - 更新するデータ { workRollName, plannedStart, plannedEnd }
- * @returns {Promise<Object>} - 更新されたスケジュールオブジェクト
- */
-export async function updateSchedule(scheduleId, data) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/schedules/${scheduleId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error updating schedule:', error);
-    throw error;
-  }
-}
-
-/**
- * 複数のスケジュールを一括で更新します。
- * @param {Array<Object>} schedules - 更新するスケジュールの配列
- * @returns {Promise<Object>} - 更新結果
- */
-export async function updateSchedulesBulk(schedules) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/schedules/bulk`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(schedules),
-    });
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error bulk updating schedules:', error);
-    // In a real app, you'd want to show a user-friendly error
-    throw error;
-  }
-}
-
-// --- Mock Data for UI Development ---
-// This part should be removed when the backend API is ready.
-function getMockShiftData(date) {
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-
-    return {
-        storeName: `〇〇店`,
-        schedules: [
-            {
-                scheduleId: 101,
-                userName: "田中 太郎",
-                hourlyWage: 1200,
-                workRollName: "レジ",
-                hopeStart: "10:00",
-                hopeEnd: "14:30",
-                plannedStart: "10:00",
-                plannedEnd: "11:30"
-            },
-            {
-                scheduleId: 102,
-                userName: "鈴木 花子",
-                hourlyWage: 1150,
-                workRollName: "品出し",
-                hopeStart: "12:00",
-                hopeEnd: "15:00",
-                plannedStart: "13:00",
-                plannedEnd: "14:00"
-            },
-            {
-                scheduleId: 103,
-                userName: "佐藤 次郎",
-                hourlyWage: 1250,
-                workRollName: "清掃",
-                hopeStart: "14:00",
-                hopeEnd: "17:00",
-                plannedStart: "15:00",
-                plannedEnd: "16:30"
-            },
-        ]
-    }
 }
 
 // 勤怠実績データ取得
@@ -336,4 +193,47 @@ export function updateRecFlag(id, recFlg) {
   return axios.put(`http://localhost:5011/api/Attendance/allshift/${id}/rec-flag`, recFlg, {
     headers: { 'Content-Type': 'application/json' }
   });
+}
+
+// --- Mock Data for UI Development ---
+// This part should be removed when the backend API is ready.
+function getMockShiftData(date) {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+
+    return {
+        storeName: `〇〇店`,
+        schedules: [
+            {
+                scheduleId: 101,
+                userName: "田中 太郎",
+                hourlyWage: 1200,
+                workRollName: "レジ",
+                hopeStart: "10:00",
+                hopeEnd: "14:30",
+                plannedStart: "10:00",
+                plannedEnd: "11:30"
+            },
+            {
+                scheduleId: 102,
+                userName: "鈴木 花子",
+                hourlyWage: 1150,
+                workRollName: "品出し",
+                hopeStart: "12:00",
+                hopeEnd: "15:00",
+                plannedStart: "13:00",
+                plannedEnd: "14:00"
+            },
+            {
+                scheduleId: 103,
+                userName: "佐藤 次郎",
+                hourlyWage: 1250,
+                workRollName: "清掃",
+                hopeStart: "14:00",
+                hopeEnd: "17:00",
+                plannedStart: "15:00",
+                plannedEnd: "16:30"
+            },
+        ]
+    }
 } 

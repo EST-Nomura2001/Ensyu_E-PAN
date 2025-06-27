@@ -9,7 +9,14 @@
     <div style="margin-bottom: 16px;">
       <button @click="goToEditAttendance">編集画面へ</button>
     </div>
-    <table>
+
+    <!-- 追加: データがない場合のメッセージ表示 -->
+    <div v-if="attendanceData.length === 0" style="margin-bottom: 16px; color: red;">
+      本日の業務はありません
+    </div>
+
+    <!-- データがある場合のみテーブルを表示 -->
+    <table v-else>
       <thead>
         <tr>
           <th>名前</th>

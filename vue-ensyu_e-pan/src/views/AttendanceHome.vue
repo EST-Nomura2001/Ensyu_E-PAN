@@ -30,17 +30,31 @@
           <input type="text" v-model="storeId" style="width: 80px;" />
           <button @click="setStoreId">店舗ID設定</button>
         </div>-->
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <input
-            type="number"
-            v-model.number="selectedYear"
-            min="2000"
-            max="2100"
-            @input="validateYear"
-            style="width: 90px;"
-          />
-          <button @click="fetchShiftsByYear">指定年のシフト取得</button>
-          <button @click="handleGenerateMonthly">翌月の新規作成</button>
+        <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input
+              type="number"
+              v-model.number="selectedYear"
+              min="2000"
+              max="2100"
+              @input="validateYear"
+              style="width: 90px;"
+            />
+            <button @click="fetchShiftsByYear">指定年のシフト取得</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input
+              type="number"
+              v-model.number="generateYear"
+              min="2000"
+              max="2100"
+              style="width: 80px;"
+            /> 年
+            <select v-model.number="generateMonth">
+              <option v-for="m in 12" :key="m" :value="m">{{ m }}月</option>
+            </select>
+            <button @click="handleGenerateMonthly">新規作成</button>
+          </div>
         </div>
       </div>
       <div v-if="noDataMessage" style="color: red; margin-bottom: 10px;">{{ noDataMessage }}</div>
@@ -106,12 +120,16 @@ export default {
     CommonHeader
   },
   data() {
+    const now = new Date();
     return {
       shifts: [], // APIから取得したデータを格納
-      selectedYear: new Date().getFullYear(),
+      selectedYear: now.getFullYear(),
       noDataMessage: '',
       storeId: sessionStorage.getItem('storeId') || '', // テスト用inputのバインド用
       isAdmin: sessionStorage.getItem('isAdmin') === 'true', // 追加: 管理者判定
+      // 追加: 新規作成用の年月
+      generateYear: now.getFullYear(),
+      generateMonth: now.getMonth() + 1,
     };
   },
   methods: {
@@ -200,18 +218,21 @@ export default {
     },
     async handleGenerateMonthly() {
       try {
-        // 今日の日付をYYYY-MM-DD形式で取得
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        const postDate = `${yyyy}-${mm}-${dd}`;
+        // 選択した月の1か月前を計算
+        let yyyy = this.generateYear;
+        let mm = this.generateMonth - 1;
+        if (mm === 0) {
+          mm = 12;
+          yyyy -= 1;
+        }
+        const mmStr = String(mm).padStart(2, '0');
+        const postDate = `${yyyy}-${mmStr}-01`;
 
         const response = await generateMonthly(postDate);
-        alert(response.data || '翌月のシフトデータを作成しました。');
+        alert(response.data || '指定月のシフトデータを作成しました。');
         this.fetchShiftsByYear();
       } catch (error) {
-        alert('翌月の新規作成に失敗しました。'|| (error && error.response && error.response.data));
+        alert('新規作成に失敗しました。'|| (error && error.response && error.response.data));
         console.error(error);
       }
     },

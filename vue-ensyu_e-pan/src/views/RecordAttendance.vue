@@ -100,8 +100,9 @@ export default {
     }
     // なければデフォルト
     if (!year || !month) {
-      year = 2025;
-      month = 7;
+      const now = new Date();
+      year = now.getFullYear();
+      month = now.getMonth() + 1;
     }
     const storeId = sessionStorage.getItem('storeId');
     let allShifts = [];
@@ -131,10 +132,10 @@ export default {
           const ds = dateShift.dateSchedule || {};
           allDatesSet.add(ds.today);
           userMap[userId].days.push({
-            workTime: ds.t_WorkTime_All || '',
+            workTime: ds.t_WorkTime_All ? this.timeStrToHourDecimal(ds.t_WorkTime_All).toFixed(1) : '',
             dayPrice: ds.t_DayPrice || ''
           });
-          userMap[userId].totalWorkTime += Number(ds.t_WorkTime_All || 0);
+          userMap[userId].totalWorkTime += ds.t_WorkTime_All ? this.timeStrToHourDecimal(ds.t_WorkTime_All) : 0;
           userMap[userId].monthPrice += Number(ds.t_DayPrice || 0);
         });
       });
@@ -170,6 +171,11 @@ export default {
     this.yearMonth = `${year}年${month}月`;
   },
   methods: {
+    timeStrToHourDecimal(timeStr) {
+      if (!timeStr) return 0;
+      const [h, m, s] = timeStr.split(':').map(Number);
+      return h + (m / 60) + (s / 3600);
+    },
     async changeMonth(diff) {
       let y, m;
       if (this.yearMonth.includes('年')) {
@@ -214,10 +220,10 @@ export default {
             const ds = dateShift.dateSchedule || {};
             allDatesSet.add(ds.today);
             userMap[userId].days.push({
-              workTime: ds.t_WorkTime_All || '',
+              workTime: ds.t_WorkTime_All ? this.timeStrToHourDecimal(ds.t_WorkTime_All).toFixed(1) : '',
               dayPrice: ds.t_DayPrice || ''
             });
-            userMap[userId].totalWorkTime += Number(ds.t_WorkTime_All || 0);
+            userMap[userId].totalWorkTime += ds.t_WorkTime_All ? this.timeStrToHourDecimal(ds.t_WorkTime_All) : 0;
             userMap[userId].monthPrice += Number(ds.t_DayPrice || 0);
           });
         });

@@ -11,7 +11,7 @@ namespace Ensyu_E_PAN.Controllers
 {
     // PurchaseOrder（発注書）に関するAPIコントローラ
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/PurchaseOrders")]
     public class PurchaseOrdersController : ControllerBase
     {
         // データベースへのアクセス用DbContext
@@ -96,7 +96,7 @@ namespace Ensyu_E_PAN.Controllers
         // 発注書新規作成API
         // POST: api/PurchaseOrders
         // =============================
-        [HttpPost("newOrder")]
+        [HttpPost]
         public async Task<IActionResult> PostNewOrder([FromBody] PurchaseOrderDto dto)
         {
             if (!ModelState.IsValid)

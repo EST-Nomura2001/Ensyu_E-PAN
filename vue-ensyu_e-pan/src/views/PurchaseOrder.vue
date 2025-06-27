@@ -237,6 +237,7 @@ export default {
     const todayStr = `${yyyy}-${mm}-${dd}`;
     return {
       isSaving: false,
+      isUnmounted: false,
       predefinedProducts: [],
       predefinedProductsList: [], // idとitem_Name両方保持
       stores: [],
@@ -402,13 +403,12 @@ export default {
       this.isSaving = true;
       try {
         const payload = {
-          id: 0,
           title: this.purchaseOrder.Title,
           quotation: Number(this.purchaseOrder.Quotation),
           tax: Number(this.purchaseOrder.Tax),
-          order_Date: this.purchaseOrder.Order_Date ? this.purchaseOrder.Order_Date + 'T00:00:00.000Z' : '',
-          delivery_Date: this.purchaseOrder.Delivery_Date ? this.purchaseOrder.Delivery_Date + 'T00:00:00.000Z' : '',
-          payment_Date: this.purchaseOrder.Payment_Date ? this.purchaseOrder.Payment_Date + 'T00:00:00.000Z' : '',
+          order_Date: this.purchaseOrder.Order_Date ? this.purchaseOrder.Order_Date + 'T00:00:00.000Z' : null,
+          delivery_Date: this.purchaseOrder.Delivery_Date ? this.purchaseOrder.Delivery_Date + 'T00:00:00.000Z' : null,
+          payment_Date: this.purchaseOrder.Payment_Date ? this.purchaseOrder.Payment_Date + 'T00:00:00.000Z' : null,
           payment_Terms: this.purchaseOrder.Payment_Terms || 'string',
           confirm_Flg: this.purchaseOrder.Confirm_Flg,
           manager: this.purchaseOrder.Manager || 'string',
@@ -436,7 +436,6 @@ export default {
           orderItems: this.purchaseOrder.OrderItems
             .filter(item => item.Item_Cd !== null && item.Item_Cd !== '' && !isNaN(item.Item_Cd))
             .map(item => ({
-              id: item.Id || 0,
               item_Cd: Number(item.Item_Cd),
               item_Name: item.Item_Name || 'string',
               amount: Number(item.Amount),
@@ -451,15 +450,17 @@ export default {
         }
         // 送信データをコンソールに出力
         console.log('送信payload:', JSON.stringify(payload, null, 2));
-        const response = await axios.post(`${API_BASE_URL}/api/PurchaseOrders/newOrder`, payload);
+        const response = await axios.post(`${API_BASE_URL}/api/PurchaseOrders`, payload);
         if (response.data && response.data.success) {
           alert('発注書が正常に保存されました。');
           this.$router.push({ name: 'SavedOrders' });
+          throw '__ROUTER_PUSH__';
         } else {
           alert('保存に失敗しました');
         }
       } catch (error) {
-        alert('保存時にエラーが発生しました');
+        if (error === '__ROUTER_PUSH__') return;
+        if (!this.isUnmounted) alert('保存時にエラーが発生しました');
       } finally {
         this.isSaving = false;
       }
@@ -475,13 +476,12 @@ export default {
       this.isSaving = true;
       try {
         const payload = {
-          id: 0,
           title: this.purchaseOrder.Title,
           quotation: Number(this.purchaseOrder.Quotation),
           tax: Number(this.purchaseOrder.Tax),
-          order_Date: this.purchaseOrder.Order_Date ? this.purchaseOrder.Order_Date + 'T00:00:00.000Z' : '',
-          delivery_Date: this.purchaseOrder.Delivery_Date ? this.purchaseOrder.Delivery_Date + 'T00:00:00.000Z' : '',
-          payment_Date: this.purchaseOrder.Payment_Date ? this.purchaseOrder.Payment_Date + 'T00:00:00.000Z' : '',
+          order_Date: this.purchaseOrder.Order_Date ? this.purchaseOrder.Order_Date + 'T00:00:00.000Z' : null,
+          delivery_Date: this.purchaseOrder.Delivery_Date ? this.purchaseOrder.Delivery_Date + 'T00:00:00.000Z' : null,
+          payment_Date: this.purchaseOrder.Payment_Date ? this.purchaseOrder.Payment_Date + 'T00:00:00.000Z' : null,
           payment_Terms: this.purchaseOrder.Payment_Terms || 'string',
           confirm_Flg: this.purchaseOrder.Confirm_Flg,
           manager: this.purchaseOrder.Manager || 'string',
@@ -526,11 +526,13 @@ export default {
         if (response.data && response.data.success) {
           alert('発注書が正常に更新されました。');
           this.$router.push({ name: 'SavedOrders' });
+          throw '__ROUTER_PUSH__';
         } else {
           alert('更新に失敗しました');
         }
       } catch (error) {
-        alert('更新時にエラーが発生しました');
+        if (error === '__ROUTER_PUSH__') return;
+        if (!this.isUnmounted) alert('更新時にエラーが発生しました');
       } finally {
         this.isSaving = false;
       }
@@ -590,6 +592,9 @@ export default {
   mounted() {
     this.fetchProducts();
     this.fetchStores();
+  },
+  beforeUnmount() {
+    this.isUnmounted = true;
   }
 };
 </script>

@@ -7,7 +7,7 @@ const users = ref([]);
 onMounted(async()=>{
     try {
         const response = await axios.get('http://localhost:5011/api/Account/users/all');
-        this.users = response.data;
+        users.value = response.data;
     } catch (error) {
         console.error('ユーザー取得エラー:', error);
     }
@@ -17,7 +17,7 @@ onMounted(async()=>{
     <div>
         <h2>アカウント一覧</h2>
 
-        <table v-if="users.length">
+        <table>
             <thead>
                 <tr>
                 <th>ID</th>
@@ -43,8 +43,6 @@ onMounted(async()=>{
                 </tr>
             </tbody>
         </table>
-
-            <p v-else>ユーザー情報を読み込んでいます...</p>
     </div>
 </template>
 

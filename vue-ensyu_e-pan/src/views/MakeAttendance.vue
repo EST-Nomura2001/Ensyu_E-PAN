@@ -28,7 +28,11 @@
   }
   th.event-col {
     background: #f0f0f0;
-    width: 120px;
+    width: 140px;
+  }
+  td select {
+    width: 100%;
+    font-size: 12px;
   }
   td.empty {
     background-color: #f8f8f8;
@@ -162,7 +166,13 @@
               {{ schedule.userName }}
             </th>
             <td rowspan="2">¥{{ schedule.hourlyWage }}</td>
-            <td rowspan="2"><input type="text" v-model="schedule.workRollName"></td>
+            <td rowspan="2">
+              <select v-model="schedule.workRollId">
+                <option :value="0">フリー</option>
+                <option :value="1">ホール</option>
+                <option :value="2">キッチン</option>
+              </select>
+            </td>
             <td>{{ schedule.hopeStart }}</td>
             <td>{{ schedule.hopeEnd }}</td>
             <td></td>
@@ -371,38 +381,27 @@ const fetchShifts = async (date) => {
     const data = await getDateSchedulesByDate(dateString);
     console.log('APIレスポンス', data);
     const rawSchedules = Array.isArray(data) ? data : (data.$values || []);
-    schedules.value = rawSchedules.map(ds => {
-      // userDateShiftsが配列であることを確認
-      const userDateShift = ds.userDateShifts?.$values?.[0] || (Array.isArray(ds.userDateShifts) ? ds.userDateShifts[0] : undefined);
-      const dateSchedule = userDateShift?.dateSchedule || {};
-
-      return {
+    schedules.value = rawSchedules.flatMap(ds => {
+      const dateSchedules = Array.isArray(ds.dateSchedules) ? ds.dateSchedules : [];
+      return dateSchedules.map(dateSchedule => ({
         scheduleId: dateSchedule.id,
-        userId: ds.user_Id,
-        userName: ds.userName || '',
+        userId: dateSchedule.userId,
+        userName: dateSchedule.userName || '',
         hourlyWage: '', // 必要ならAPIで返すようにする
-        workRollName: dateSchedule.workRollName || '',
+        workRollId: dateSchedule.workRollId || 0,
         plannedStart: dateSchedule.p_Start_WorkTime
-          ? (typeof dateSchedule.p_Start_WorkTime === 'string'
-              ? dateSchedule.p_Start_WorkTime.substring(11, 16)
-              : new Date(dateSchedule.p_Start_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
+          ? dateSchedule.p_Start_WorkTime.substring(11, 16)
           : '',
         plannedEnd: dateSchedule.p_End_WorkTime
-          ? (typeof dateSchedule.p_End_WorkTime === 'string'
-              ? dateSchedule.p_End_WorkTime.substring(11, 16)
-              : new Date(dateSchedule.p_End_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
+          ? dateSchedule.p_End_WorkTime.substring(11, 16)
           : '',
         hopeStart: dateSchedule.u_Start_WorkTime
-          ? (typeof dateSchedule.u_Start_WorkTime === 'string'
-              ? dateSchedule.u_Start_WorkTime.substring(11, 16)
-              : new Date(dateSchedule.u_Start_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
+          ? dateSchedule.u_Start_WorkTime.substring(11, 16)
           : '',
         hopeEnd: dateSchedule.u_End_WorkTime
-          ? (typeof dateSchedule.u_End_WorkTime === 'string'
-              ? dateSchedule.u_End_WorkTime.substring(11, 16)
-              : new Date(dateSchedule.u_End_WorkTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false }))
+          ? dateSchedule.u_End_WorkTime.substring(11, 16)
           : ''
-      };
+      }));
     });
     originalSchedules.value = JSON.parse(JSON.stringify(schedules.value));
     storeName.value = rawSchedules.length > 0 && rawSchedules[0].storeName ? rawSchedules[0].storeName : '';
@@ -469,7 +468,8 @@ const saveChanges = async () => {
       // ISO形式に変換
       const toISO = (date, time) => `${date}T${time}:00.000Z`;
       const body = {
-        targetDate: toISO(dateString, schedule.plannedStart), // targetDateは開始時刻で送信
+        work_Roll_Id: schedule.workRollId ?? 0,
+        targetDate: toISO(dateString, schedule.plannedStart),
         p_Start_WorkTime: toISO(dateString, schedule.plannedStart),
         p_End_WorkTime: toISO(dateString, schedule.plannedEnd)
       };

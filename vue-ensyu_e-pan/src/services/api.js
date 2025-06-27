@@ -242,8 +242,6 @@ export function fetchDateSchedules(today) {
  * @param {string} action - 'clockIn' | 'clockOut' | 'startBreak' | 'endBreak'
  * @returns {Promise}
  */
-export function operateAttendance(userId, scheduleId, action) {
-  // actionごとにエンドポイントやbodyを変えたい場合はここで分岐
-  // 今回はURLのみ指定、bodyは空
-  return axios.put(`http://localhost:5011/api/Attendance/users/${userId}/schedules/${scheduleId}/${action}`, {});
+export function operateAttendance(userId, scheduleId, updateDto) {
+  return axios.put(`http://localhost:5011/api/Attendance/users/${userId}/schedules/${scheduleId}`, updateDto);
 } 

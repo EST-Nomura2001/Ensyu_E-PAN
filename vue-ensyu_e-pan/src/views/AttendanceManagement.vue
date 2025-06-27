@@ -74,8 +74,21 @@ export default {
     const fetchData = async () => {
       try {
         const response = await fetchDateSchedules(selectedDate.value);
-        allAttendanceData.value = response.data;
-        console.log('APIレスポンス:', response.data);
+        // データ整形処理を追加
+        const formatted = response.data.flatMap(day =>
+          day.dateSchedules.map(ds => ({
+            user_Id: ds.userId,
+            userName: ds.userName,
+            userDateShifts: [
+              {
+                id: ds.id,
+                dateSchedule: ds
+              }
+            ]
+          }))
+        );
+        allAttendanceData.value = formatted;
+        console.log('整形後:', formatted);
       } catch (error) {
         console.error('Failed to fetch attendance data:', error);
       }
@@ -94,7 +107,24 @@ export default {
     // 勤怠操作ボタン用
     const clockIn = async (userId, scheduleId) => {
       try {
-        await operateAttendance(userId, scheduleId, 'clockIn');
+        // 対象のシフト情報を取得
+        const item = allAttendanceData.value.find(i => i.user_Id === userId);
+        const shift = item?.userDateShifts.find(s => s.id === scheduleId);
+        const ds = shift?.dateSchedule;
+        if (!ds) throw new Error('シフト情報が見つかりません');
+        // UpdateDateScheduleDtoを作成
+        const now = new Date();
+        const updateDto = {
+          Id: ds.id,
+          User_Id: userId,
+          Work_Roll_Id: ds.workRollId,
+          Day_Shift_Id: ds.dayShiftId,
+          Start_WorkTime: now.toISOString(),
+          End_WorkTime: ds.end_WorkTime,
+          Start_BreakTime: ds.start_BreakTime,
+          End_BreakTime: ds.end_BreakTime
+        };
+        await operateAttendance(userId, scheduleId, updateDto);
         await fetchData();
       } catch (e) {
         alert('出勤処理に失敗しました');
@@ -102,7 +132,22 @@ export default {
     };
     const clockOut = async (userId, scheduleId) => {
       try {
-        await operateAttendance(userId, scheduleId, 'clockOut');
+        const item = allAttendanceData.value.find(i => i.user_Id === userId);
+        const shift = item?.userDateShifts.find(s => s.id === scheduleId);
+        const ds = shift?.dateSchedule;
+        if (!ds) throw new Error('シフト情報が見つかりません');
+        const now = new Date();
+        const updateDto = {
+          Id: ds.id,
+          User_Id: userId,
+          Work_Roll_Id: ds.workRollId,
+          Day_Shift_Id: ds.dayShiftId,
+          Start_WorkTime: ds.start_WorkTime,
+          End_WorkTime: now.toISOString(),
+          Start_BreakTime: ds.start_BreakTime,
+          End_BreakTime: ds.end_BreakTime
+        };
+        await operateAttendance(userId, scheduleId, updateDto);
         await fetchData();
       } catch (e) {
         alert('退勤処理に失敗しました');
@@ -110,7 +155,22 @@ export default {
     };
     const startBreak = async (userId, scheduleId) => {
       try {
-        await operateAttendance(userId, scheduleId, 'startBreak');
+        const item = allAttendanceData.value.find(i => i.user_Id === userId);
+        const shift = item?.userDateShifts.find(s => s.id === scheduleId);
+        const ds = shift?.dateSchedule;
+        if (!ds) throw new Error('シフト情報が見つかりません');
+        const now = new Date();
+        const updateDto = {
+          Id: ds.id,
+          User_Id: userId,
+          Work_Roll_Id: ds.workRollId,
+          Day_Shift_Id: ds.dayShiftId,
+          Start_WorkTime: ds.start_WorkTime,
+          End_WorkTime: ds.end_WorkTime,
+          Start_BreakTime: now.toISOString(),
+          End_BreakTime: ds.end_BreakTime
+        };
+        await operateAttendance(userId, scheduleId, updateDto);
         await fetchData();
       } catch (e) {
         alert('休憩入処理に失敗しました');
@@ -118,7 +178,22 @@ export default {
     };
     const endBreak = async (userId, scheduleId) => {
       try {
-        await operateAttendance(userId, scheduleId, 'endBreak');
+        const item = allAttendanceData.value.find(i => i.user_Id === userId);
+        const shift = item?.userDateShifts.find(s => s.id === scheduleId);
+        const ds = shift?.dateSchedule;
+        if (!ds) throw new Error('シフト情報が見つかりません');
+        const now = new Date();
+        const updateDto = {
+          Id: ds.id,
+          User_Id: userId,
+          Work_Roll_Id: ds.workRollId,
+          Day_Shift_Id: ds.dayShiftId,
+          Start_WorkTime: ds.start_WorkTime,
+          End_WorkTime: ds.end_WorkTime,
+          Start_BreakTime: ds.start_BreakTime,
+          End_BreakTime: now.toISOString()
+        };
+        await operateAttendance(userId, scheduleId, updateDto);
         await fetchData();
       } catch (e) {
         alert('休憩戻処理に失敗しました');

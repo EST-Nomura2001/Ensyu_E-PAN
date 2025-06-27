@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import CommonHeader from '../components/CommonHeader.vue';
 
 const apiClient = axios.create({
   baseURL: 'http://localhost:5011/api', // 仮のバックエンドAPIのURL
@@ -13,8 +14,13 @@ const apiClient = axios.create({
 const loginId = ref('');
 const password = ref('');
 const loginError = ref('');
+const isAdmin = ref(false);
 
 const router = useRouter();
+
+onMounted(() => {
+  isAdmin.value = sessionStorage.getItem('isAdmin') === 'true';
+});
 
 async function login() {
   loginError.value = '';
@@ -59,6 +65,7 @@ async function login() {
 </script>
 
 <template>
+  <CommonHeader v-if="isAdmin" />
   <!-- ログイン画面 -->
   <div id="loginPage" class="container page">
     <h2>ログイン</h2>

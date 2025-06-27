@@ -28,7 +28,7 @@
       <div>
         <p>{{ userName }}さん</p>
         <p>ステータス：<span>{{ status }}</span></p>
-        <p>提出期限：<span>{{ deadline }}</span></p>
+        <!-- <p>提出期限：<span>{{ deadline }}</span></p> -->
       </div>
       <form @submit.prevent="submitShifts">
         <table>
@@ -101,6 +101,8 @@ export default {
       shifts: [],
       currentUserId: Number(sessionStorage.getItem('userId')) || null, // sessionStorageからuserId取得
       testUserId: '', // テスト用userId入力欄
+      originalShifts: [], // 追加: 取得直後のshiftsを保持
+      isDirty: false,     // 追加: 編集フラグ
     };
   },
   async created() {
@@ -118,6 +120,28 @@ export default {
     this.year = year;
     this.month = nextMonth;
     await this.fetchInitialData();
+    // 追加: 初期データ取得後にoriginalShiftsをセット
+    this.originalShifts = JSON.parse(JSON.stringify(this.shifts));
+    this.isDirty = false;
+  },
+  watch: {
+    shifts: {
+      handler(newVal) {
+        this.isDirty = JSON.stringify(newVal) !== JSON.stringify(this.originalShifts);
+      },
+      deep: true
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.isDirty) {
+      if (window.confirm('内容が保存されていません。ページを移動しますか？')) {
+        next();
+      } else {
+        next(false);
+      }
+    } else {
+      next();
+    }
   },
   methods: {
     async fetchInitialData() {
@@ -173,6 +197,9 @@ export default {
         alert('データの取得に失敗しました。APIサーバーが起動しているか確認してください。');
       } finally {
         this.isLoading = false;
+        // 追加: データ取得後にoriginalShiftsを更新
+        this.originalShifts = JSON.parse(JSON.stringify(this.shifts));
+        this.isDirty = false;
       }
     },
     getDayOfWeek(date) {
@@ -264,6 +291,9 @@ export default {
         alert('シフトが提出されました。');
         // 提出後は「シフト提出済み」に更新
         this.status = 'シフト提出済み';
+        // 追加: 送信後にoriginalShiftsを更新
+        this.originalShifts = JSON.parse(JSON.stringify(this.shifts));
+        this.isDirty = false;
       } catch (error) {
         console.error('シフトの提出に失敗しました。', error);
         alert('シフトの提出に失敗しました。');
@@ -278,6 +308,11 @@ export default {
       }
     },
     onYearMonthChange() {
+      if (this.isDirty) {
+        if (!window.confirm('内容が保存されていません。年月を変更しますか？')) {
+          return;
+        }
+      }
       this.fetchInitialData();
     },
   },

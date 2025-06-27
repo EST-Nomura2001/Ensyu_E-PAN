@@ -195,8 +195,9 @@ import CommonHeader from '../components/CommonHeader.vue';
         this.totalLaborCost = apiTotalLaborCost.toLocaleString();
         this.totalWorkTime = apiTotalWorkTime ? this.timeStrToHourDecimal(apiTotalWorkTime) : '';
         this.totalNightWorkTime = ''; // 必要なら合計ロジックを追加
-        this.fetchError = false;
+        this.storeName = '';
         this.dayShiftDate = today;
+        this.fetchError = false;
       } catch (e) {
         this.fetchError = true;
         // ↓↓↓ デモデータ（後で削除してください）↓↓↓

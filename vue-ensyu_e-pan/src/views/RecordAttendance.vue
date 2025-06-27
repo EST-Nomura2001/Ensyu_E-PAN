@@ -59,7 +59,7 @@
     </table>
   </div>
   <div class="table-footer">
-    <button class="export-btn" disabled>出力</button>
+    <button class="export-btn" @click="printTable">出力</button>
   </div>
 </template>
 
@@ -263,6 +263,9 @@ export default {
       const d = new Date(dateStr);
       if (isNaN(d)) return dateStr; // パース失敗時はそのまま
       return `${d.getMonth() + 1}/${d.getDate()}`;
+    },
+    printTable() {
+      window.print();
     }
   },
 
@@ -338,3 +341,37 @@ export default {
   background: #e0f7fa !important;
 }
 </style>
+
+/* 印刷用スタイル */
+@media print {
+  html, body {
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  .attendance-table-wrapper {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow: visible !important;
+  }
+  .attendance-table {
+    width: 100% !important;
+    min-width: unset !important;
+    font-size: 9pt !important;
+    table-layout: fixed !important;
+    word-break: break-all;
+  }
+  .attendance-table th,
+  .attendance-table td {
+    min-width: unset !important;
+    padding: 1px 2px !important;
+    font-size: 9pt !important;
+    word-break: break-all;
+  }
+  /* ページ幅に合わせて縮小 */
+  body {
+    zoom: 0.7;
+  }
+}

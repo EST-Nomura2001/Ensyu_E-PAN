@@ -23,7 +23,7 @@
           <th class="sticky sticky-3">項目</th>
           <th class="sticky sticky-4">合計</th>
           <th v-for="ds in dayShifts" :key="'header-'+ds.date">
-            <router-link :to="{ name: 'Edit-Attendance', query: { date: ds.date, storeName: storeName } }">
+            <router-link :to="{ name: 'Edit-Attendance', params: { date: ds.date } }">
               {{ formatDate(ds.date) }}
             </router-link>
           </th>

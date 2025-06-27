@@ -6,6 +6,8 @@ import PartTimeView from '../views/PartTimeView.vue'
 import AttendanceManagement from '../views/AttendanceManagement.vue'
 import PurchaseOrder from '../views/PurchaseOrder.vue'
 import SavedOrders from '@/views/SavedOrders.vue'
+import AdminEditView from '@/views/AdminEditView.vue'
+import PurchaseEditOrder from '@/views/PurchaseEditOrder.vue'
 
 
 const router = createRouter({
@@ -33,6 +35,12 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       component: AdminView,
+      // meta: { requiresAuth: true, role: 'admin' },　ログイン機能
+    },
+    { //アドミン。アカウント管理。社員一覧と新規登録
+      path: '/adminEdit',
+      name: 'adminEdit',
+      component: ()=> import('../views/AdminEditView.vue'),
       // meta: { requiresAuth: true, role: 'admin' },　ログイン機能
     },
     { ///???
@@ -63,6 +71,12 @@ const router = createRouter({
       path: '/purchase-order',
       name: 'PurchaseOrder',
       component: () => import('../views/PurchaseOrder.vue'),
+      // meta: { requiresAuth: true }, ログイン機能
+    },
+    { //
+      path: '/purchase-edit-order',
+      name: 'PurchaseEditOrder',
+      component: () => import('../views/PurchaseEditOrder.vue'),
       // meta: { requiresAuth: true }, ログイン機能
     },
     { //

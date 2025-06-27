@@ -16,11 +16,12 @@ const loggedInUserName = ref(sessionStorage.getItem('userName') || '');
 
 const newUserId = ref('');
 const newUserPw = ref('');
-const newUserRole = ref('partTime');
+const newUserRole = ref('');
 const registerMsg = ref('');
 const registerMsgIsSuccess = ref(false);
 
 const userList = ref([]);
+const rolls = ref([]);
 
 async function registerUser() {
   if (!newUserId.value || !newUserPw.value) {
@@ -74,8 +75,16 @@ function logout() {
   router.push('/login');
 }
 
+//役職一覧作成
+const getRolls = async()=>{
+  const rollResponse = await axios.get('http://localhost:5011/api/Masters/roles');
+  console.log("役職一覧",rollResponse.data);
+  rolls.value = rollResponse.data;
+};
+
 onMounted(() => {
   fetchUsers();
+  getRolls();
 });
 
 </script>
@@ -90,8 +99,7 @@ onMounted(() => {
     <input type="text" v-model="newUserId" placeholder="新規ユーザーID">
     <input type="password" v-model="newUserPw" placeholder="パスワード">
     <select v-model="newUserRole">
-      <option value="partTime">アルバイト</option>
-      <option value="admin">管理者</option>
+      <option v-for="roll in rolls" :key="roll.id" :value="roll.id">{{ roll.name }}</option>
     </select>
     <button @click="registerUser">登録</button>
     <p v-if="registerMsg" class="message" :class="{ success: registerMsgIsSuccess }">{{ registerMsg }}</p>

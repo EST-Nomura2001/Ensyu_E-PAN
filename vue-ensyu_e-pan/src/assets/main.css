@@ -21,7 +21,9 @@ a,
   }
 }
 
-@media (min-width: 1024px) {
+
+/*配置崩れの諸悪の根源！！！（by田村） 
+  @media (min-width: 1024px) {
   body {
     display: flex;
     place-items: center;
@@ -32,4 +34,4 @@ a,
     grid-template-columns: 1fr 1fr;
     padding: 0 2rem;
   }
-}
+} */

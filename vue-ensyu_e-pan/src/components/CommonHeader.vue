@@ -1,5 +1,11 @@
 <script setup>
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
+
+const router = useRouter();
+function logout() {
+  sessionStorage.clear();
+  router.push('/login');
+}
 </script>
 
 <template>
@@ -11,6 +17,9 @@ import { RouterLink } from 'vue-router'
         <li><RouterLink to="/kibou-form">シフト希望フォーム</RouterLink></li>
         <li><RouterLink to="/purchase-order">発注管理</RouterLink></li>
         <li><RouterLink to="/admin">アカウント管理</RouterLink></li>
+        <li>
+          <button class="logout-btn" @click="logout">ログアウト</button>
+        </li>
       </ul>
     </nav>
   </header>
@@ -44,7 +53,26 @@ import { RouterLink } from 'vue-router'
 
 .header-nav a:hover,
 .header-nav a.router-link-active {
-  background-color: #000000;
+  background-color:  hsla(160, 100%, 37%, 1);
   color: white;
+}
+
+.header-nav li {
+  display: flex;
+  align-items: center;
+}
+
+.logout-btn {
+  background-color: #df6c78;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 5px;
+  transition: background-color 0.3s;
+}
+.logout-btn:hover {
+  background-color: #df6c78;
 }
 </style> 

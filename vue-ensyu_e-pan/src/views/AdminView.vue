@@ -53,9 +53,13 @@ async function registerUser() {
   }
   try {
     await apiClient.post('http://localhost:5011/api/Account/users/register', {
-      loginId: newUserId.value,
+      login_Id: newUserId.value,
+      name: newUserName.value,
+      roll_Cd: newUserRole.value,
       password: newUserPw.value,
-      role: newUserRole.value,
+      stores_Cd: newUserStore.value,
+      timePrice_D: dayTimePrace.value,
+      timePrice_N: nightTimePrace.value
     });
     registerMsg.value = `ユーザー「${newUserId.value}」を登録しました。`;
     registerMsgIsSuccess.value = true;
@@ -75,7 +79,8 @@ async function registerUser() {
 
 async function fetchUsers() {
   try {
-    const response = await apiClient.get('/Account/users/all');
+    const response = await apiClient.get('http://localhost:5011/api/Account/users/all');
+    console.log("ユーザー一覧",response.data);
     userList.value = response.data;
   } catch (error) {
     console.error('Failed to fetch users:', error);
@@ -84,10 +89,10 @@ async function fetchUsers() {
 
 const userListForDisplay = computed(() => {
   return userList.value.map(user => {
-    const roleLabel = user.role === 'partTime' ? 'アルバイト'
-                    : user.role === 'admin' ? '管理者'
+    const roleLabel = user.isAdmin === false ? 'アルバイト'
+                    : user.isAdmin === true ? '管理者'
                     : '不明';
-    return { id: user.id, label: `・${user.loginId}（${roleLabel}）` };
+    return { id: user.id, label: `・${user.login_Id}（${roleLabel}）` };
   });
 });
 
@@ -148,7 +153,9 @@ onMounted(() => {
     <h3>登録済みユーザー一覧</h3>
     <div class="user-list">
       <p v-if="userList.length === 0">現在登録されているユーザーはいません。</p>
-      <p v-for="user in userListForDisplay" :key="user.id">{{ user.label }}</p>
+      <p v-for="user in userListForDisplay" :key="user.id">
+        {{ user.label }}
+      </p>
     </div>
 
     <button class="logout-btn" @click="logout">ログアウト</button>

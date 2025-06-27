@@ -18,6 +18,7 @@
         public int? D_DayPrice { get; set; }
         public int? N_DayPrice { get; set; }
         public int? T_DayPrice { get; set; }
+        public int UserId { get; set; }
         public string UserName { get; set; }
         public int WorkRollId { get; set; }
         public string WorkRollName { get; set; }

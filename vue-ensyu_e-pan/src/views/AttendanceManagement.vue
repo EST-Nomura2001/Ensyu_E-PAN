@@ -75,6 +75,7 @@ export default {
       try {
         const response = await fetchDateSchedules(selectedDate.value);
         allAttendanceData.value = response.data;
+        console.log('APIレスポンス:', response.data);
       } catch (error) {
         console.error('Failed to fetch attendance data:', error);
       }

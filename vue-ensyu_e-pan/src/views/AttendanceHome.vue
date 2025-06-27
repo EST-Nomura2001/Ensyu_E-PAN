@@ -95,7 +95,7 @@
 </template>
 
 <script>
-import { getAttendanceData, updateAttendanceData, getUserInfo, getStoreInfo, generateMonthly, getAllShiftsForAllMonths, updateRecFlag } from '@/services/api';
+import { getAttendanceData, updateAttendanceData, getStoreInfo, generateMonthly, getAllShiftsForAllMonths, updateRecFlag } from '@/services/api';
 import CommonHeader from '../components/CommonHeader.vue';
 
 export default {

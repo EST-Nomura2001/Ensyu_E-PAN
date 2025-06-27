@@ -66,7 +66,7 @@ namespace Ensyu_E_PAN.Controllers
             return Ok(users);
         }
 
-        [HttpPost("users")]
+        [HttpPost("users/register")]
         public async Task<IActionResult> CreateUser([FromBody] UserRequestDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);

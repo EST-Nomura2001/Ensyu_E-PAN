@@ -130,15 +130,15 @@ onMounted(() => {
     <p>ようこそ、{{ loggedInUserName }}さん (管理者)！</p>
     <p>新しいユーザーを登録できます。</p>
 
-    <input type="text" v-model="newUserId" placeholder="新規ユーザーID">
-    <input type="text" placeholder="新規ユーザー名" v-model = "newUserName">
-    <input type="password" v-model="newUserPw" placeholder="パスワード">
-    <select v-model="newUserRole">
+    <label>ユーザー名<input type="text" placeholder="新規ユーザー名" v-model = "newUserName"></label>
+    <label>ログインID<input type="text" v-model="newUserId" placeholder="新規ユーザーID"></label>
+    <label>パスワード<input type="password" v-model="newUserPw" placeholder="パスワード"></label>
+    <label>役職<select v-model="newUserRole">
       <option v-for="roll in rolls" :key="roll.id" :value="roll.id">{{ roll.name }}</option>
-    </select>
-    <select v-model="newUserStore">
+    </select></label>
+    <label>所属店舗<select v-model="newUserStore">
       <option v-for="store in stores" :value="store.id">{{store.c_Name}}</option>
-    </select>
+    </select></label>
     <div>
       <p>日中時給<input type="number" min="0" v-model="dayTimePrace"></p>
       <p>深夜時給<input type="number" min="0" v-model="nightTimePrace"></p>

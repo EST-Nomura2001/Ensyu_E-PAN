@@ -137,7 +137,7 @@
       <thead>
         <tr>
           <th>名前</th>
-          <th>時給</th>
+          <!--<th>時給</th>-->
           <th>担当業務</th>
           <th>出勤時間</th>
           <th>退勤時間</th>
@@ -150,7 +150,7 @@
             <th class="event-col">
               {{ schedule.userName }}
             </th>
-            <td >¥{{ schedule.hourlyWage }}</td>
+            <!--<td >¥{{ schedule.hourlyWage }}</td>-->
             <td >{{ schedule.workRollName }}</td>
             <td>{{ schedule.plannedStart }}</td>
             <td>{{ schedule.plannedEnd }}</td>

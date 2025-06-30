@@ -25,12 +25,15 @@
         </label>
       </div>
       
-      <div>
+      <div v-if="shifts.length === 0">
+        <p style="color: #888; font-size: 18px; text-align: center; margin: 40px 0;">当月のシフトは提出期間対象外です</p>
+      </div>
+      <div v-else>
         <p>{{ userName }}さん</p>
         <p>ステータス：<span>{{ status }}</span></p>
         <!-- <p>提出期限：<span>{{ deadline }}</span></p> -->
       </div>
-      <form @submit.prevent="submitShifts">
+      <form v-if="shifts.length > 0" @submit.prevent="submitShifts">
         <table>
           <thead>
             <tr>

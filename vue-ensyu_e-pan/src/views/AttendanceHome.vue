@@ -24,6 +24,7 @@
   <CommonHeader />
   <div v-if="isAdmin">
     <div class="attendance-home">
+      <h1>勤怠情報一覧</h1>
       <div class="header">
         <!--<div style="display: flex; align-items: center; gap: 8px;">
           <label>店舗ID:</label>
@@ -40,7 +41,7 @@
               @input="validateYear"
               style="width: 90px;"
             />
-            <button @click="fetchShiftsByYear">指定年のシフト取得</button>
+            <button @click="fetchShiftsByYear">指定年の一覧取得</button>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
             <input
@@ -84,7 +85,7 @@
               </div>
               <div v-else>
                 {{ formatDeadline(shift.fixedDate) }}
-                <button @click="editDeadline(shift)">設定</button>
+                <!--<button @click="editDeadline(shift)">設定</button>-->
               </div>
             </td>
             <td>

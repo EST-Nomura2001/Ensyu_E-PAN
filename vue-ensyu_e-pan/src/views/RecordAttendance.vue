@@ -65,9 +65,6 @@
         </tbody>
       </table>
     </div>
-    <div class="table-footer">
-      <button class="export-btn" disabled>出力</button>
-    </div>
   </template>
 </template>
 <script>

@@ -44,9 +44,9 @@
             <td v-for="ds in dayShifts" :key="'total-worktime'+ds.date">{{ ds.sumWorkTime }}</td>
           </tr>
           <tr class="total-row">
-            <td class="sticky sticky-3">人件費</td>
-            <td class="sticky sticky-4">{{ totalCost }}</td>
-            <td v-for="ds in dayShifts" :key="'total-cost'+ds.date">{{ ds.sumTotalCost }}</td>
+            <td class="sticky sticky-3">人件費(円)</td>
+            <td class="sticky sticky-4">{{ totalCost ? Number(totalCost).toLocaleString() : '' }}</td>
+            <td v-for="ds in dayShifts" :key="'total-cost'+ds.date">{{ ds.sumTotalCost ? Number(ds.sumTotalCost).toLocaleString() : '' }}</td>
           </tr>
           <template v-for="user in users" :key="user.name">
             <tr>
@@ -57,9 +57,9 @@
               <td v-for="(d, idx) in user.days" :key="'worktime'+user.name+idx">{{ d.workTime }}</td>
             </tr>
             <tr>
-              <td class="sticky sticky-3">人件費</td>
-              <td class="sticky sticky-4">{{ user.monthPrice }}</td>
-              <td v-for="(d, idx) in user.days" :key="'cost'+user.name+idx">{{ d.dayPrice }}</td>
+              <td class="sticky sticky-3">人件費(円)</td>
+              <td class="sticky sticky-4">{{ user.monthPrice ? Number(user.monthPrice).toLocaleString() : '' }}</td>
+              <td v-for="(d, idx) in user.days" :key="'cost'+user.name+idx">{{ d.dayPrice ? Number(d.dayPrice).toLocaleString() : '' }}</td>
             </tr>
           </template>
         </tbody>

@@ -67,7 +67,7 @@
             <th>シフト提出期限</th>
             <th>シフト表</th>
             <th>勤怠画面</th>
-            <th>勤怠送付</th>
+            <!-- <th>勤怠送付</th> -->
           </tr>
         </thead>
         <tbody>
@@ -102,7 +102,7 @@
                 :to="{ name: 'Record-Attendance', query: { date: shift.date.split('T')[0] } }"
               >閲覧</router-link>
             </td>
-            <td>{{ shift.sendingFlg ? '済' : '' }}</td>
+            <!-- <td>{{ shift.sendingFlg ? '済' : '' }}</td> -->
           </tr>
         </tbody>
       </table>

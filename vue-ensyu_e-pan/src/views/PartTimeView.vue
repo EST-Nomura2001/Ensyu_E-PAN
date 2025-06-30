@@ -14,12 +14,17 @@ function logout() {
 </script>
 
 <template>
+  
   <div id="partTimePage" class="container page">
     <h2>アルバイトページ</h2>
     <p>ようこそ、{{ loggedInUserName }}さん (アルバイト)！</p>
 
     <router-link to="/attendance-management" custom v-slot="{ navigate }">
       <button @click="navigate" role="link" class="nav-button">勤怠管理ページへ</button>
+    </router-link>
+
+    <router-link to="/kibou-form" custom v-slot="{ navigate }">
+      <button @click="navigate" role="link" class="nav-button">シフト希望フォームへ</button>
     </router-link>
 
     <button class="logout-btn" @click="logout">ログアウト</button>

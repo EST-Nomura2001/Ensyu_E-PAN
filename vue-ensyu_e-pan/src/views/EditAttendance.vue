@@ -26,7 +26,7 @@
           <thead>
             <tr>
               <th>名前</th>
-              <th>時給(円)</th>
+              <!--<th>時給(円)</th>-->
               <th>人件費(円)</th>
               <th>勤務時間(h)</th>
               <th>うち深夜勤務時間(h)</th> <!--要相談-->
@@ -40,7 +40,7 @@
           <tbody>
             <tr class="total-row">
               <td>合計</td>
-              <td class="slash-cell"></td>
+              <!--<td class="slash-cell"></td>-->
               <td>{{ totalLaborCost }}</td>
               <td>{{ totalWorkTime }}</td>
               <td class="slash-cell"></td>
@@ -52,7 +52,7 @@
             </tr>
             <tr v-for="(row, idx) in tableData" :key="idx">
               <td>{{ row.name }}</td>
-              <td>{{ row.wage }}</td>
+              <!--<td>{{ row.wage }}</td>-->
               <td>{{ row.laborCost }}</td>
               <td>{{ row.workTime }}</td>
               <td>{{ row.nightWorkTime }}</td>

@@ -44,12 +44,8 @@ async function login() {
     console.log('isAdmin:', sessionStorage.getItem('isAdmin'));
     console.log('storeId:', sessionStorage.getItem('storeId'));
 
-    // 権限に応じてリダイレクト
-    if (data.role?.isAdmin) {
-      router.push('/attendance-management');
-    } else {
-      router.push('/part-time');
-    }
+    // 権限に関わらず/attendance-managementに遷移
+    router.push('/attendance-management');
   } catch (error) {
     // コントローラーから返ってきたメッセージを表示
     if (error.response && error.response.data) {

@@ -85,7 +85,7 @@
               </div>
               <div v-else>
                 {{ formatDeadline(shift.fixedDate) }}
-                <button @click="editDeadline(shift)">設定</button>
+                <!--<button @click="editDeadline(shift)">設定</button>-->
               </div>
             </td>
             <td>

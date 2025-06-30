@@ -158,7 +158,7 @@
         <thead>
           <tr>
             <th>名前</th>
-            <th>時給</th>
+            <!--<th>時給</th>-->
             <th>担当業務</th>
             <th>出勤時間</th>
             <th>退勤時間</th>
@@ -172,7 +172,7 @@
               <th class="event-col" rowspan="2">
                 {{ schedule.userName }}
               </th>
-              <td rowspan="2">¥{{ schedule.hourlyWage }}</td>
+              <!--<td rowspan="2">¥{{ schedule.hourlyWage }}</td>-->
               <td rowspan="2">
                 <select v-model="schedule.workRollId">
                   <option :value="0">フリー</option>

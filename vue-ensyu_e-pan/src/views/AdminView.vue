@@ -98,7 +98,7 @@ const userListForDisplay = computed(() => {
 
 function logout() {
   sessionStorage.clear(); // すべてのsessionStorageデータをクリア
-  router.push('/login');
+  router.push('/');
 }
 
 //役職一覧作成

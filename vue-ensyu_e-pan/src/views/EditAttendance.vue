@@ -48,6 +48,7 @@
               <td class="slash-cell"></td>
               <td class="slash-cell"></td>
               <td class="slash-cell"></td>
+              <td class="slash-cell"></td>
             </tr>
             <tr v-for="(row, idx) in tableData" :key="idx">
               <td>{{ row.name }}</td>

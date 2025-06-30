@@ -3,208 +3,208 @@
   このコンポーネントは発注書を作成・編集・印刷する機能を持っています
 -->
 <template>
-    <CommonHeader />
+  <CommonHeader class="no-print" />
 
-  <div id="purchase-order-page">
-    <div id="purchase-order-container">
-      <!-- 発注書ヘッダー部分 -->
-      <header class="po-header">
-        <h1 class="po-title">発注書</h1>
+<div id="purchase-order-page">
+  <div id="purchase-order-container" class="print-content">
+    <!-- 発注書ヘッダー部分 -->
+    <header class="po-header">
+      <h1 class="po-title">発注書</h1>
+      
+      <!-- 発注元の会社情報 -->
+      <div class="company-info">
+        <!-- v-modelは双方向データバインディング：入力内容がデータと同期される -->
+        <input type="text" v-model="purchaseOrder.Company.Id" class="issuer-company-name" placeholder="会社CD" @change="onCompanyChange">
+        <div class="issuer-address">
+            <span>〒</span>
+            <!-- 郵便番号入力欄 -->
+            <input type="text" v-model="purchaseOrder.Postal_Code" class="issuer-postal-code" placeholder="郵便番号" readonly>
+        </div>
+        <!-- 住所入力欄（2行） -->
+        <input type="text" v-model="purchaseOrder.Address1" class="issuer-address-line" placeholder="住所1" readonly>
+        <input type="text" v-model="purchaseOrder.Address2" class="issuer-address-line" placeholder="住所2" readonly>
         
-        <!-- 発注元の会社情報 -->
-        <div class="company-info">
-          <!-- v-modelは双方向データバインディング：入力内容がデータと同期される -->
-          <input type="text" v-model="purchaseOrder.Company.Id" class="issuer-company-name" placeholder="会社CD" @change="onCompanyChange">
-          <div class="issuer-address">
-              <span>〒</span>
-              <!-- 郵便番号入力欄 -->
-              <input type="text" v-model="purchaseOrder.Postal_Code" class="issuer-postal-code" placeholder="郵便番号" readonly>
+        <!-- 連絡先情報（電話、FAX、メール、担当者） -->
+        <div class="issuer-contact-row">
+            <label>TEL:</label>
+            <input type="text" v-model="purchaseOrder.Tel" placeholder="電話番号" readonly>
+        </div>
+        <div class="issuer-contact-row">
+            <label>FAX:</label>
+            <input type="text" v-model="purchaseOrder.Fax" placeholder="FAX番号" readonly>
+        </div>
+        <div class="issuer-contact-row">
+            <label>Mail:</label>
+            <input type="email" v-model="purchaseOrder.Email" placeholder="メールアドレス" readonly>
+        </div>
+        <div class="issuer-contact-row">
+            <label>担当者:</label>
+            <input type="text" v-model="purchaseOrder.Manager" placeholder="担当者">
+        </div>
+      </div>
+
+      <!-- 社印表示エリア -->
+      <div class="company-stamp">
+        社印
+      </div>
+    </header>
+
+    <!-- 宛先情報 -->
+    <section class="po-customer">
+      <div class="customer-name-wrapper">
+        <!-- 発注先の会社名入力 -->
+        <input type="text" v-model="purchaseOrder.CustomerName" class="customer-name-input" placeholder="宛名を入力" readonly>
+        <span class="honorific">御中</span>
+      </div>
+    </section>
+
+    <!-- 消費税率と発注番号・発注日の情報 -->
+    <section class="po-meta-info">
+      <!-- 上段：消費税率（左）と発注番号・発注日（右） -->
+      <div class="meta-top-row">
+        <div class="tax-rate">
+          <span>消費税率</span>
+          <input type="number" v-model.number="purchaseOrder.Tax" class="tax-rate-input" min="0" max="100">
+          <span>%</span>
+        </div>
+        <div class="order-info">
+          <div class="meta-item">
+            <span>発注番号</span>
+            <input type="text" v-model="purchaseOrder.Quotation" class="meta-input">
           </div>
-          <!-- 住所入力欄（2行） -->
-          <input type="text" v-model="purchaseOrder.Address1" class="issuer-address-line" placeholder="住所1" readonly>
-          <input type="text" v-model="purchaseOrder.Address2" class="issuer-address-line" placeholder="住所2" readonly>
-          
-          <!-- 連絡先情報（電話、FAX、メール、担当者） -->
-          <div class="issuer-contact-row">
-              <label>TEL:</label>
-              <input type="text" v-model="purchaseOrder.Tel" placeholder="電話番号" readonly>
-          </div>
-          <div class="issuer-contact-row">
-              <label>FAX:</label>
-              <input type="text" v-model="purchaseOrder.Fax" placeholder="FAX番号" readonly>
-          </div>
-          <div class="issuer-contact-row">
-              <label>Mail:</label>
-              <input type="email" v-model="purchaseOrder.Email" placeholder="メールアドレス" readonly>
-          </div>
-          <div class="issuer-contact-row">
-              <label>担当者:</label>
-              <input type="text" v-model="purchaseOrder.Manager" placeholder="担当者">
+          <div class="meta-item">
+            <span>発注日</span>
+            <input type="date" v-model="purchaseOrder.Order_Date" class="meta-input">
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- 社印表示エリア -->
-        <div class="company-stamp">
-          社印
-        </div>
-      </header>
+    <p class="order-statement">下記のとおり、発注いたします。</p>
 
-      <!-- 宛先情報 -->
-      <section class="po-customer">
-        <div class="customer-name-wrapper">
-          <!-- 発注先の会社名入力 -->
-          <input type="text" v-model="purchaseOrder.CustomerName" class="customer-name-input" placeholder="宛名を入力" readonly>
-          <span class="honorific">御中</span>
-        </div>
-      </section>
+    <!-- 発注詳細情報 -->
+    <section class="po-details">
+      <table class="details-table">
+        <tbody>
+          <!-- 各詳細項目の入力欄 -->
+          <tr>
+            <th>件名:</th>
+            <td><input type="text" v-model="purchaseOrder.Title" placeholder="件名"></td>
+          </tr>
+          <tr>
+            <th>現場住所:</th>
+            <td>
+              <select v-model="purchaseOrder.Location">
+                <option disabled value="">選択してください</option>
+                <option v-for="store in stores" :key="store.id" :value="store.address1 + (store.address2 || '')">
+                  {{ store.address1 }}{{ store.address2 }}
+                </option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <th>工期:</th>
+            <td><input type="date" v-model="purchaseOrder.Delivery_Date"></td>
+          </tr>
+          <tr>
+            <th>支払期日:</th>
+            <td><input type="date" v-model="purchaseOrder.Payment_Date"></td>
+          </tr>
+          <tr>
+            <th>支払条件:</th>
+            <td><input type="text" v-model="purchaseOrder.Payment_Terms" placeholder="月末締め、翌月末払い"></td>
+          </tr>
+          <tr>
+            <th>見積No:</th>
+            <td><input type="text" v-model="purchaseOrder.Quotation" placeholder="見積番号"></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
 
-      <!-- 消費税率と発注番号・発注日の情報 -->
-      <section class="po-meta-info">
-        <!-- 上段：消費税率（左）と発注番号・発注日（右） -->
-        <div class="meta-top-row">
-          <div class="tax-rate">
-            <span>消費税率</span>
-            <input type="number" v-model.number="purchaseOrder.Tax" class="tax-rate-input" min="0" max="100">
-            <span>%</span>
-          </div>
-          <div class="order-info">
-            <div class="meta-item">
-              <span>発注番号</span>
-              <input type="text" v-model="purchaseOrder.Quotation" class="meta-input">
-            </div>
-            <div class="meta-item">
-              <span>発注日</span>
-              <input type="date" v-model="purchaseOrder.Order_Date" class="meta-input">
-            </div>
-          </div>
-        </div>
-      </section>
+    <!-- 商品リスト -->
+    <section class="po-items">
+      <!-- datalistは入力候補を表示するHTMLの機能 -->
+      <datalist id="product-list">
+        <!-- v-forでpredefinedProducts配列の各要素を繰り返し表示 -->
+        <!-- :keyは各要素を識別するためのユニークな値 -->
+        <option v-for="product in predefinedProducts" :key="product" :value="product"></option>
+      </datalist>
 
-      <p class="order-statement">下記のとおり、発注いたします。</p>
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th class="col-no">No</th>
+            <th class="col-product">商品</th>
+            <th class="col-quantity">数量</th>
+            <!-- no-printクラスは印刷時に非表示にするためのクラス -->
+            <th class="col-actions no-print"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- v-forで商品項目を繰り返し表示 -->
+          <!-- (item, index)でitemは商品データ、indexは配列の番号 -->
+          <tr v-for="(item, index) in purchaseOrder.OrderItems" :key="index">
+            <td>{{ index + 1 }}</td>
+            <td style="vertical-align: top;">
+              <input
+                type="text"
+                v-model="item.Item_Name"
+                list="product-list"
+                placeholder="商品コードまたは商品名"
+                @change="onItemNameChange(item)"
+                style="margin-bottom:2px;"
+              >
+              <div v-if="item.Item_Cd === 0 && item.Item_Name === 'その他' && item.Other_ItemName && item.Other_ItemName.trim() !== ''" style="margin-top:2px; font-size:15px;">
+                {{ item.Other_ItemName }}
+              </div>
+            </td>
+            <td>
+              <input type="number" v-model.number="item.Amount" placeholder="数量">
+            </td>
+            <td class="no-print">
+              <button @click="removeItem(index)" class="remove-btn">削除</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- 新しい商品行を追加するボタン -->
+      <button @click="addItem" class="add-btn no-print">＋ 行を追加</button>
+    </section>
 
-      <!-- 発注詳細情報 -->
-      <section class="po-details">
-        <table class="details-table">
-          <tbody>
-            <!-- 各詳細項目の入力欄 -->
-            <tr>
-              <th>件名:</th>
-              <td><input type="text" v-model="purchaseOrder.Title" placeholder="件名"></td>
-            </tr>
-            <tr>
-              <th>現場住所:</th>
-              <td>
-                <select v-model="purchaseOrder.Location">
-                  <option disabled value="">選択してください</option>
-                  <option v-for="store in stores" :key="store.id" :value="store.address1 + (store.address2 || '')">
-                    {{ store.address1 }}{{ store.address2 }}
-                  </option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <th>工期:</th>
-              <td><input type="date" v-model="purchaseOrder.Delivery_Date"></td>
-            </tr>
-            <tr>
-              <th>支払期日:</th>
-              <td><input type="date" v-model="purchaseOrder.Payment_Date"></td>
-            </tr>
-            <tr>
-              <th>支払条件:</th>
-              <td><input type="text" v-model="purchaseOrder.Payment_Terms" placeholder="月末締め、翌月末払い"></td>
-            </tr>
-            <tr>
-              <th>見積No:</th>
-              <td><input type="text" v-model="purchaseOrder.Quotation" placeholder="見積番号"></td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <!-- 商品リスト -->
-      <section class="po-items">
-        <!-- datalistは入力候補を表示するHTMLの機能 -->
-        <datalist id="product-list">
-          <!-- v-forでpredefinedProducts配列の各要素を繰り返し表示 -->
-          <!-- :keyは各要素を識別するためのユニークな値 -->
-          <option v-for="product in predefinedProducts" :key="product" :value="product"></option>
-        </datalist>
-
-        <table class="items-table">
-          <thead>
-            <tr>
-              <th class="col-no">No</th>
-              <th class="col-product">商品</th>
-              <th class="col-quantity">数量</th>
-              <!-- no-printクラスは印刷時に非表示にするためのクラス -->
-              <th class="col-actions no-print"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- v-forで商品項目を繰り返し表示 -->
-            <!-- (item, index)でitemは商品データ、indexは配列の番号 -->
-            <tr v-for="(item, index) in purchaseOrder.OrderItems" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td style="vertical-align: top;">
-                <input
-                  type="text"
-                  v-model="item.Item_Name"
-                  list="product-list"
-                  placeholder="商品コードまたは商品名"
-                  @change="onItemNameChange(item)"
-                  style="margin-bottom:2px;"
-                >
-                <div v-if="item.Item_Cd === 0 && item.Item_Name === 'その他' && item.Other_ItemName && item.Other_ItemName.trim() !== ''" style="margin-top:2px; font-size:15px;">
-                  {{ item.Other_ItemName }}
-                </div>
-              </td>
-              <td>
-                <input type="number" v-model.number="item.Amount" placeholder="数量">
-              </td>
-              <td class="no-print">
-                <button @click="removeItem(index)" class="remove-btn">削除</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <!-- 新しい商品行を追加するボタン -->
-        <button @click="addItem" class="add-btn no-print">＋ 行を追加</button>
-      </section>
-
-      <!-- 備考欄 -->
-      <section class="po-notes">
-        <label for="notes">備考:</label>
-        <!-- textareaは複数行のテキスト入力欄 -->
-        <textarea id="notes" v-model="purchaseOrder.Other" rows="4"></textarea>
-      </section>
-    </div>
-
-    <!-- フッター部分のボタン群 -->
-    <footer class="actions-footer no-print">
-      <!-- 新規作成ボタン -->
-      <button @click="resetForm" class="action-btn clear-btn">新規作成フォーム</button>
-      
-      <!-- 下書き保存ボタン -->
-      <button @click="handleSave(false)" class="action-btn save-btn" :disabled="isSaving">
-        {{ isSaving ? '保存中...' : (purchaseOrder.Id ? '下書きを更新' : '下書き保存') }}
-      </button>
-      
-      <!-- 確定保存ボタン -->
-      <button @click="handleSave(true)" class="action-btn save-btn" :disabled="isSaving">
-        {{ isSaving ? '保存中...' : (purchaseOrder.Id ? '確定内容を更新' : '確定保存') }}
-      </button>
-      
-      <!-- 印刷ボタン -->
-      <button @click="printPage" class="action-btn print-btn">印刷</button>
-    </footer>
-
-    <!-- 確定済みの場合の警告バナー -->
-    <!-- v-ifは条件に合致する場合のみ要素を表示 -->
-    <div v-if="purchaseOrder.Confirm_Flg" class="confirmed-banner no-print">
-      <p>この発注書は確定済みです。内容は変更できません。</p>
-    </div>
+    <!-- 備考欄 -->
+    <section class="po-notes">
+      <label for="notes">備考:</label>
+      <!-- textareaは複数行のテキスト入力欄 -->
+      <textarea id="notes" v-model="purchaseOrder.Other" rows="4"></textarea>
+    </section>
   </div>
+
+  <!-- フッター部分のボタン群 -->
+  <footer class="actions-footer no-print">
+    <!-- 新規作成ボタン -->
+    <button @click="resetForm" class="action-btn clear-btn">新規作成フォーム</button>
+    
+    <!-- 下書き保存ボタン -->
+    <button @click="handleSave(false)" class="action-btn save-btn" :disabled="isSaving">
+      {{ isSaving ? '保存中...' : (purchaseOrder.Id ? '下書きを更新' : '下書き保存') }}
+    </button>
+    
+    <!-- 確定保存ボタン -->
+    <button @click="handleSave(true)" class="action-btn save-btn" :disabled="isSaving">
+      {{ isSaving ? '保存中...' : (purchaseOrder.Id ? '確定内容を更新' : '確定保存') }}
+    </button>
+    
+    <!-- 印刷ボタン -->
+    <button @click="printPage" class="action-btn print-btn">印刷</button>
+  </footer>
+
+  <!-- 確定済みの場合の警告バナー -->
+  <!-- v-ifは条件に合致する場合のみ要素を表示 -->
+  <div v-if="purchaseOrder.Confirm_Flg" class="confirmed-banner no-print">
+    <p>この発注書は確定済みです。内容は変更できません。</p>
+  </div>
+</div>
 </template>
 
 <script>
@@ -218,276 +218,276 @@ const API_BASE_URL = 'http://localhost:5011';
 
 // 5桁ランダム番号生成関数
 function generateRandomQuotation() {
-  return Math.floor(10000 + Math.random() * 90000);
+return Math.floor(10000 + Math.random() * 90000);
 }
 
 // Vue.jsコンポーネントの定義
 export default {
-  components:{
-  CommonHeader
+components:{
+CommonHeader
 },
 
-  name: 'PurchaseOrder', // コンポーネントの名前
-  props: ['id'], // 親コンポーネントから受け取るプロパティ（発注書のID）
-  
-  // データ定義：このコンポーネントで管理する変数
-  data() {
+name: 'PurchaseOrder', // コンポーネントの名前
+props: ['id'], // 親コンポーネントから受け取るプロパティ（発注書のID）
+
+// データ定義：このコンポーネントで管理する変数
+data() {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const todayStr = `${yyyy}-${mm}-${dd}`;
+  return {
+    isSaving: false,
+    isUnmounted: false,
+    predefinedProducts: [],
+    predefinedProductsList: [], // idとitem_Name両方保持
+    stores: [],
+    purchaseOrder: {
+      Id: null,
+      Title: '',
+      Quotation: generateRandomQuotation(),
+      Tax: 10,
+      Order_Date: todayStr,
+      Delivery_Date: '',
+      Payment_Date: '',
+      Payment_Terms: '',
+      Confirm_Flg: false,
+      Company: { Id: '' },
+      Store: { Id: 1 },
+      Manager: '',
+      Other: '',
+      OrderItems: [
+        { Id: null, Item_Cd: '', Item_Name: '', Amount: 1, Other_ItemName: '' }
+      ],
+      Postal_Code: '',
+      Address1: '',
+      Address2: '',
+      Tel: '',
+      Fax: '',
+      Email: '',
+      CustomerName: ''
+    },
+  };
+},
+
+// watchは特定の値の変化を監視する機能
+// '$route.query.id': {
+//   immediate: true, // コンポーネント作成時にも実行
+//   handler(newId) {
+//     if (newId) {
+//       // IDがある場合は既存データを読み込み
+//       this.loadOrder(newId);
+//     } else {
+//       // IDがない場合は新規作成フォームを表示
+//       this.resetForm();
+//     }
+//   }
+// },
+
+// メソッド定義：このコンポーネントで使用する関数
+methods: {
+  // 新規作成用のフォーム初期化
+  resetForm() {
+    // this.$router.push({ name: 'PurchaseOrder' }); // ルーター遷移は不要
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     const todayStr = `${yyyy}-${mm}-${dd}`;
-    return {
-      isSaving: false,
-      isUnmounted: false,
-      predefinedProducts: [],
-      predefinedProductsList: [], // idとitem_Name両方保持
-      stores: [],
-      purchaseOrder: {
-        Id: null,
-        Title: '',
-        Quotation: generateRandomQuotation(),
-        Tax: 10,
-        Order_Date: todayStr,
-        Delivery_Date: '',
-        Payment_Date: '',
-        Payment_Terms: '',
-        Confirm_Flg: false,
-        Company: { Id: '' },
-        Store: { Id: 1 },
-        Manager: '',
-        Other: '',
-        OrderItems: [
-          { Id: null, Item_Cd: '', Item_Name: '', Amount: 1, Other_ItemName: '' }
-        ],
-        Postal_Code: '',
-        Address1: '',
-        Address2: '',
-        Tel: '',
-        Fax: '',
-        Email: '',
-        CustomerName: ''
-      },
+    this.purchaseOrder = {
+      Id: null,
+      Title: '',
+      Quotation: generateRandomQuotation(),
+      Tax: 10,
+      Order_Date: todayStr,
+      Delivery_Date: '',
+      Payment_Date: '',
+      Payment_Terms: '',
+      Confirm_Flg: false,
+      Company: { Id: '' },
+      Store: { Id: 1 },
+      Manager: '',
+      Other: '',
+      OrderItems: [
+        { Id: null, Item_Cd: '', Item_Name: '', Amount: 1, Other_ItemName: '' }
+      ],
+      Postal_Code: '',
+      Address1: '',
+      Address2: '',
+      Tel: '',
+      Fax: '',
+      Email: '',
+      CustomerName: ''
     };
   },
   
-  // watchは特定の値の変化を監視する機能
-  // '$route.query.id': {
-  //   immediate: true, // コンポーネント作成時にも実行
-  //   handler(newId) {
-  //     if (newId) {
-  //       // IDがある場合は既存データを読み込み
-  //       this.loadOrder(newId);
-  //     } else {
-  //       // IDがない場合は新規作成フォームを表示
-  //       this.resetForm();
-  //     }
-  //   }
-  // },
-  
-  // メソッド定義：このコンポーネントで使用する関数
-  methods: {
-    // 新規作成用のフォーム初期化
-    resetForm() {
-      // this.$router.push({ name: 'PurchaseOrder' }); // ルーター遷移は不要
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
-      const todayStr = `${yyyy}-${mm}-${dd}`;
-      this.purchaseOrder = {
-        Id: null,
-        Title: '',
-        Quotation: generateRandomQuotation(),
-        Tax: 10,
-        Order_Date: todayStr,
-        Delivery_Date: '',
-        Payment_Date: '',
-        Payment_Terms: '',
-        Confirm_Flg: false,
-        Company: { Id: '' },
-        Store: { Id: 1 },
-        Manager: '',
-        Other: '',
-        OrderItems: [
-          { Id: null, Item_Cd: '', Item_Name: '', Amount: 1, Other_ItemName: '' }
-        ],
-        Postal_Code: '',
-        Address1: '',
-        Address2: '',
-        Tel: '',
-        Fax: '',
-        Email: '',
-        CustomerName: ''
+  // 商品行を追加する関数
+  addItem() {
+    if (this.purchaseOrder.Confirm_Flg) return;
+    this.purchaseOrder.OrderItems.push({ Id: null, Item_Cd: '', Item_Name: '', Amount: 1, Other_ItemName: '' });
+  },
+
+  // 商品行を削除する関数
+  removeItem(index) {
+    if (this.purchaseOrder.Confirm_Flg) return;
+    if (this.purchaseOrder.OrderItems.length > 1) {
+      this.purchaseOrder.OrderItems.splice(index, 1);
+    } else {
+      alert('最低1行は必要です。');
+    }
+  },
+
+  // 保存ボタンが押されたときの処理
+  async handleSave(isConfirm) {
+    if (this.purchaseOrder.Confirm_Flg) {
+      alert('この発注書は確定済みのため、保存できません。');
+      return;
+    }
+    this.purchaseOrder.Confirm_Flg = isConfirm;
+    // 編集分岐を削除し、常に新規作成APIのみ呼ぶ
+    await this.saveOrder();
+  },
+
+  // 実際の保存処理（非同期処理）
+  async saveOrder() {
+    this.isSaving = true;
+    try {
+      const payload = {
+        title: this.purchaseOrder.Title,
+        quotation: Number(this.purchaseOrder.Quotation),
+        tax: Number(this.purchaseOrder.Tax),
+        order_Date: this.purchaseOrder.Order_Date ? this.purchaseOrder.Order_Date + 'T00:00:00.000Z' : null,
+        delivery_Date: this.purchaseOrder.Delivery_Date ? this.purchaseOrder.Delivery_Date + 'T00:00:00.000Z' : null,
+        payment_Date: this.purchaseOrder.Payment_Date ? this.purchaseOrder.Payment_Date + 'T00:00:00.000Z' : null,
+        payment_Terms: this.purchaseOrder.Payment_Terms || 'string',
+        confirm_Flg: this.purchaseOrder.Confirm_Flg,
+        manager: this.purchaseOrder.Manager || 'string',
+        other: this.purchaseOrder.Other || 'string',
+        company: {
+          id: Number(this.purchaseOrder.Company.Id),
+          c_Name: this.purchaseOrder.CustomerName || 'string',
+          address1: this.purchaseOrder.Address1 || 'string',
+          address2: this.purchaseOrder.Address2 || 'string',
+          post_Code: this.purchaseOrder.Postal_Code || 'string',
+          mail: this.purchaseOrder.Email || 'string',
+          tel: this.purchaseOrder.Tel || 'string',
+          fax: this.purchaseOrder.Fax || 'string'
+        },
+        store: {
+          id: Number(this.purchaseOrder.Store.Id),
+          c_Name: this.purchaseOrder.Store.c_Name || 'string',
+          address1: this.purchaseOrder.Store.address1 || 'string',
+          address2: this.purchaseOrder.Store.address2 || 'string',
+          post_Code: this.purchaseOrder.Store.post_Code || 'string',
+          mail: this.purchaseOrder.Store.mail || 'string',
+          tel: this.purchaseOrder.Store.tel || 'string',
+          fax: this.purchaseOrder.Store.fax || 'string'
+        },
+        orderItems: this.purchaseOrder.OrderItems
+          .filter(item => item.Item_Name && item.Item_Name.trim() !== '')
+          .map(item => ({
+            item_Cd: Number(item.Item_Cd) || 0,
+            item_Name: item.Item_Name,
+            amount: Number(item.Amount),
+            other_ItemName: item.Other_ItemName || 'string'
+          }))
       };
-    },
-    
-    // 商品行を追加する関数
-    addItem() {
-      if (this.purchaseOrder.Confirm_Flg) return;
-      this.purchaseOrder.OrderItems.push({ Id: null, Item_Cd: '', Item_Name: '', Amount: 1, Other_ItemName: '' });
-    },
-
-    // 商品行を削除する関数
-    removeItem(index) {
-      if (this.purchaseOrder.Confirm_Flg) return;
-      if (this.purchaseOrder.OrderItems.length > 1) {
-        this.purchaseOrder.OrderItems.splice(index, 1);
-      } else {
-        alert('最低1行は必要です。');
-      }
-    },
-
-    // 保存ボタンが押されたときの処理
-    async handleSave(isConfirm) {
-      if (this.purchaseOrder.Confirm_Flg) {
-        alert('この発注書は確定済みのため、保存できません。');
+      // OrderItemsのバリデーション
+      if (payload.orderItems.length === 0) {
+        alert('商品が1つも入力されていません。');
+        this.isSaving = false;
         return;
       }
-      this.purchaseOrder.Confirm_Flg = isConfirm;
-      // 編集分岐を削除し、常に新規作成APIのみ呼ぶ
-      await this.saveOrder();
-    },
-
-    // 実際の保存処理（非同期処理）
-    async saveOrder() {
-      this.isSaving = true;
-      try {
-        const payload = {
-          title: this.purchaseOrder.Title,
-          quotation: Number(this.purchaseOrder.Quotation),
-          tax: Number(this.purchaseOrder.Tax),
-          order_Date: this.purchaseOrder.Order_Date ? this.purchaseOrder.Order_Date + 'T00:00:00.000Z' : null,
-          delivery_Date: this.purchaseOrder.Delivery_Date ? this.purchaseOrder.Delivery_Date + 'T00:00:00.000Z' : null,
-          payment_Date: this.purchaseOrder.Payment_Date ? this.purchaseOrder.Payment_Date + 'T00:00:00.000Z' : null,
-          payment_Terms: this.purchaseOrder.Payment_Terms || 'string',
-          confirm_Flg: this.purchaseOrder.Confirm_Flg,
-          manager: this.purchaseOrder.Manager || 'string',
-          other: this.purchaseOrder.Other || 'string',
-          company: {
-            id: Number(this.purchaseOrder.Company.Id),
-            c_Name: this.purchaseOrder.CustomerName || 'string',
-            address1: this.purchaseOrder.Address1 || 'string',
-            address2: this.purchaseOrder.Address2 || 'string',
-            post_Code: this.purchaseOrder.Postal_Code || 'string',
-            mail: this.purchaseOrder.Email || 'string',
-            tel: this.purchaseOrder.Tel || 'string',
-            fax: this.purchaseOrder.Fax || 'string'
-          },
-          store: {
-            id: Number(this.purchaseOrder.Store.Id),
-            c_Name: this.purchaseOrder.Store.c_Name || 'string',
-            address1: this.purchaseOrder.Store.address1 || 'string',
-            address2: this.purchaseOrder.Store.address2 || 'string',
-            post_Code: this.purchaseOrder.Store.post_Code || 'string',
-            mail: this.purchaseOrder.Store.mail || 'string',
-            tel: this.purchaseOrder.Store.tel || 'string',
-            fax: this.purchaseOrder.Store.fax || 'string'
-          },
-          orderItems: this.purchaseOrder.OrderItems
-            .filter(item => item.Item_Name && item.Item_Name.trim() !== '')
-            .map(item => ({
-              item_Cd: Number(item.Item_Cd) || 0,
-              item_Name: item.Item_Name,
-              amount: Number(item.Amount),
-              other_ItemName: item.Other_ItemName || 'string'
-            }))
-        };
-        // OrderItemsのバリデーション
-        if (payload.orderItems.length === 0) {
-          alert('商品が1つも入力されていません。');
-          this.isSaving = false;
-          return;
-        }
-        // 送信データをコンソールに出力
-        console.log('送信payload:', JSON.stringify(payload, null, 2));
-        const response = await axios.post(`${API_BASE_URL}/api/PurchaseOrders`, payload);
-        if (response.data && response.data.success) {
-          alert('発注書が正常に保存されました。');
-          this.$router.push({ name: 'SavedOrders' });
-          throw '__ROUTER_PUSH__';
-        } else {
-          alert('保存に失敗しました');
-        }
-      } catch (error) {
-        if (error === '__ROUTER_PUSH__') return;
-        if (!this.isUnmounted) alert('保存時にエラーが発生しました');
-      } finally {
-        this.isSaving = false;
-      }
-    },
-    
-    // 印刷機能
-    printPage() {
-      // ブラウザの印刷機能を呼び出し
-      window.print();
-    },
-
-    async onCompanyChange() {
-      const id = this.purchaseOrder.Company.Id;
-      if (!id) return;
-      try {
-        const res = await axios.get(`${API_BASE_URL}/api/Masters/company/${id}`);
-        const c = res.data;
-        this.purchaseOrder.Postal_Code = c.post_Code || '';
-        this.purchaseOrder.Address1 = c.address1 || '';
-        this.purchaseOrder.Address2 = c.address2 || '';
-        this.purchaseOrder.Tel = c.tel || '';
-        this.purchaseOrder.Fax = c.fax || '';
-        this.purchaseOrder.Email = c.mail || '';
-        this.purchaseOrder.CustomerName = c.c_Name || '';
-      } catch (e) {
-        alert('会社情報の取得に失敗しました');
-      }
-    },
-
-    async fetchProducts() {
-      try {
-        const res = await axios.get(`${API_BASE_URL}/api/Masters/items`);
-        if (Array.isArray(res.data)) {
-          this.predefinedProducts = res.data.map(item => item.item_Name);
-          this.predefinedProductsList = res.data; // idとitem_Name両方保持
-        }
-      } catch (e) {
-        alert('商品リストの取得に失敗しました');
-      }
-    },
-
-    async fetchStores() {
-      try {
-        const res = await axios.get(`${API_BASE_URL}/api/Masters/stores`);
-        if (Array.isArray(res.data)) {
-          this.stores = res.data;
-        }
-      } catch (e) {
-        alert('店舗リストの取得に失敗しました');
-      }
-    },
-
-    onItemNameChange(item) {
-      // 商品リストからitem_Nameに一致するidを探してセット
-      const found = this.predefinedProductsList.find(p => p.item_Name === item.Item_Name);
-      if (found) {
-        item.Item_Cd = found.id;
-        item.Other_ItemName = '';
-      } else if (item.Item_Name === 'その他') {
-        item.Item_Cd = 0;
-        // 入力値はother_ItemNameに記録する（item_Nameは'その他'のまま）
-        // 入力欄でother_ItemNameを編集できるようにする
+      // 送信データをコンソールに出力
+      console.log('送信payload:', JSON.stringify(payload, null, 2));
+      const response = await axios.post(`${API_BASE_URL}/api/PurchaseOrders`, payload);
+      if (response.data && response.data.success) {
+        alert('発注書が正常に保存されました。');
+        this.$router.push({ name: 'SavedOrders' });
+        throw '__ROUTER_PUSH__';
       } else {
-        item.Item_Cd = 0;
-        item.Other_ItemName = item.Item_Name;
-        item.Item_Name = 'その他';
+        alert('保存に失敗しました');
       }
-    },
+    } catch (error) {
+      if (error === '__ROUTER_PUSH__') return;
+      if (!this.isUnmounted) alert('保存時にエラーが発生しました');
+    } finally {
+      this.isSaving = false;
+    }
   },
-  mounted() {
-    this.fetchProducts();
-    this.fetchStores();
+  
+  // 印刷機能
+  printPage() {
+    // ブラウザの印刷機能を呼び出し
+    window.print();
   },
-  beforeUnmount() {
-    this.isUnmounted = true;
-  }
+
+  async onCompanyChange() {
+    const id = this.purchaseOrder.Company.Id;
+    if (!id) return;
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/Masters/company/${id}`);
+      const c = res.data;
+      this.purchaseOrder.Postal_Code = c.post_Code || '';
+      this.purchaseOrder.Address1 = c.address1 || '';
+      this.purchaseOrder.Address2 = c.address2 || '';
+      this.purchaseOrder.Tel = c.tel || '';
+      this.purchaseOrder.Fax = c.fax || '';
+      this.purchaseOrder.Email = c.mail || '';
+      this.purchaseOrder.CustomerName = c.c_Name || '';
+    } catch (e) {
+      alert('会社情報の取得に失敗しました');
+    }
+  },
+
+  async fetchProducts() {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/Masters/items`);
+      if (Array.isArray(res.data)) {
+        this.predefinedProducts = res.data.map(item => item.item_Name);
+        this.predefinedProductsList = res.data; // idとitem_Name両方保持
+      }
+    } catch (e) {
+      alert('商品リストの取得に失敗しました');
+    }
+  },
+
+  async fetchStores() {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/Masters/stores`);
+      if (Array.isArray(res.data)) {
+        this.stores = res.data;
+      }
+    } catch (e) {
+      alert('店舗リストの取得に失敗しました');
+    }
+  },
+
+  onItemNameChange(item) {
+    // 商品リストからitem_Nameに一致するidを探してセット
+    const found = this.predefinedProductsList.find(p => p.item_Name === item.Item_Name);
+    if (found) {
+      item.Item_Cd = found.id;
+      item.Other_ItemName = '';
+    } else if (item.Item_Name === 'その他') {
+      item.Item_Cd = 0;
+      // 入力値はother_ItemNameに記録する（item_Nameは'その他'のまま）
+      // 入力欄でother_ItemNameを編集できるようにする
+    } else {
+      item.Item_Cd = 0;
+      item.Other_ItemName = item.Item_Name;
+      item.Item_Name = 'その他';
+    }
+  },
+},
+mounted() {
+  this.fetchProducts();
+  this.fetchStores();
+},
+beforeUnmount() {
+  this.isUnmounted = true;
+}
 };
 </script>
 

@@ -68,7 +68,7 @@
   </template>
 </template>
 <script>
-import { getAllShiftsForAllMonths } from '../services/api';
+import { getAllShiftsForAllMonths, getAllUsers } from '../services/api';
 
 //ヘッダー用
 import CommonHeader from '../components/CommonHeader.vue';
@@ -98,6 +98,7 @@ export default {
     console.log('userId:', sessionStorage.getItem('userId'));
     console.log('userName:', sessionStorage.getItem('userName'));
     console.log('storeId:', sessionStorage.getItem('storeId'));
+    console.log('isAdmin:', sessionStorage.getItem('isAdmin'));
     let year, month;
     // クエリパラメータdateがあれば年月を取得
     if (this.$route.query.date) {
@@ -115,13 +116,17 @@ export default {
     }
     const storeId = sessionStorage.getItem('storeId');
     let allShifts = [];
+    let allUsers = [];
     try {
       allShifts = await getAllShiftsForAllMonths(storeId, year, month);
+      allUsers = await getAllUsers();
     } catch (e) {
       console.error('API error:', e);
       allShifts = [];
+      allUsers = [];
     }
     if (!Array.isArray(allShifts)) allShifts = [];
+    if (!Array.isArray(allUsers)) allUsers = [];
     // --- ネスト構造を展開してusers配列・days配列を生成 ---
     const userMap = {};
     const allDatesSet = new Set();
@@ -129,9 +134,15 @@ export default {
       (monthData.userShifts || []).forEach(userShift => {
         const userId = userShift.user_Id || userShift.userName;
         if (!userMap[userId]) {
+          // ユーザー情報から時給を取得
+          let wage = '';
+          const userInfo = allUsers.find(u => u.id === userShift.user_Id || u.name === userShift.userName);
+          if (userInfo && userInfo.timePrice_D !== undefined) {
+            wage = userInfo.timePrice_D;
+          }
           userMap[userId] = {
             name: userShift.userName,
-            wage: '', // 必要ならuserShiftから取得
+            wage: wage,
             totalWorkTime: 0,
             monthPrice: 0,
             days: []
@@ -203,13 +214,17 @@ export default {
       let month = m;
       const storeId = sessionStorage.getItem('storeId');
       let allShifts = [];
+      let allUsers = [];
       try {
         allShifts = await getAllShiftsForAllMonths(storeId, year, month);
+        allUsers = await getAllUsers();
       } catch (e) {
         console.error('API error:', e);
         allShifts = [];
+        allUsers = [];
       }
       if (!Array.isArray(allShifts)) allShifts = [];
+      if (!Array.isArray(allUsers)) allUsers = [];
       // --- ネスト構造を展開してusers配列・days配列を生成 ---
       const userMap = {};
       const allDatesSet = new Set();
@@ -217,9 +232,15 @@ export default {
         (monthData.userShifts || []).forEach(userShift => {
           const userId = userShift.user_Id || userShift.userName;
           if (!userMap[userId]) {
+            // ユーザー情報から時給を取得
+            let wage = '';
+            const userInfo = allUsers.find(u => u.id === userShift.user_Id || u.name === userShift.userName);
+            if (userInfo && userInfo.timePrice_D !== undefined) {
+              wage = userInfo.timePrice_D;
+            }
             userMap[userId] = {
               name: userShift.userName,
-              wage: '', // 必要ならuserShiftから取得
+              wage: wage,
               totalWorkTime: 0,
               monthPrice: 0,
               days: []

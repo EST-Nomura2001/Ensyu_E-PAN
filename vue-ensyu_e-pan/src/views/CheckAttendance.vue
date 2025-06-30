@@ -137,7 +137,7 @@
       <thead>
         <tr>
           <th>名前</th>
-          <!--<th>時給</th>-->
+          <th>時給</th>
           <th>担当業務</th>
           <th>出勤時間</th>
           <th>退勤時間</th>
@@ -150,7 +150,7 @@
             <th class="event-col">
               {{ schedule.userName }}
             </th>
-            <!--<td >¥{{ schedule.hourlyWage }}</td>-->
+            <td >¥{{ schedule.hourlyWage }}</td>
             <td >{{ schedule.workRollName }}</td>
             <td>{{ schedule.plannedStart }}</td>
             <td>{{ schedule.plannedEnd }}</td>
@@ -360,24 +360,27 @@ const fetchShifts = async (date) => {
     const rawSchedules = Array.isArray(data) ? data : (data.$values || []);
     schedules.value = rawSchedules.flatMap(ds => {
       const dateSchedules = Array.isArray(ds.dateSchedules) ? ds.dateSchedules : [];
-      return dateSchedules.map(dateSchedule => ({
-        scheduleId: dateSchedule.id,
-        userName: dateSchedule.userName || '',
-        hourlyWage: '', // 必要ならAPIで返すようにする
-        workRollName: dateSchedule.workRollName || '',
-        plannedStart: dateSchedule.p_Start_WorkTime
-          ? dateSchedule.p_Start_WorkTime.substring(11, 16)
-          : '',
-        plannedEnd: dateSchedule.p_End_WorkTime
-          ? dateSchedule.p_End_WorkTime.substring(11, 16)
-          : '',
-        hopeStart: dateSchedule.u_Start_WorkTime
-          ? dateSchedule.u_Start_WorkTime.substring(11, 16)
-          : '',
-        hopeEnd: dateSchedule.u_End_WorkTime
-          ? dateSchedule.u_End_WorkTime.substring(11, 16)
-          : ''
-      }));
+      const storeId = Number(sessionStorage.getItem('storeId'));
+      return dateSchedules
+        .filter(dateSchedule => Number(dateSchedule.storeId) === storeId)
+        .map(dateSchedule => ({
+          scheduleId: dateSchedule.id,
+          userName: dateSchedule.userName || '',
+          hourlyWage: dateSchedule.dayPrice ?? '',
+          workRollName: dateSchedule.workRollName || '',
+          plannedStart: dateSchedule.p_Start_WorkTime
+            ? dateSchedule.p_Start_WorkTime.substring(11, 16)
+            : '',
+          plannedEnd: dateSchedule.p_End_WorkTime
+            ? dateSchedule.p_End_WorkTime.substring(11, 16)
+            : '',
+          hopeStart: dateSchedule.u_Start_WorkTime
+            ? dateSchedule.u_Start_WorkTime.substring(11, 16)
+            : '',
+          hopeEnd: dateSchedule.u_End_WorkTime
+            ? dateSchedule.u_End_WorkTime.substring(11, 16)
+            : ''
+        }));
     });
     // 店舗名は必要に応じてセット（APIで取得できる場合のみ）
     storeName.value = rawSchedules.length > 0 && rawSchedules[0].storeName ? rawSchedules[0].storeName : '';

@@ -26,7 +26,7 @@
           <thead>
             <tr>
               <th>名前</th>
-              <!--<th>時給(円)</th>-->
+              <th>時給(円)</th>
               <th>人件費(円)</th>
               <th>勤務時間(h)</th>
               <th>うち深夜勤務時間(h)</th> <!--要相談-->
@@ -40,10 +40,9 @@
           <tbody>
             <tr class="total-row">
               <td>合計</td>
-              <!--<td class="slash-cell"></td>-->
+              <td class="slash-cell"></td>
               <td>{{ totalLaborCost }}</td>
               <td>{{ totalWorkTime }}</td>
-              <td class="slash-cell"></td>
               <td class="slash-cell"></td>
               <td class="slash-cell"></td>
               <td class="slash-cell"></td>
@@ -52,7 +51,7 @@
             </tr>
             <tr v-for="(row, idx) in tableData" :key="idx">
               <td>{{ row.name }}</td>
-              <!--<td>{{ row.wage }}</td>-->
+              <td>{{ row.wage }}</td>
               <td>{{ row.laborCost }}</td>
               <td>{{ row.workTime }}</td>
               <td>{{ row.nightWorkTime }}</td>
@@ -181,13 +180,15 @@ import CommonHeader from '../components/CommonHeader.vue';
             apiTotalWorkTime = dayShift.sum_WorkTime;
           }
           (dayShift.dateSchedules || []).forEach(ds => {
+            const storeId = Number(sessionStorage.getItem('storeId'));
+            if (Number(ds.storeId) !== storeId) return;
             this.tableData.push({
               name: ds.userName || '',
               userId: ds.userId,
               scheduleId: ds.id,
               workRollId: ds.workRollId,
               dayShiftId: ds.dayShiftId,
-              wage: '', // 必要なら追加
+              wage: ds.dayPrice ?? '',
               laborCost: ds.t_DayPrice != null ? Number(ds.t_DayPrice).toLocaleString() : '',
               workTime: ds.t_WorkTime_All ? this.timeStrToHourDecimal(ds.t_WorkTime_All) : '',
               nightWorkTime: ds.t_WorkTime_N ? this.timeStrToHourDecimal(ds.t_WorkTime_N) : '',

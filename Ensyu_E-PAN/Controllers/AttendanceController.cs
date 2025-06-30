@@ -37,6 +37,7 @@ namespace Ensyu_E_PAN.Controllers
                 .Include(ds => ds.UserDateShifts)
                     .ThenInclude(uds => uds.UserShift)
                         .ThenInclude(us => us.User)
+                        .ThenInclude(u => u.Store)
                 .ToListAsync();
 
             // DayShift単位でグループ化
@@ -56,6 +57,7 @@ namespace Ensyu_E_PAN.Controllers
                         DateSchedules = g.Select(ds => new DateScheduleDto
                         {
                             Id = ds.Id,
+                            StoreId = ds.User.Store.Id,
                             Today = ds.Today,
                             P_Start_WorkTime = ds.P_Start_WorkTime,
                             P_End_WorkTime = ds.P_End_WorkTime,
@@ -77,7 +79,8 @@ namespace Ensyu_E_PAN.Controllers
                             WorkRollName = ds.WorkRoll?.Name,
                             DayShiftId = ds.Day_Shift_Id,
                             U_Confirm_Flg = ds.UserDateShifts
-                                .FirstOrDefault()?.UserShift?.U_Confirm_Flg
+                                .FirstOrDefault()?.UserShift?.U_Confirm_Flg,
+                            DayPrice = ds.User.TimePrice_D
                         }).ToList()
                     };
                 })

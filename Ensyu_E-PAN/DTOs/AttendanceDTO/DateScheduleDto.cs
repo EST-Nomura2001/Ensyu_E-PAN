@@ -3,6 +3,7 @@
     public class DateScheduleDto
     {
         public int Id { get; set; }
+        public int StoreId { get; set; }//店舗ID
         public DateTime Today { get; set; }
         public DateTime? P_Start_WorkTime { get; set; }
         public DateTime? P_End_WorkTime { get; set; }
@@ -24,5 +25,6 @@
         public string WorkRollName { get; set; }
         public int DayShiftId { get; set; }
         public bool? U_Confirm_Flg { get; set; }
+        public int DayPrice { get; set; }
     }
 }

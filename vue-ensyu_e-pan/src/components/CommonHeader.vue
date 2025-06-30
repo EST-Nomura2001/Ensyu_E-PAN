@@ -9,7 +9,7 @@ function logout() {
 </script>
 
 <template>
-  <header class="common-header">
+  <header class="common-header no-print">
     <nav>
       <ul class="header-nav">
         <li><RouterLink to="/attendance-management">本日のシフト勤怠登録</RouterLink></li>

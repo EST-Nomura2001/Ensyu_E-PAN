@@ -158,7 +158,7 @@
         <thead>
           <tr>
             <th>名前</th>
-            <!--<th>時給</th>-->
+            <th>時給</th>
             <th>担当業務</th>
             <th>出勤時間</th>
             <th>退勤時間</th>
@@ -172,7 +172,7 @@
               <th class="event-col" rowspan="2">
                 {{ schedule.userName }}
               </th>
-              <!--<td rowspan="2">¥{{ schedule.hourlyWage }}</td>-->
+              <td rowspan="2">¥{{ schedule.hourlyWage }}</td>
               <td rowspan="2">
                 <select v-model="schedule.workRollId">
                   <option :value="0">フリー</option>
@@ -393,27 +393,31 @@ const fetchShifts = async (date) => {
     const data = await getDateSchedulesByDate(dateString);
     console.log('APIレスポンス', data);
     const rawSchedules = Array.isArray(data) ? data : (data.$values || []);
+    const storeId = Number(sessionStorage.getItem('storeId'));
     schedules.value = rawSchedules.flatMap(ds => {
       const dateSchedules = Array.isArray(ds.dateSchedules) ? ds.dateSchedules : [];
-      return dateSchedules.map(dateSchedule => ({
-        scheduleId: dateSchedule.id,
-        userId: dateSchedule.userId,
-        userName: dateSchedule.userName || '',
-        hourlyWage: '', // 必要ならAPIで返すようにする
-        workRollId: dateSchedule.workRollId || 0,
-        plannedStart: dateSchedule.p_Start_WorkTime
-          ? dateSchedule.p_Start_WorkTime.substring(11, 16)
-          : '',
-        plannedEnd: dateSchedule.p_End_WorkTime
-          ? dateSchedule.p_End_WorkTime.substring(11, 16)
-          : '',
-        hopeStart: dateSchedule.u_Start_WorkTime
-          ? dateSchedule.u_Start_WorkTime.substring(11, 16)
-          : '',
-        hopeEnd: dateSchedule.u_End_WorkTime
-          ? dateSchedule.u_End_WorkTime.substring(11, 16)
-          : ''
-      }));
+      // storeIdで絞り込み
+      return dateSchedules
+        .filter(dateSchedule => Number(dateSchedule.storeId) === storeId)
+        .map(dateSchedule => ({
+          scheduleId: dateSchedule.id,
+          userId: dateSchedule.userId,
+          userName: dateSchedule.userName || '',
+          hourlyWage: dateSchedule.dayPrice ?? '',
+          workRollId: dateSchedule.workRollId || 0,
+          plannedStart: dateSchedule.p_Start_WorkTime
+            ? dateSchedule.p_Start_WorkTime.substring(11, 16)
+            : '',
+          plannedEnd: dateSchedule.p_End_WorkTime
+            ? dateSchedule.p_End_WorkTime.substring(11, 16)
+            : '',
+          hopeStart: dateSchedule.u_Start_WorkTime
+            ? dateSchedule.u_Start_WorkTime.substring(11, 16)
+            : '',
+          hopeEnd: dateSchedule.u_End_WorkTime
+            ? dateSchedule.u_End_WorkTime.substring(11, 16)
+            : ''
+        }));
     });
     originalSchedules.value = JSON.parse(JSON.stringify(schedules.value));
     storeName.value = rawSchedules.length > 0 && rawSchedules[0].storeName ? rawSchedules[0].storeName : '';

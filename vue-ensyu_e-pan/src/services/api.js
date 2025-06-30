@@ -244,4 +244,18 @@ export function fetchDateSchedules(today) {
  */
 export function operateAttendance(userId, scheduleId, updateDto) {
   return axios.put(`http://localhost:5011/api/Attendance/users/${userId}/schedules/${scheduleId}`, updateDto);
+}
+
+/**
+ * @description 全ユーザー情報（時給含む）を取得します。
+ * @returns {Promise<Array>} ユーザー情報配列
+ */
+export async function getAllUsers() {
+  try {
+    const response = await axios.get('http://localhost:5011/api/Account/users/all');
+    return response.data;
+  } catch (error) {
+    console.error('全ユーザー情報取得失敗:', error);
+    throw error;
+  }
 } 

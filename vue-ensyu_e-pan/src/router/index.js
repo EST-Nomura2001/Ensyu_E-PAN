@@ -13,21 +13,21 @@ import PurchaseEditOrder from '@/views/PurchaseEditOrder.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { //ホーム（デフォルトのVue機能）
-      path: '/',
-      name: 'home',
-      component: HomeView,
-    },
-    { //アバウト（デフォルトのVue機能）
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
-    },
+    // { //ホーム（デフォルトのVue機能）
+    //   path: '/',
+    //   name: 'home',
+    //   component: HomeView,
+    // },
+    // { //アバウト（デフォルトのVue機能）
+    //   path: '/about',
+    //   name: 'about',
+    //   // route level code-splitting
+    //   // this generates a separate chunk (About.[hash].js) for this route
+    //   // which is lazy-loaded when the route is visited.
+    //   component: () => import('../views/AboutView.vue'),
+    // },
     { //ログイン表示
-      path: '/login',
+      path: '/',  //pathを変更してVueアプリ起動時にログインページを開けるように設定
       name: 'login',
       component: LoginPageView,
     },

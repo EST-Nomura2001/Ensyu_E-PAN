@@ -7,7 +7,7 @@
       <label>表示中の日付：</label>
       <span>{{ formatDateJp(selectedDate) }}</span>
     </div>
-    <div style="margin-bottom: 16px;">
+    <div v-if="canOperate" style="margin-bottom: 16px;">
       <button @click="goToEditAttendance">編集画面へ</button>
     </div>
 
@@ -152,7 +152,10 @@ export default {
         const shift = item?.userDateShifts.find(s => s.id === scheduleId);
         const ds = shift?.dateSchedule;
         if (!ds) throw new Error('シフト情報が見つかりません');
-        // UpdateDateScheduleDtoを作成
+        if (ds.start_WorkTime) {
+          const result = window.confirm('すでに出勤時間が登録されています。上書きしますか？');
+          if (!result) return;
+        }
         const now = new Date();
         const updateDto = {
           Id: ds.id,
@@ -166,6 +169,8 @@ export default {
         };
         await operateAttendance(userId, scheduleId, updateDto);
         await fetchData();
+        // ポップアップ表示
+        alert(`${item.userName}さんの出勤時間を登録しました。\n出勤時間：${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
       } catch (e) {
         alert('出勤処理に失敗しました');
       }
@@ -176,6 +181,10 @@ export default {
         const shift = item?.userDateShifts.find(s => s.id === scheduleId);
         const ds = shift?.dateSchedule;
         if (!ds) throw new Error('シフト情報が見つかりません');
+        if (ds.end_WorkTime) {
+          const result = window.confirm('すでに退勤時間が登録されています。上書きしますか？');
+          if (!result) return;
+        }
         const now = new Date();
         const updateDto = {
           Id: ds.id,
@@ -189,6 +198,7 @@ export default {
         };
         await operateAttendance(userId, scheduleId, updateDto);
         await fetchData();
+        alert(`${item.userName}さんの退勤時間を登録しました。\n退勤時間：${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
       } catch (e) {
         alert('退勤処理に失敗しました');
       }
@@ -199,6 +209,10 @@ export default {
         const shift = item?.userDateShifts.find(s => s.id === scheduleId);
         const ds = shift?.dateSchedule;
         if (!ds) throw new Error('シフト情報が見つかりません');
+        if (ds.start_BreakTime) {
+          const result = window.confirm('すでに休憩開始時間が登録されています。上書きしますか？');
+          if (!result) return;
+        }
         const now = new Date();
         const updateDto = {
           Id: ds.id,
@@ -212,6 +226,7 @@ export default {
         };
         await operateAttendance(userId, scheduleId, updateDto);
         await fetchData();
+        alert(`${item.userName}さんの休憩開始時間を登録しました。\n休憩開始時間：${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
       } catch (e) {
         alert('休憩入処理に失敗しました');
       }
@@ -222,6 +237,10 @@ export default {
         const shift = item?.userDateShifts.find(s => s.id === scheduleId);
         const ds = shift?.dateSchedule;
         if (!ds) throw new Error('シフト情報が見つかりません');
+        if (ds.end_BreakTime) {
+          const result = window.confirm('すでに休憩終了時間が登録されています。上書きしますか？');
+          if (!result) return;
+        }
         const now = new Date();
         const updateDto = {
           Id: ds.id,
@@ -235,6 +254,7 @@ export default {
         };
         await operateAttendance(userId, scheduleId, updateDto);
         await fetchData();
+        alert(`${item.userName}さんの休憩終了時間を登録しました。\n休憩終了時間：${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
       } catch (e) {
         alert('休憩戻処理に失敗しました');
       }

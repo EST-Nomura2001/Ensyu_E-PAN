@@ -2,7 +2,8 @@
  田村 -->
 
 <template>
-  <CommonHeader />
+  <CommonHeader v-if="canOperate" />
+  <PartTimeHeader v-else />
   <!--<div style="margin: 10px 0; padding: 10px; background: #f9f9f9; border: 1px solid #ccc;">
     <label>テスト用ユーザーID: <input type="number" v-model.number="testUserId" style="width: 60px;" /></label>
     <button @click="setTestUserId">設定</button>
@@ -82,6 +83,7 @@ import * as api from '@/services/api';
 
 //ヘッダー用
 import CommonHeader from '../components/CommonHeader.vue';
+import PartTimeHeader from '../components/PartTimeHeader.vue';
 
 export default {
   props: {
@@ -319,8 +321,14 @@ export default {
       this.fetchInitialData();
     },
   },
+  computed: {
+    canOperate() {
+      return sessionStorage.getItem('isAdmin') === 'true';
+    }
+  },
   components: {
-    CommonHeader
+    CommonHeader,
+    PartTimeHeader
   },
 };
 </script>
@@ -334,7 +342,6 @@ export default {
 }
 
 h1 {
-  text-align: center;
   margin-bottom: 20px;
 }
 

@@ -1,5 +1,6 @@
 <template>
   <CommonHeader v-if="canOperate" />
+  <PartTimeHeader v-else />
   <div class="attendance-management">
     <h1>勤怠管理</h1>
     <div>
@@ -61,6 +62,7 @@ import { useRouter } from 'vue-router';
 
 //ヘッダー用
 import CommonHeader from '../components/CommonHeader.vue';
+import PartTimeHeader from '../components/PartTimeHeader.vue';
 
 export default {
   name: 'AttendanceManagement',
@@ -270,7 +272,8 @@ export default {
 
   //ヘッダー用
   components: {
-    CommonHeader
+    CommonHeader,
+    PartTimeHeader
   },
 };
 </script>

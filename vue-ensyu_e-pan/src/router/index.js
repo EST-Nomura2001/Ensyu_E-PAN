@@ -121,13 +121,13 @@ router.beforeEach((to, from, next) => {
   const userRole = localStorage.getItem('role') // ユーザーの役割
 
   if (requiresAuth && !isAuthenticated) {
-    next('/login')
+    next('/')
   } else if (isAuthenticated && to.name === 'login') {
     // ログインしているユーザーがログインページにアクセスしようとした場合
-    next('/') // ホームにリダイレクト
+    next('/attendance-management') // 本日の勤怠にリダイレクト
   } else if (requiresAuth && to.meta.role && to.meta.role !== userRole) {
     // 必要な役割があるルートで、ユーザーの役割が一致しない場合
-    next('/') // またはアクセス拒否ページへリダイレクト
+    next('/attendance-management') // 
   } else {
     next()
   }

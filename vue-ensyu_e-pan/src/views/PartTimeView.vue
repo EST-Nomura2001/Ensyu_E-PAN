@@ -9,12 +9,11 @@ const loggedInUserName = ref(sessionStorage.getItem('userName') || '');
 function logout() {
   sessionStorage.removeItem('userRole');
   sessionStorage.removeItem('userName');
-  router.push('/login');
+  router.push('/');
 }
 </script>
 
 <template>
-  <CommonHeader />
   <div id="partTimePage" class="container page">
     <h2>アルバイトページ</h2>
     <p>ようこそ、{{ loggedInUserName }}さん (アルバイト)！</p>

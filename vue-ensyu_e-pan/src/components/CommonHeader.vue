@@ -4,7 +4,7 @@ import { RouterLink, useRouter } from 'vue-router'
 const router = useRouter();
 function logout() {
   sessionStorage.clear();
-  router.push('/login');
+  router.push('/');
 }
 </script>
 

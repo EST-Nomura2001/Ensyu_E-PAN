@@ -1,5 +1,5 @@
 <template>
-  <CommonHeader />
+  <CommonHeader v-if="canOperate" />
   <div class="attendance-management">
     <h1>勤怠管理</h1>
     <div>
